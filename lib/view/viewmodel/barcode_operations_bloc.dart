@@ -23,7 +23,5 @@ class BarcodeOperationsBloc extends Bloc<BarcodeEvent, BarcodeState> {
 
     }
   }
-  void _deleteBarcode(BarcodeEvent event, Emitter<BarcodeState> emit) {}
-
 }
 
