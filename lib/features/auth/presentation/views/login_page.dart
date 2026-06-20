@@ -8,7 +8,6 @@ import 'package:inventory_count_flutter_app/features/auth/presentation/widgets/l
 import 'package:inventory_count_flutter_app/features/auth/presentation/widgets/login_header.dart';
 import 'package:inventory_count_flutter_app/features/auth/presentation/widgets/version.dart';
 
-
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -40,8 +39,6 @@ class _LoginPageState extends State<LoginPage> {
             Navigator.of(context).pushReplacementNamed(Routes.scanner);
             return;
           }
-
-
         },
         builder: (BuildContext context, AuthState state) {
           final double pagePadding = ResponsiveUtils.responsiveSpacing(
@@ -86,39 +83,39 @@ class _LoginPageState extends State<LoginPage> {
                       child: LayoutBuilder(
                         builder:
                             (
-                            BuildContext context,
-                            BoxConstraints innerConstraints,
+                              BuildContext context,
+                              BoxConstraints innerConstraints,
                             ) {
-                          return ConstrainedBox(
-                            constraints: BoxConstraints(
-                              minHeight: innerConstraints.maxHeight,
-                            ),
-                            child: SingleChildScrollView(
-                              child: Column(
-                                mainAxisAlignment: isCompactLayout
-                                    ? MainAxisAlignment.start
-                                    : MainAxisAlignment.center,
-                                children: <Widget>[
-                                  LoginHeader(compact: isCompactLayout),
-                                  SizedBox(height: sectionGap),
-                                  LoginForm(
-                                    formKey: _formKey,
-                                    passwordController: _passwordController,
-                                    compact: isCompactLayout,
-                                  ),
-                                  if (state.status == AuthStatus.loading)
-                                    Padding(
-                                      padding: EdgeInsets.only(
-                                        top: loadingGap,
+                              return ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  minHeight: innerConstraints.maxHeight,
+                                ),
+                                child: SingleChildScrollView(
+                                  child: Column(
+                                    mainAxisAlignment: isCompactLayout
+                                        ? MainAxisAlignment.start
+                                        : MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      LoginHeader(compact: isCompactLayout),
+                                      SizedBox(height: sectionGap),
+                                      LoginForm(
+                                        formKey: _formKey,
+                                        passwordController: _passwordController,
+                                        compact: isCompactLayout,
                                       ),
-                                      child:
-                                      const CircularProgressIndicator(),
-                                    ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
+                                      if (state.status == AuthStatus.loading)
+                                        Padding(
+                                          padding: EdgeInsets.only(
+                                            top: loadingGap,
+                                          ),
+                                          child:
+                                              const CircularProgressIndicator(),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
                       ),
                     ),
                     if (showVersion)

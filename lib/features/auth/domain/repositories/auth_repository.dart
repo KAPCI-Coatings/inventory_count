@@ -1,5 +1,3 @@
-
-
 import 'package:inventory_count_flutter_app/features/auth/domain/entities/auth_user.dart';
 
 abstract class AuthRepository {

@@ -49,10 +49,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     _isInitialized = true;
   }
 
-  void _onRoleSelected(
-    AuthRoleSelected event,
-    Emitter<AuthState> emit,
-  ) {
+  void _onRoleSelected(AuthRoleSelected event, Emitter<AuthState> emit) {
     final role = event.role;
     if (role != 'Admin' && role != 'User') {
       return;

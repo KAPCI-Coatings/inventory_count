@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inventory_count_flutter_app/core/utils/colors.dart';
+import 'package:inventory_count_flutter_app/core/widgets/custom_dropdown_field.dart';
 import 'package:inventory_count_flutter_app/features/auth/presentation/view%20models/auth_bloc.dart';
 import 'package:inventory_count_flutter_app/features/auth/presentation/view%20models/auth_event.dart';
 import 'package:inventory_count_flutter_app/features/auth/presentation/view%20models/auth_state.dart';
-import 'package:inventory_count_flutter_app/core/widgets/custom_dropdown_field.dart';
 
-
-import '../../../../core/resources/responsive_utils.dart';
+import '../../../../../../core/resources/responsive_utils.dart';
 
 class LoginForm extends StatelessWidget {
   final GlobalKey<FormState> formKey;
@@ -84,16 +83,17 @@ class LoginForm extends StatelessWidget {
 
           final Color borderColor = isError ? AppColors.errorRed : Colors.black;
 
-          final InputDecoration dynamicDecoration = inputDecorationTemplate.copyWith(
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: borderColor, width: 2),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: borderColor, width: 2),
-            ),
-          );
+          final InputDecoration dynamicDecoration = inputDecorationTemplate
+              .copyWith(
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: borderColor, width: 2),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: borderColor, width: 2),
+                ),
+              );
 
           return Column(
             children: <Widget>[
@@ -132,9 +132,7 @@ class LoginForm extends StatelessWidget {
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
                   ),
-                  decoration: dynamicDecoration.copyWith(
-                    labelText: 'Password',
-                  ),
+                  decoration: dynamicDecoration.copyWith(labelText: 'Password'),
                 ),
               ),
               if (isError)

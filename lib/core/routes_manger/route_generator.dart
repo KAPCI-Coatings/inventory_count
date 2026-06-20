@@ -13,7 +13,9 @@ class RouteGenerator {
         return _buildRoute(const LoginPage());
       case Routes.scanner:
         // For now, return a placeholder or LoginPage if scanner page is not ready
-        return _buildRoute(const Scaffold(body: Center(child: Text('Scanner Page Placeholder'))));
+        return _buildRoute(
+          const Scaffold(body: Center(child: Text('Scanner Page Placeholder'))),
+        );
       default:
         return _buildRoute(const LoginPage());
     }

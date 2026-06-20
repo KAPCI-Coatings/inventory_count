@@ -5,7 +5,6 @@ import 'package:inventory_count_flutter_app/features/auth/data/models/auth_user_
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 
-
 String hashAuthPin(String value) {
   return sha256.convert(utf8.encode(value)).toString();
 }
@@ -62,7 +61,7 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
 
     batch.insert(
       _usersTable,
-      AuthUserModel(role: 'User', passwordHash: hashAuthPin('1')).toMap(),
+      AuthUserModel(role: 'User', passwordHash: hashAuthPin('11')).toMap(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
 

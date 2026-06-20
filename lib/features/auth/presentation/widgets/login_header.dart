@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/resources/responsive_utils.dart';
+import '../../../../../../core/resources/responsive_utils.dart';
 
 class LoginHeader extends StatelessWidget {
   final bool compact;

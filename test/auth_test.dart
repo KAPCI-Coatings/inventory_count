@@ -14,7 +14,7 @@ void main() {
     // User: 1
     final adminHash = hashAuthPin('123456789');
     final userHash = hashAuthPin('1');
-    
+
     expect(adminHash, isNot(equals(userHash)));
   });
 }

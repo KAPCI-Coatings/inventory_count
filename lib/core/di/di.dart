@@ -32,10 +32,7 @@ Future<void> initAppModule() async {
 
     // Data Sources
     instance.registerLazySingleton<AuthLocalDataSource>(
-      () => AuthLocalDataSourceImpl(
-        database: instance(),
-        prefs: instance(),
-      ),
+      () => AuthLocalDataSourceImpl(database: instance(), prefs: instance()),
     );
 
     // Repositories
