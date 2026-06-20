@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inventory_count_flutter_app/core/utils/colors.dart';
 import 'package:inventory_count_flutter_app/core/widgets/custom_dropdown_field.dart';
+import 'package:inventory_count_flutter_app/core/widgets/default_button.dart';
 import 'package:inventory_count_flutter_app/features/auth/presentation/view%20models/auth_bloc.dart';
 import 'package:inventory_count_flutter_app/features/auth/presentation/view%20models/auth_event.dart';
 import 'package:inventory_count_flutter_app/features/auth/presentation/view%20models/auth_state.dart';
@@ -106,6 +107,7 @@ class LoginForm extends StatelessWidget {
                     context.read<AuthBloc>().add(AuthRoleSelected(value));
                   }
                 },
+                labelText: 'Username',
                 fontSize: fieldFont,
                 decoration: dynamicDecoration,
                 isLoading: isLoading,
@@ -150,46 +152,19 @@ class LoginForm extends StatelessWidget {
                   ),
                 ),
               SizedBox(height: buttonGap),
-              Container(
+              DefaultButton(
+                text: 'Login',
+                onPressed: () {
+                  if (formKey.currentState?.validate() ?? false) {
+                    context.read<AuthBloc>().add(
+                      AuthLoginRequested(passwordController.text),
+                    );
+                  }
+                },
+                isLoading: isLoading,
                 width: ResponsiveUtils.responsiveWidth(context, 0.6),
                 height: buttonHeight,
-                decoration: BoxDecoration(
-                  boxShadow: <BoxShadow>[
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.2),
-                      blurRadius: 4,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.button,
-                    foregroundColor: AppColors.text,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                      side: const BorderSide(color: Colors.black, width: 2),
-                    ),
-                  ),
-                  onPressed: isLoading
-                      ? null
-                      : () {
-                          if (formKey.currentState?.validate() ?? false) {
-                            context.read<AuthBloc>().add(
-                              AuthLoginRequested(passwordController.text),
-                            );
-                          }
-                        },
-                  child: Text(
-                    'Login',
-                    style: textTheme.titleMedium?.copyWith(
-                      fontSize: buttonTextSize,
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
+                textSize: buttonTextSize,
               ),
             ],
           );
