@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:inventory_count_flutter_app/data/datasource/auth_local_datasource.dart';
+import 'package:inventory_count_flutter_app/features/auth/data/datasource/auth_local_datasource.dart';
 
 void main() {
   test('Password hashing should be consistent', () {

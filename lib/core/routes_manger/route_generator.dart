@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:inventory_count_flutter_app/view/pages/login_page.dart';
+import 'package:inventory_count_flutter_app/features/auth/presentation/views/login_page.dart';
 
 import 'routes.dart';
 

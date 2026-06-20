@@ -1,13 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
-import 'package:inventory_count_flutter_app/data/datasource/auth_local_datasource.dart';
-import 'package:inventory_count_flutter_app/data/repos/auth_repository_impl.dart';
-import 'package:inventory_count_flutter_app/domain/repos/auth_repository.dart';
-import 'package:inventory_count_flutter_app/domain/usecase/change_password_usecase.dart';
-import 'package:inventory_count_flutter_app/domain/usecase/get_last_role_usecase.dart';
-import 'package:inventory_count_flutter_app/domain/usecase/initialize_auth_usecase.dart';
-import 'package:inventory_count_flutter_app/domain/usecase/login_usecase.dart';
-import 'package:inventory_count_flutter_app/view/viewmodel/auth/auth_cubit.dart';
+import 'package:inventory_count_flutter_app/features/auth/data/datasource/auth_local_datasource.dart';
+import 'package:inventory_count_flutter_app/features/auth/data/repositories/auth_repository_impl.dart';
+import 'package:inventory_count_flutter_app/features/auth/domain/repositories/auth_repository.dart';
+import 'package:inventory_count_flutter_app/features/auth/domain/uescases/change_password_usecase.dart';
+import 'package:inventory_count_flutter_app/features/auth/domain/uescases/get_last_role_usecase.dart';
+import 'package:inventory_count_flutter_app/features/auth/domain/uescases/initialize_auth_usecase.dart';
+import 'package:inventory_count_flutter_app/features/auth/domain/uescases/login_usecase.dart';
+import 'package:inventory_count_flutter_app/features/auth/presentation/view%20models/auth_bloc.dart';
 import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
@@ -57,9 +57,9 @@ Future<void> initAppModule() async {
       () => ChangePasswordUseCase(instance()),
     );
 
-    // Cubits
-    instance.registerFactory<AuthCubit>(
-      () => AuthCubit(
+    // Blocs
+    instance.registerFactory<AuthBloc>(
+      () => AuthBloc(
         initializeAuth: instance(),
         loginUseCase: instance(),
         getLastRoleUseCase: instance(),
