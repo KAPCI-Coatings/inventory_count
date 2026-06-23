@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:inventory_count_flutter_app/core/resources/responsive_utils.dart';
 import 'package:inventory_count_flutter_app/core/utils/colors.dart';
 
 class DefaultButton extends StatelessWidget {
@@ -28,6 +29,7 @@ class DefaultButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
+    final double radius = ResponsiveUtils.responsiveRadius(context, 15);
 
     return Container(
       width: width,
@@ -47,7 +49,7 @@ class DefaultButton extends StatelessWidget {
           foregroundColor: textColor ?? AppColors.text,
           elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
+            borderRadius: BorderRadius.circular(radius),
             side: BorderSide(color: borderColor ?? Colors.black, width: 2),
           ),
         ),

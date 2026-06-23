@@ -9,19 +9,19 @@ class AppException implements Exception {
 }
 
 class ServerException extends AppException {
-  ServerException([String message = 'Server Error Occurred']) : super(message);
+  ServerException([super.message = 'Server Error Occurred']);
 }
 
 class CacheException extends AppException {
-  CacheException([String message = 'Cache Error Occurred']) : super(message);
+  CacheException([super.message = 'Cache Error Occurred']);
 }
 
 class NetworkException extends AppException {
-  NetworkException([String message = 'No Internet Connection']) : super(message);
+  NetworkException([super.message = 'No Internet Connection']);
 }
 
 class ValidationException extends AppException {
-  ValidationException([String message = 'Validation Error']) : super(message);
+  ValidationException([super.message = 'Validation Error']);
 }
 
 class ExceptionHandler {
