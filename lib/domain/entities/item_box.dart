@@ -28,8 +28,7 @@ class ItemBox extends Equatable {
   /// (21 characters, starting with 'P').
   static bool isPalletBarcode(String barcode) {
     final String normalized = barcode.replaceAll(RegExp(r'\s+'), '').trim();
-    return normalized.length == 21 &&
-        normalized[0].toUpperCase() == 'P';
+    return normalized.length == 21 && normalized[0].toUpperCase() == 'P';
   }
 
   /// Parses a raw barcode into an [ItemBox].
@@ -60,7 +59,7 @@ class ItemBox extends Equatable {
         matnr: material,
         qty: qty,
         batchNo: batch,
-        serialNo: palletType, // store pallet type letter in serialNo
+        serialNo: '-',
         barCodeNo: normalized,
         palletBox: palletType,
         readDate: readDate ?? DateTime.now(),
@@ -105,7 +104,7 @@ class ItemBox extends Equatable {
   factory ItemBox.fromCacheJson(Map<String, dynamic> json) {
     return ItemBox(
       matnr: (json['matnr'] as String?) ?? '',
-      qty: (json['qty'] as num?)?.toInt() ?? 1,
+      qty: (json['qty'] as num?)?.toInt() ?? 0,
       batchNo: (json['batch_No'] as String?) ?? '',
       serialNo: (json['serial_No'] as String?) ?? '',
       barCodeNo: (json['barCode_No'] as String?) ?? '',

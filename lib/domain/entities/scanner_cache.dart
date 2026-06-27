@@ -8,7 +8,7 @@ class ScannerCache {
 
   const ScannerCache({
     this.itemBoxes = const <ItemBox>[],
-    this.palletCount = 1,
+    this.palletCount = 0,
     this.dailyScanCount = 0,
     this.dailyKey = '',
   });
@@ -47,7 +47,7 @@ class ScannerCache {
           .whereType<Map<String, dynamic>>()
           .map(ItemBox.fromCacheJson)
           .toList(growable: false),
-      palletCount: (json['palletCount'] as num?)?.toInt() ?? 1,
+      palletCount: (json['palletCount'] as num?)?.toInt() ?? 0,
       dailyScanCount: (json['dailyScanCount'] as num?)?.toInt() ?? 0,
       dailyKey: (json['dailyKey'] as String?) ?? '',
     );

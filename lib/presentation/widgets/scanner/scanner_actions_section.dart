@@ -50,7 +50,7 @@ class ScannerActionsSection extends StatelessWidget {
                         text: 'Settings',
                         onPressed: isBusy
                             ? null
-                            : () { /* TODO: handle settings */ },
+                            : () => Navigator.of(context).pushNamed(Routes.settings),
                         backgroundColor: Colors.grey.shade400,
                         textColor: Colors.black,
                         textSize: ResponsiveUtils.responsiveFontSize(context, 16),
@@ -62,7 +62,7 @@ class ScannerActionsSection extends StatelessWidget {
                         text: 'Search',
                         onPressed: isBusy
                             ? null
-                            : () { /* TODO: handle search */ },
+                            : () => Navigator.of(context).pushNamed(Routes.search),
                         backgroundColor: Colors.grey.shade400,
                         textColor: Colors.black,
                         textSize: ResponsiveUtils.responsiveFontSize(context, 16),

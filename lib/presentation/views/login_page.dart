@@ -6,6 +6,8 @@ import 'package:inventory_count_flutter_app/presentation/view_models/auth/auth_s
 import 'package:inventory_count_flutter_app/presentation/widgets/auth/login_form.dart';
 import 'package:inventory_count_flutter_app/presentation/widgets/auth/login_header.dart';
 import 'package:inventory_count_flutter_app/presentation/widgets/auth/version.dart';
+import 'package:inventory_count_flutter_app/presentation/view_models/settings/settings_bloc.dart';
+import 'package:inventory_count_flutter_app/presentation/view_models/settings/settings_state.dart';
 
 import '../view_models/auth/auth_bloc.dart';
 
@@ -38,7 +40,12 @@ class _LoginPageState extends State<LoginPage> {
         },
         listener: (BuildContext context, AuthState state) {
           if (state.status == AuthStatus.authenticated) {
-            Navigator.of(context).pushReplacementNamed(Routes.scanner);
+            final SettingsState settingsState = context.read<SettingsBloc>().state;
+            if (settingsState.selectedOption == SettingsOption.asset) {
+              Navigator.of(context).pushReplacementNamed(Routes.assets);
+            } else {
+              Navigator.of(context).pushReplacementNamed(Routes.scanner);
+            }
             return;
           }
         },

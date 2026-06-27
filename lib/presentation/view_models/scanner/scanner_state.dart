@@ -30,7 +30,7 @@ class ScannerState extends Equatable {
     this.lastScan,
     this.itemBoxes = const <ItemBox>[],
     this.currentOrderItemBoxes = const <ItemBox>[],
-    this.palletCount = 1,
+    this.palletCount = 0,
     this.dailyScanCount = 0,
     this.dailyKey = '',
     this.baseUrl = 'http://10.10.30.47:2604',

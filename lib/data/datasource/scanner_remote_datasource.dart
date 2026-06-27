@@ -13,7 +13,7 @@ abstract class ScannerRemoteDataSource {
 }
 
 class ScannerRemoteDataSourceImpl implements ScannerRemoteDataSource {
-  static const String _endpoint = '/api/HandelingDetailV2';
+  static const String _endpoint = '';
 
   final http.Client _client;
 

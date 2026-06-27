@@ -135,27 +135,13 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
       } else {
         // ── Box scan ──
         final List<ItemBox> currentOrderItems = state.currentOrderItemBoxes;
-        if (currentOrderItems.isNotEmpty) {
-          final ItemBox firstItem = currentOrderItems.first;
-          final bool hasDifferentMaterialOrBatch =
-              itemBox.matnr != firstItem.matnr ||
-              itemBox.batchNo != firstItem.batchNo;
 
-          if (hasDifferentMaterialOrBatch) {
-            await _triggerWrongBarcodeFlow(
-              'يجب أن يكون الماتيريال والباتش مطابقين لأول باركود تم قراءته.',
-              emit,
-            );
-            return;
-          }
-        }
-
-        final bool duplicateSerial = currentOrderItems.any(
-          (ItemBox existing) => existing.serialNo == itemBox.serialNo,
+        final bool duplicateBarcode = currentOrderItems.any(
+          (ItemBox existing) => existing.barCodeNo == itemBox.barCodeNo,
         );
 
-        if (duplicateSerial) {
-          await _triggerWrongBarcodeFlow('رقم السيريال مكرر داخل نفس الأوردر.', emit);
+        if (duplicateBarcode) {
+          await _triggerWrongBarcodeFlow('هذا الباركود مكرر داخل نفس الأوردر.', emit);
           return;
         }
 
@@ -188,6 +174,9 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
     )..add(itemBox);
 
     final int nextDailyScanCount = state.dailyScanCount + itemBox.qty;
+    final int nextPalletCount = itemBox.isPallet
+        ? state.palletCount + 1
+        : state.palletCount;
     final String todayKey = _todayKey();
 
     emit(
@@ -197,6 +186,7 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
         itemBoxes: nextAllItems,
         currentOrderItemBoxes: nextCurrentOrderItems,
         dailyScanCount: nextDailyScanCount,
+        palletCount: nextPalletCount,
         dailyKey: todayKey,
         message: null,
         centeredErrorMessage: null,
@@ -208,7 +198,7 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
 
     await _persistCache(
       itemBoxes: nextAllItems,
-      palletCount: state.palletCount,
+      palletCount: nextPalletCount,
       dailyScanCount: nextDailyScanCount,
       dailyKey: todayKey,
     );
@@ -306,8 +296,8 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
       final int normalizedDailyCount = cache.dailyKey == todayKey
           ? cache.dailyScanCount
           : 0;
-      final int normalizedPalletCount = cache.palletCount < 1
-          ? 1
+      final int normalizedPalletCount = cache.palletCount < 0
+          ? 0
           : cache.palletCount;
 
       await _initializeScanner();
@@ -367,7 +357,7 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
         status: ScannerStatus.ready,
         lastScan: null,
         currentOrderItemBoxes: const <ItemBox>[],
-        palletCount: 1,
+        palletCount: 0,
         dailyKey: todayKey,
         message: null,
         centeredErrorMessage: null,

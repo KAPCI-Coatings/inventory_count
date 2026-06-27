@@ -10,6 +10,9 @@ import 'package:inventory_count_flutter_app/presentation/view_models/auth/auth_b
 import 'package:inventory_count_flutter_app/presentation/view_models/auth/auth_event.dart';
 import 'package:inventory_count_flutter_app/presentation/view_models/scanner/scanner_bloc.dart';
 import 'package:inventory_count_flutter_app/presentation/view_models/scanner/scanner_event.dart';
+import 'package:inventory_count_flutter_app/presentation/view_models/settings/settings_bloc.dart';
+import 'package:inventory_count_flutter_app/presentation/view_models/settings/settings_event.dart';
+import 'package:inventory_count_flutter_app/l10n/app_localizations.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 
@@ -42,10 +45,16 @@ class MyApp extends StatelessWidget {
           instance<ScannerBloc>()
             ..add(ScannerInitializeRequested()),
         ),
+        BlocProvider<SettingsBloc>(
+          create: (BuildContext context) => instance<SettingsBloc>()
+            ..add(SettingsLoaded()),
+        ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Inventory Count',
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,

@@ -59,7 +59,7 @@ class ScannerStatusSection extends StatelessWidget {
             SizedBox(height: spacing),
             _InfoRow(
               label: 'Pallet Count',
-              value: state.palletCount.toString(),
+              value: state.palletCount == 0 ? '-' : state.palletCount.toString(),
               style: style,
             ),
           ],

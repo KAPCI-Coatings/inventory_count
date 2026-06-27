@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:inventory_count_flutter_app/core/routes_manger/routes.dart';
 
 
 class ScannerAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -22,7 +23,7 @@ class ScannerAppBar extends StatelessWidget implements PreferredSizeWidget {
       leading: showBack
           ? IconButton(
               icon: const Icon(Icons.arrow_back),
-              onPressed: () => Navigator.of(context).maybePop(),
+              onPressed: () => Navigator.of(context).pushReplacementNamed(Routes.login),
             )
           : null,
       title: title.isEmpty

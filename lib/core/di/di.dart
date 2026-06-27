@@ -30,6 +30,8 @@ import 'package:inventory_count_flutter_app/domain/uescases/load_scanner_cache_u
 import 'package:inventory_count_flutter_app/domain/uescases/post_handling_details_usecase.dart';
 import 'package:inventory_count_flutter_app/domain/uescases/switch_profile_usecase.dart';
 import 'package:inventory_count_flutter_app/presentation/view_models/scanner/scanner_bloc.dart';
+import 'package:inventory_count_flutter_app/presentation/view_models/settings/settings_bloc.dart';
+import 'package:inventory_count_flutter_app/presentation/view_models/search/search_bloc.dart';
 
 final GetIt instance = GetIt.instance;
 
@@ -160,6 +162,18 @@ Future<void> initAppModule() async {
         saveScannerCache: instance(),
         clearScannerCache: instance(),
         postHandlingDetails: instance(),
+      ),
+    );
+    // Settings Bloc
+    instance.registerFactory<SettingsBloc>(
+          () => SettingsBloc(
+        sharedPreferences: instance(),
+      ),
+    );
+    // Search Bloc
+    instance.registerFactory<SearchBloc>(
+          () => SearchBloc(
+        loadScannerCache: instance(),
       ),
     );
   } catch (e) {

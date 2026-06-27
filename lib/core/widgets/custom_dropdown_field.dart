@@ -9,7 +9,7 @@ class CustomDropdownField<T> extends StatelessWidget {
   final double fontSize;
   final InputDecoration decoration;
   final bool isLoading;
-
+  final double? height;
   const CustomDropdownField({
     super.key,
     required this.value,
@@ -20,13 +20,13 @@ class CustomDropdownField<T> extends StatelessWidget {
     required this.fontSize,
     required this.decoration,
     this.isLoading = false,
+    this.height,
   });
-
   @override
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
-
     return Container(
+      height: height,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
         boxShadow: <BoxShadow>[
