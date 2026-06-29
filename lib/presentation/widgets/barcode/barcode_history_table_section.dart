@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:inventory_count_flutter_app/presentation/view_models/scanner/scanner_bloc.dart';
-import 'package:inventory_count_flutter_app/presentation/view_models/scanner/scanner_state.dart';
+import 'package:inventory_count_flutter_app/presentation/view_models/barcode/barcode_bloc.dart';
+import 'package:inventory_count_flutter_app/presentation/view_models/barcode/barcode_state.dart';
 
 import '../../../core/resources/responsive_utils.dart';
 
-class ScannerHistoryTableSection extends StatelessWidget {
-  const ScannerHistoryTableSection({super.key});
+class BarcodeHistoryTableSection extends StatelessWidget {
+  const BarcodeHistoryTableSection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ScannerBloc, ScannerState>(
+    return BlocBuilder<BarcodeBloc, BarcodeState>(
       buildWhen: (previous, current) => previous.itemBoxes != current.itemBoxes,
       builder: (context, state) {
         final Map<String, int> groupedCounts = <String, int>{};

@@ -54,14 +54,22 @@ class DefaultButton extends StatelessWidget {
           ),
         ),
         onPressed: isLoading ? null : onPressed,
-        child: Text(
-          text,
-          style: textTheme.titleMedium?.copyWith(
-            fontSize: textSize,
-            color: textColor ?? Colors.black,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        child: isLoading
+            ? const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.5,
+                  color: Colors.black,
+                ),
+              )
+            : Text(
+                text,
+                style: textTheme.titleMedium?.copyWith(
+                  fontSize: textSize,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
       ),
     );
   }

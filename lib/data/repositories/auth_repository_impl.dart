@@ -1,5 +1,4 @@
-
-import 'package:inventory_count_flutter_app/data/datasource/auth_local_datasource.dart';
+import 'package:inventory_count_flutter_app/data/datasources/auth_local_datasource.dart';
 import 'package:inventory_count_flutter_app/data/models/auth_user_model.dart';
 import 'package:inventory_count_flutter_app/domain/entities/auth_user.dart';
 import 'package:inventory_count_flutter_app/domain/repositories/auth_repository.dart';

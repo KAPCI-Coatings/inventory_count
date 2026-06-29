@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:inventory_count_flutter_app/core/routes_manger/routes.dart';
 
 
-class ScannerAppBar extends StatelessWidget implements PreferredSizeWidget {
+class BarcodeAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final bool showBack;
 
-  const ScannerAppBar({super.key, this.title = '', this.showBack = true});
+  const BarcodeAppBar({super.key, this.title = '', this.showBack = true});
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);

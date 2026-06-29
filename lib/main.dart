@@ -8,8 +8,8 @@ import 'package:inventory_count_flutter_app/core/routes_manger/route_generator.d
 import 'package:inventory_count_flutter_app/core/routes_manger/routes.dart';
 import 'package:inventory_count_flutter_app/presentation/view_models/auth/auth_bloc.dart';
 import 'package:inventory_count_flutter_app/presentation/view_models/auth/auth_event.dart';
-import 'package:inventory_count_flutter_app/presentation/view_models/scanner/scanner_bloc.dart';
-import 'package:inventory_count_flutter_app/presentation/view_models/scanner/scanner_event.dart';
+import 'package:inventory_count_flutter_app/presentation/view_models/barcode/barcode_bloc.dart';
+import 'package:inventory_count_flutter_app/presentation/view_models/barcode/barcode_event.dart';
 import 'package:inventory_count_flutter_app/presentation/view_models/settings/settings_bloc.dart';
 import 'package:inventory_count_flutter_app/presentation/view_models/settings/settings_event.dart';
 import 'package:inventory_count_flutter_app/l10n/app_localizations.dart';
@@ -37,17 +37,15 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider<AuthBloc>(
           create: (BuildContext context) =>
-          instance<AuthBloc>()
-            ..add(const AuthInitializeRequested()),
+              instance<AuthBloc>()..add(const AuthInitializeRequested()),
         ),
-        BlocProvider<ScannerBloc>(
+        BlocProvider<BarcodeBloc>(
           create: (BuildContext context) =>
-          instance<ScannerBloc>()
-            ..add(ScannerInitializeRequested()),
+              instance<BarcodeBloc>()..add(BarcodeInitializeRequested()),
         ),
         BlocProvider<SettingsBloc>(
-          create: (BuildContext context) => instance<SettingsBloc>()
-            ..add(SettingsLoaded()),
+          create: (BuildContext context) =>
+              instance<SettingsBloc>()..add(SettingsLoaded()),
         ),
       ],
       child: MaterialApp(

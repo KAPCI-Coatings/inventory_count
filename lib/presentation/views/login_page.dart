@@ -8,6 +8,7 @@ import 'package:inventory_count_flutter_app/presentation/widgets/auth/login_head
 import 'package:inventory_count_flutter_app/presentation/widgets/auth/version.dart';
 import 'package:inventory_count_flutter_app/presentation/view_models/settings/settings_bloc.dart';
 import 'package:inventory_count_flutter_app/presentation/view_models/settings/settings_state.dart';
+import 'package:inventory_count_flutter_app/core/widgets/numeric_keypad.dart';
 
 import '../view_models/auth/auth_bloc.dart';
 
@@ -21,10 +22,56 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _passwordController = TextEditingController();
+  final FocusNode _passwordFocus = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    _passwordFocus.addListener(_onFocusChange);
+  }
+
+  void _onFocusChange() {
+    setState(() {});
+  }
+
+  void _onDigitPressed(String digit) {
+    final text = _passwordController.text;
+    final selection = _passwordController.selection;
+    
+    if (selection.start >= 0 && selection.end >= 0) {
+      final newText = text.replaceRange(selection.start, selection.end, digit);
+      _passwordController.value = TextEditingValue(
+        text: newText,
+        selection: TextSelection.collapsed(offset: selection.start + 1),
+      );
+    } else {
+      _passwordController.text = text + digit;
+    }
+  }
+
+  void _onDeletePressed() {
+    final text = _passwordController.text;
+    final selection = _passwordController.selection;
+    
+    if (selection.start > 0 && selection.start == selection.end) {
+      final newText = text.replaceRange(selection.start - 1, selection.end, '');
+      _passwordController.value = TextEditingValue(
+        text: newText,
+        selection: TextSelection.collapsed(offset: selection.start - 1),
+      );
+    } else if (selection.start >= 0 && selection.end > selection.start) {
+      final newText = text.replaceRange(selection.start, selection.end, '');
+      _passwordController.value = TextEditingValue(
+        text: newText,
+        selection: TextSelection.collapsed(offset: selection.start),
+      );
+    }
+  }
 
   @override
   void dispose() {
     _passwordController.dispose();
+    _passwordFocus.dispose();
     super.dispose();
   }
 
@@ -38,13 +85,17 @@ class _LoginPageState extends State<LoginPage> {
           return previous.status != current.status ||
               previous.message != current.message;
         },
+        buildWhen: (AuthState previous, AuthState current) {
+          return previous.status != current.status ||
+              previous.message != current.message;
+        },
         listener: (BuildContext context, AuthState state) {
           if (state.status == AuthStatus.authenticated) {
             final SettingsState settingsState = context.read<SettingsBloc>().state;
             if (settingsState.selectedOption == SettingsOption.asset) {
               Navigator.of(context).pushReplacementNamed(Routes.assets);
             } else {
-              Navigator.of(context).pushReplacementNamed(Routes.scanner);
+              Navigator.of(context).pushReplacementNamed(Routes.barcode);
             }
             return;
           }
@@ -55,7 +106,7 @@ class _LoginPageState extends State<LoginPage> {
             30,
           );
           final bool isKeyboardOpen =
-              MediaQuery.of(context).viewInsets.bottom > 0;
+              MediaQuery.of(context).viewInsets.bottom > 0 || _passwordFocus.hasFocus;
 
           return LayoutBuilder(
             builder: (BuildContext context, BoxConstraints constraints) {
@@ -90,6 +141,7 @@ class _LoginPageState extends State<LoginPage> {
                                 LoginForm(
                                   formKey: _formKey,
                                   passwordController: _passwordController,
+                                  passwordFocusNode: _passwordFocus,
                                   compact: isCompactLayout,
                                 ),
                                 if (state.status == AuthStatus.loading)
@@ -102,12 +154,17 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                       ),
-                      if (!isKeyboardOpen)
+                      if (!isKeyboardOpen && !_passwordFocus.hasFocus)
                         Padding(
                           padding: EdgeInsets.only(
                             bottom: ResponsiveUtils.responsiveHeight(context, 0.01),
                           ),
                           child: const AuthVersionText(),
+                        ),
+                      if (_passwordFocus.hasFocus)
+                        NumericKeypad(
+                          onDigitPressed: _onDigitPressed,
+                          onDeletePressed: _onDeletePressed,
                         ),
                     ],
                   ),

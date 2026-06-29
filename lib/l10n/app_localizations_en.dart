@@ -76,4 +76,144 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get clear => 'Clear';
+
+  @override
+  String get error => 'Error';
+
+  @override
+  String get close => 'Close';
+
+  @override
+  String get retry => 'Retry';
+
+  @override
+  String get errorInitialization => 'Error initializing';
+
+  @override
+  String get errorEmptyPassword => 'Password cannot be empty.';
+
+  @override
+  String get errorInvalidCredentials => 'Login data is incorrect.';
+
+  @override
+  String get errorLoginFailed => 'Login failed.';
+
+  @override
+  String get errorPasswordUpdateFailed =>
+      'Password update failed. Admin privileges required.';
+
+  @override
+  String get successPasswordUpdated => 'Password updated successfully.';
+
+  @override
+  String get username => 'Username';
+
+  @override
+  String get password => 'Password';
+
+  @override
+  String get login => 'Login';
+
+  @override
+  String get inventoryCount => 'Inventory Count';
+
+  @override
+  String get confirm_duplicate_pallet =>
+      'Are you sure you want to duplicate this pallet?';
+
+  @override
+  String get error_duplicate_barcode =>
+      'This barcode is duplicated in the same order.';
+
+  @override
+  String get error_invalid_barcode_format =>
+      'Invalid barcode. Must be exactly 20 or 21 characters.';
+
+  @override
+  String get error_unexpected_scan =>
+      'An unexpected error occurred during scan processing.';
+
+  @override
+  String get error_scan_failed =>
+      'An error occurred while reading the barcode.';
+
+  @override
+  String get error_scanner_init =>
+      'Failed to initialize scanner. Check settings.';
+
+  @override
+  String get error_no_scanned_data => 'No scanned data to post.';
+
+  @override
+  String get success_post_clear_cache =>
+      'Posted successfully and cache cleared.';
+
+  @override
+  String get error_scanner_restart => 'Failed to restart scanner.';
+
+  @override
+  String get success_scanner_stopped => 'Scanner stopped.';
+
+  @override
+  String get error_scanner_status_change => 'Failed to change scanner status.';
+
+  @override
+  String get error_profile_empty => 'Profile name cannot be empty.';
+
+  @override
+  String get success_profile_changed => 'Profile changed successfully.';
+
+  @override
+  String get error_profile_change_failed => 'Failed to change profile.';
+
+  @override
+  String get error_invalid_url =>
+      'Invalid URL. Example: http://10.10.30.47:2604';
+
+  @override
+  String get error_invalid_device_id => 'Invalid device ID.';
+
+  @override
+  String get error_confirm_save_settings =>
+      'Could not confirm saving settings.';
+
+  @override
+  String success_save_settings(String url) {
+    return 'Settings saved successfully.\n$url';
+  }
+
+  @override
+  String get error_save_settings => 'Failed to save settings.';
+
+  @override
+  String get error_post_no_connection =>
+      'Post failed. No connection to server. Check network and URL.';
+
+  @override
+  String error_post_server_connection(String details) {
+    return 'Post failed. Could not connect to server. $details';
+  }
+
+  @override
+  String get error_post_http_not_allowed =>
+      'Post failed. Cleartext HTTP traffic not permitted.';
+
+  @override
+  String error_post_server_code(String code) {
+    return 'Post failed. Server returned code $code.';
+  }
+
+  @override
+  String error_post_unknown(String details) {
+    return 'Post failed. Error reason: $details';
+  }
+
+  @override
+  String get yes => 'Yes';
+
+  @override
+  String get no => 'No';
+
+  @override
+  String get ok => 'OK';
 }

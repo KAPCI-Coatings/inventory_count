@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:inventory_count_flutter_app/presentation/view_models/scanner/scanner_bloc.dart';
-import 'package:inventory_count_flutter_app/presentation/view_models/scanner/scanner_event.dart';
-import 'package:inventory_count_flutter_app/presentation/view_models/scanner/scanner_state.dart';
+import 'package:inventory_count_flutter_app/presentation/view_models/barcode/barcode_bloc.dart';
+import 'package:inventory_count_flutter_app/presentation/view_models/barcode/barcode_event.dart';
+import 'package:inventory_count_flutter_app/presentation/view_models/barcode/barcode_state.dart';
 
 
 
-class ScannerSettingsSection extends StatelessWidget {
-  const ScannerSettingsSection({super.key});
+class BarcodeSettingsSection extends StatelessWidget {
+  const BarcodeSettingsSection({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -20,9 +20,9 @@ class ScannerSettingsSection extends StatelessWidget {
       elevation: 0,
     );
 
-    return BlocBuilder<ScannerBloc, ScannerState>(
+    return BlocBuilder<BarcodeBloc, BarcodeState>(
       builder: (context, state) {
-        final bool isPosting = state.status == ScannerStatus.posting;
+        final bool isPosting = state.status == BarcodeStatus.posting;
 
         return Column(
           children: <Widget>[
@@ -35,7 +35,7 @@ class ScannerSettingsSection extends StatelessWidget {
               style: simpleButtonStyle,
               onPressed: isPosting
                   ? null
-                  : () => context.read<ScannerBloc>().add(ScannerPostCurrentOrderRequested()),
+                  : () => context.read<BarcodeBloc>().add(BarcodePostCurrentOrderRequested()),
               child: isPosting
                   ? const SizedBox(
                       width: 22,

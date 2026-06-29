@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inventory_count_flutter_app/core/utils/colors.dart';
 import 'package:inventory_count_flutter_app/core/widgets/custom_dropdown_field.dart';
 import 'package:inventory_count_flutter_app/core/widgets/default_button.dart';
 import 'package:inventory_count_flutter_app/presentation/view_models/auth/auth_event.dart';
 import 'package:inventory_count_flutter_app/presentation/view_models/auth/auth_state.dart';
+import 'package:inventory_count_flutter_app/l10n/app_localizations.dart';
 
 import '../../../../../../../core/resources/responsive_utils.dart';
 import '../../view_models/auth/auth_bloc.dart';
@@ -12,17 +14,34 @@ import '../../view_models/auth/auth_bloc.dart';
 class LoginForm extends StatelessWidget {
   final GlobalKey<FormState> formKey;
   final TextEditingController passwordController;
+  final FocusNode? passwordFocusNode;
   final bool compact;
 
   const LoginForm({
     super.key,
     required this.formKey,
     required this.passwordController,
+    this.passwordFocusNode,
     this.compact = false,
   });
 
+  String _getLocalizedMessage(BuildContext context, String? message) {
+    if (message == null) return '';
+    final l10n = AppLocalizations.of(context);
+    switch (message) {
+      case 'error_initialization': return l10n?.errorInitialization ?? message;
+      case 'error_empty_password': return l10n?.errorEmptyPassword ?? message;
+      case 'error_invalid_credentials': return l10n?.errorInvalidCredentials ?? message;
+      case 'error_login_failed': return l10n?.errorLoginFailed ?? message;
+      case 'error_password_update_failed': return l10n?.errorPasswordUpdateFailed ?? message;
+      case 'success_password_updated': return l10n?.successPasswordUpdated ?? message;
+      default: return message;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final TextTheme textTheme = Theme.of(context).textTheme;
     final double fieldFont = ResponsiveUtils.responsiveFontSize(
       context,
@@ -76,7 +95,8 @@ class LoginForm extends StatelessWidget {
       child: BlocBuilder<AuthBloc, AuthState>(
         buildWhen: (AuthState previous, AuthState current) {
           return previous.selectedRole != current.selectedRole ||
-              previous.status != current.status;
+              previous.status != current.status ||
+              previous.message != current.message;
         },
         builder: (BuildContext context, AuthState state) {
           final bool isLoading = state.status == AuthStatus.loading;
@@ -107,7 +127,7 @@ class LoginForm extends StatelessWidget {
                     context.read<AuthBloc>().add(AuthRoleSelected(value));
                   }
                 },
-                labelText: 'Username',
+                labelText: l10n?.username ?? 'Username',
                 fontSize: fieldFont,
                 decoration: dynamicDecoration,
                 isLoading: isLoading,
@@ -126,24 +146,27 @@ class LoginForm extends StatelessWidget {
                 ),
                 child: TextFormField(
                   controller: passwordController,
+                  focusNode: passwordFocusNode,
                   enabled: !isLoading,
                   obscureText: true,
-                  keyboardType: TextInputType.number,
+                  keyboardType: TextInputType.none,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   style: textTheme.bodyMedium?.copyWith(
                     fontSize: fieldFont,
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
                   ),
-                  decoration: dynamicDecoration.copyWith(labelText: 'Password'),
+                  decoration: dynamicDecoration.copyWith(labelText: l10n?.password ?? 'Password'),
                 ),
               ),
-              if (isError)
+              if (isError && state.message != null)
                 Padding(
                   padding: EdgeInsets.only(
                     top: ResponsiveUtils.responsiveSpacing(context, 9),
                   ),
                   child: Text(
-                    'Incorrect password or selected user',
+                    _getLocalizedMessage(context, state.message),
+                    textAlign: TextAlign.center,
                     style: textTheme.bodySmall?.copyWith(
                       color: AppColors.errorRed,
                       fontWeight: FontWeight.bold,
@@ -153,7 +176,7 @@ class LoginForm extends StatelessWidget {
                 ),
               SizedBox(height: buttonGap),
               DefaultButton(
-                text: 'Login',
+                text: l10n?.login ?? 'Login',
                 onPressed: () {
                   if (formKey.currentState?.validate() ?? false) {
                     context.read<AuthBloc>().add(

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'app_input_decoration.dart';
+
 class CustomDropdownField<T> extends StatelessWidget {
   final T value;
   final List<T> items;
@@ -7,9 +9,11 @@ class CustomDropdownField<T> extends StatelessWidget {
   final void Function(T?)? onChanged;
   final String? labelText;
   final double fontSize;
-  final InputDecoration decoration;
+  final InputDecoration? decoration;
   final bool isLoading;
   final double? height;
+  final String? Function(T?)? validator;
+
   const CustomDropdownField({
     super.key,
     required this.value,
@@ -18,13 +22,24 @@ class CustomDropdownField<T> extends StatelessWidget {
     required this.onChanged,
     this.labelText,
     required this.fontSize,
-    required this.decoration,
+    this.decoration,
     this.isLoading = false,
     this.height,
+    this.validator,
   });
+
   @override
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
+    final defaultDeco = AppInputDecoration.standard(
+      context: context,
+      labelText: labelText ?? itemLabelBuilder(value),
+    );
+    final appliedDecoration = decoration?.copyWith(
+          labelText: labelText ?? itemLabelBuilder(value),
+        ) ??
+        defaultDeco;
+
     return Container(
       height: height,
       decoration: BoxDecoration(
@@ -45,9 +60,7 @@ class CustomDropdownField<T> extends StatelessWidget {
           fontWeight: FontWeight.bold,
         ),
         icon: const Icon(Icons.keyboard_arrow_down, color: Colors.black),
-        decoration: decoration.copyWith(
-          labelText: labelText ?? itemLabelBuilder(value),
-        ),
+        decoration: appliedDecoration,
         items: items.map((T item) {
           return DropdownMenuItem<T>(
             value: item,
@@ -62,6 +75,7 @@ class CustomDropdownField<T> extends StatelessWidget {
           );
         }).toList(),
         onChanged: isLoading ? null : onChanged,
+        validator: validator,
       ),
     );
   }

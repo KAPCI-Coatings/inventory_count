@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:inventory_count_flutter_app/core/resources/exceptions.dart'; 
+import 'package:inventory_count_flutter_app/core/resources/exceptions.dart';
+import 'package:inventory_count_flutter_app/core/resources/responsive_utils.dart';
+import 'package:inventory_count_flutter_app/l10n/app_localizations.dart';
 
 class ErrorPopup extends StatelessWidget {
   final String message;
@@ -27,6 +29,8 @@ class ErrorPopup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    
     return Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16.0),
@@ -50,16 +54,16 @@ class ErrorPopup extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min, // To make the card compact
           children: <Widget>[
-            const Icon(
+            Icon(
               Icons.error_outline_rounded,
               color: Colors.redAccent,
-              size: 60.0,
+              size: ResponsiveUtils.responsiveFontSize(context, 60.0),
             ),
             const SizedBox(height: 16.0),
-            const Text(
-              'Error',
+            Text(
+              l10n?.error ?? 'Error',
               style: TextStyle(
-                fontSize: 22.0,
+                fontSize: ResponsiveUtils.responsiveFontSize(context, 22.0),
                 fontWeight: FontWeight.w700,
                 color: Colors.black87,
               ),
@@ -68,8 +72,8 @@ class ErrorPopup extends StatelessWidget {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 16.0,
+              style: TextStyle(
+                fontSize: ResponsiveUtils.responsiveFontSize(context, 16.0),
                 color: Colors.black54,
               ),
             ),
@@ -89,10 +93,10 @@ class ErrorPopup extends StatelessWidget {
                         side: BorderSide(color: Colors.grey.shade300),
                       ),
                     ),
-                    child: const Text(
-                      'Close',
+                    child: Text(
+                      l10n?.close ?? 'Close',
                       style: TextStyle(
-                        fontSize: 16.0,
+                        fontSize: ResponsiveUtils.responsiveFontSize(context, 16.0),
                         color: Colors.black54,
                         fontWeight: FontWeight.bold,
                       ),
@@ -115,10 +119,10 @@ class ErrorPopup extends StatelessWidget {
                         ),
                         elevation: 0,
                       ),
-                      child: const Text(
-                        'Retry',
+                      child: Text(
+                        l10n?.retry ?? 'Retry',
                         style: TextStyle(
-                          fontSize: 16.0,
+                          fontSize: ResponsiveUtils.responsiveFontSize(context, 16.0),
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                         ),

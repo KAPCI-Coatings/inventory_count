@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:inventory_count_flutter_app/domain/entities/item_box.dart';
+import 'package:inventory_count_flutter_app/domain/entities/barcode.dart';
 import 'package:inventory_count_flutter_app/core/resources/responsive_utils.dart';
 import 'package:inventory_count_flutter_app/l10n/app_localizations.dart';
 

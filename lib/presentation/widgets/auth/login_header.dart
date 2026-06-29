@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../../../../core/resources/responsive_utils.dart';
+import '../../../../../../../l10n/app_localizations.dart';
 
 class LoginHeader extends StatelessWidget {
   final bool compact;
@@ -8,6 +9,7 @@ class LoginHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final TextTheme textTheme = Theme.of(context).textTheme;
     final double logoHeight = compact
         ? ResponsiveUtils.responsiveHeight(
@@ -40,7 +42,7 @@ class LoginHeader extends StatelessWidget {
         ),
         SizedBox(height: titleGap),
         Text(
-          "Inventory Count",
+          l10n?.inventoryCount ?? "Inventory Count",
           style: textTheme.headlineMedium?.copyWith(
             fontSize: titleFontSize,
             fontWeight: FontWeight.w900,

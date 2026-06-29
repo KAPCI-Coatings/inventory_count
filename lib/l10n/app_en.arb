@@ -22,5 +22,73 @@
   "qty": "Qty",
   "patch": "Patch",
   "totalQty": "Total Qty",
-  "clear": "Clear"
+  "clear": "Clear",
+  "error": "Error",
+  "close": "Close",
+  "retry": "Retry",
+  "errorInitialization": "Error initializing",
+  "errorEmptyPassword": "Password cannot be empty.",
+  "errorInvalidCredentials": "Login data is incorrect.",
+  "errorLoginFailed": "Login failed.",
+  "errorPasswordUpdateFailed": "Password update failed. Admin privileges required.",
+  "successPasswordUpdated": "Password updated successfully.",
+  "username": "Username",
+  "password": "Password",
+  "login": "Login",
+  "inventoryCount": "Inventory Count",
+  "confirm_duplicate_pallet": "Are you sure you want to duplicate this pallet?",
+  "error_duplicate_barcode": "This barcode is duplicated in the same order.",
+  "error_invalid_barcode_format": "Invalid barcode. Must be exactly 20 or 21 characters.",
+  "error_unexpected_scan": "An unexpected error occurred during scan processing.",
+  "error_scan_failed": "An error occurred while reading the barcode.",
+  "error_scanner_init": "Failed to initialize scanner. Check settings.",
+  "error_no_scanned_data": "No scanned data to post.",
+  "success_post_clear_cache": "Posted successfully and cache cleared.",
+  "error_scanner_restart": "Failed to restart scanner.",
+  "success_scanner_stopped": "Scanner stopped.",
+  "error_scanner_status_change": "Failed to change scanner status.",
+  "error_profile_empty": "Profile name cannot be empty.",
+  "success_profile_changed": "Profile changed successfully.",
+  "error_profile_change_failed": "Failed to change profile.",
+  "error_invalid_url": "Invalid URL. Example: http://10.10.30.47:2604",
+  "error_invalid_device_id": "Invalid device ID.",
+  "error_confirm_save_settings": "Could not confirm saving settings.",
+  "success_save_settings": "Settings saved successfully.\n{url}",
+  "@success_save_settings": {
+    "placeholders": {
+      "url": {
+        "type": "String"
+      }
+    }
+  },
+  "error_save_settings": "Failed to save settings.",
+  "error_post_no_connection": "Post failed. No connection to server. Check network and URL.",
+  "error_post_server_connection": "Post failed. Could not connect to server. {details}",
+  "@error_post_server_connection": {
+    "placeholders": {
+      "details": {
+        "type": "String"
+      }
+    }
+  },
+  "error_post_http_not_allowed": "Post failed. Cleartext HTTP traffic not permitted.",
+  "error_post_server_code": "Post failed. Server returned code {code}.",
+  "@error_post_server_code": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "error_post_unknown": "Post failed. Error reason: {details}",
+  "@error_post_unknown": {
+    "placeholders": {
+      "details": {
+        "type": "String"
+      }
+    }
+  },
+  "yes": "Yes",
+  "no": "No",
+  "ok": "OK"
 }

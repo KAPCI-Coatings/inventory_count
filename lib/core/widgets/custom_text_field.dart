@@ -1,23 +1,42 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import '../resources/responsive_utils.dart';
 
 class CustomTextField extends StatelessWidget {
   final TextEditingController? controller;
+  final FocusNode? focusNode;
   final String labelText;
   final ValueChanged<String>? onChanged;
   final String? initialValue;
   final TextInputType? keyboardType;
   final bool autofocus;
   final double? height;
+  final TextAlign textAlign;
+  final bool obscureText;
+  final int maxLines;
+  final String? Function(String?)? validator;
+  final List<TextInputFormatter>? inputFormatters;
+
   const CustomTextField({
     super.key,
     this.controller,
+    this.focusNode,
     required this.labelText,
     this.onChanged,
     this.initialValue,
     this.keyboardType,
     this.autofocus = false,
     this.height,
-  });
+    this.textAlign = TextAlign.start,
+    this.obscureText = false,
+    this.maxLines = 1,
+    this.validator,
+    this.inputFormatters,
+  }) : assert(
+          controller == null || initialValue == null,
+          'Cannot provide both a controller and an initial value.',
+        );
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -34,12 +53,17 @@ class CustomTextField extends StatelessWidget {
       ),
       child: TextFormField(
         controller: controller,
+        focusNode: focusNode,
         initialValue: initialValue,
-        textAlign: TextAlign.center,
+        textAlign: textAlign,
         keyboardType: keyboardType,
         autofocus: autofocus,
-        style: const TextStyle(
-          fontSize: 18,
+        obscureText: obscureText,
+        maxLines: maxLines,
+        validator: validator,
+        inputFormatters: inputFormatters,
+        style: TextStyle(
+          fontSize: ResponsiveUtils.responsiveFontSize(context, 18),
           fontWeight: FontWeight.bold,
           color: Colors.black,
         ),
@@ -47,8 +71,8 @@ class CustomTextField extends StatelessWidget {
           isDense: true,
           labelText: labelText,
           floatingLabelBehavior: FloatingLabelBehavior.always,
-          labelStyle: const TextStyle(
-            fontSize: 22,
+          labelStyle: TextStyle(
+            fontSize: ResponsiveUtils.responsiveFontSize(context, 22),
             fontWeight: FontWeight.bold,
             color: Colors.black,
           ),

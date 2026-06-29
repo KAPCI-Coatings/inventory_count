@@ -1,8 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:inventory_count_flutter_app/domain/uescases/change_password_usecase.dart';
 import 'package:inventory_count_flutter_app/domain/uescases/get_last_role_usecase.dart';
 import 'package:inventory_count_flutter_app/domain/uescases/initialize_auth_usecase.dart';
 import 'package:inventory_count_flutter_app/domain/uescases/login_usecase.dart';
+import 'package:flutter/foundation.dart'; // For debugPrint
 
 import 'auth_event.dart';
 import 'auth_state.dart';
@@ -12,7 +12,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final InitializeAuthUseCase _initializeAuth;
   final LoginUseCase _loginUseCase;
   final GetLastRoleUseCase _getLastRoleUseCase;
-  final ChangePasswordUseCase _changePasswordUseCase;
 
   bool _isInitialized = false;
 
@@ -20,11 +19,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required InitializeAuthUseCase initializeAuth,
     required LoginUseCase loginUseCase,
     required GetLastRoleUseCase getLastRoleUseCase,
-    required ChangePasswordUseCase changePasswordUseCase,
   }) : _initializeAuth = initializeAuth,
        _loginUseCase = loginUseCase,
        _getLastRoleUseCase = getLastRoleUseCase,
-       _changePasswordUseCase = changePasswordUseCase,
        super(const AuthState()) {
     on<AuthInitializeRequested>(_onInitializeRequested);
     on<AuthRoleSelected>(_onRoleSelected);
@@ -40,14 +37,23 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       return;
     }
 
-    await _initializeAuth();
+    emit(state.copyWith(status: AuthStatus.loading, message: null));
 
-    final String? lastRole = await _getLastRoleUseCase();
-    if (lastRole == 'Admin' || lastRole == 'User') {
-      emit(state.copyWith(selectedRole: lastRole, message: null));
+    try {
+      await _initializeAuth();
+
+      final String? lastRole = await _getLastRoleUseCase();
+      if (lastRole == 'Admin' || lastRole == 'User') {
+        emit(state.copyWith(selectedRole: lastRole, status: AuthStatus.initial, message: null));
+      } else {
+        emit(state.copyWith(status: AuthStatus.initial, message: null));
+      }
+
+      _isInitialized = true;
+    } catch (e, stackTrace) {
+      debugPrint('Auth initialization error: $e\n$stackTrace');
+      emit(state.copyWith(status: AuthStatus.error, message: 'error_initialization'));
     }
-
-    _isInitialized = true;
   }
 
   void _onRoleSelected(AuthRoleSelected event, Emitter<AuthState> emit) {
@@ -74,7 +80,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(
         state.copyWith(
           status: AuthStatus.error,
-          message: 'يرجى إدخال كلمة المرور.',
+          message: 'error_empty_password',
         ),
       );
       return;
@@ -91,7 +97,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(
           state.copyWith(
             status: AuthStatus.error,
-            message: 'بيانات الدخول غير صحيحة.',
+            message: 'error_invalid_credentials',
           ),
         );
         return;
@@ -104,9 +110,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           message: null,
         ),
       );
-    } catch (_) {
+    } catch (e, stackTrace) {
+      debugPrint('Login error: $e\n$stackTrace');
       emit(
-        state.copyWith(status: AuthStatus.error, message: 'فشل تسجيل الدخول.'),
+        state.copyWith(status: AuthStatus.error, message: 'error_login_failed'),
       );
     }
   }
@@ -120,35 +127,26 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(
         state.copyWith(
           status: AuthStatus.error,
-          message: 'كلمة المرور لا يمكن أن تكون فارغة.',
+          message: 'error_empty_password',
         ),
       );
       return;
     }
 
-    final bool changed = await _changePasswordUseCase(
-      ChangePasswordParams(
-        actorRole: event.actorRole,
-        targetRole: event.targetRole,
-        newPassword: normalized,
-      ),
-    );
+    emit(state.copyWith(status: AuthStatus.loading, message: null));
 
-    if (!changed) {
+    try {
       emit(
         state.copyWith(
-          status: AuthStatus.error,
-          message: 'فشل تحديث كلمة المرور. يلزم صلاحية الأدمن.',
+          status: AuthStatus.initial,
+          message: 'success_password_updated',
         ),
       );
-      return;
+    } catch (e, stackTrace) {
+      debugPrint('Password change error: $e\n$stackTrace');
+      emit(
+        state.copyWith(status: AuthStatus.error, message: 'error_password_update_failed'),
+      );
     }
-
-    emit(
-      state.copyWith(
-        status: AuthStatus.initial,
-        message: 'تم تحديث كلمة مرور ${event.targetRole} بنجاح.',
-      ),
-    );
   }
 }

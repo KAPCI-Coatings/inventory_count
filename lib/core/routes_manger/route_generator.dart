@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:inventory_count_flutter_app/presentation/views/login_page.dart';
-import 'package:inventory_count_flutter_app/presentation/views/scanner_screen.dart';
+import 'package:inventory_count_flutter_app/presentation/views/barcode_screen.dart';
 import 'package:inventory_count_flutter_app/presentation/views/settings_screen.dart';
 import 'package:inventory_count_flutter_app/presentation/views/assets_screen.dart';
 import 'package:inventory_count_flutter_app/presentation/views/search_screen.dart';
@@ -15,8 +15,8 @@ class RouteGenerator {
     switch (settings.name) {
       case Routes.login:
         return _buildRoute(const LoginPage());
-      case Routes.scanner:
-        return _buildRoute(const ScannerScreen());
+      case Routes.barcode:
+        return _buildRoute(const BarcodeScreen());
       case Routes.settings:
         return _buildRoute(const SettingsScreen());
       case Routes.assets:

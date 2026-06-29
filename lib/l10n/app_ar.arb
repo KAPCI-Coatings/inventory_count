@@ -22,5 +22,73 @@
   "qty": "الكمية",
   "patch": "الباتش",
   "totalQty": "إجمالي الكمية",
-  "clear": "مسح"
+  "clear": "مسح",
+  "error": "خطأ",
+  "close": "إغلاق",
+  "retry": "إعادة المحاولة",
+  "errorInitialization": "خطأ في التهيئة",
+  "errorEmptyPassword": "يرجى إدخال كلمة المرور.",
+  "errorInvalidCredentials": "بيانات الدخول غير صحيحة.",
+  "errorLoginFailed": "فشل تسجيل الدخول.",
+  "errorPasswordUpdateFailed": "فشل تحديث كلمة المرور. يلزم صلاحية الأدمن.",
+  "successPasswordUpdated": "تم تحديث كلمة المرور بنجاح.",
+  "username": "اسم المستخدم",
+  "password": "كلمة المرور",
+  "login": "تسجيل الدخول",
+  "inventoryCount": "جرد المخزون",
+  "confirm_duplicate_pallet": "هل أنت متأكد أنك تريد تكرار هذا الباليت؟",
+  "error_duplicate_barcode": "هذا الباركود مكرر داخل نفس الأوردر.",
+  "error_invalid_barcode_format": "باركود غير صحيح. يجب أن يكون 20 أو 21 حرف بالضبط.",
+  "error_unexpected_scan": "حدث خطأ غير متوقع أثناء معالجة القراءة.",
+  "error_scan_failed": "حدث خطأ أثناء قراءة الباركود.",
+  "error_scanner_init": "تعذر تهيئة الماسح. تأكد من الإعدادات.",
+  "error_no_scanned_data": "لا توجد بيانات ممسوحة للإرسال.",
+  "success_post_clear_cache": "تم الإرسال بنجاح وتم مسح الكاش.",
+  "error_scanner_restart": "تعذر إعادة تشغيل الماسح.",
+  "success_scanner_stopped": "تم إيقاف الماسح.",
+  "error_scanner_status_change": "تعذر تغيير حالة الماسح.",
+  "error_profile_empty": "اسم البروفايل لا يمكن أن يكون فارغا.",
+  "success_profile_changed": "تم تغيير البروفايل بنجاح.",
+  "error_profile_change_failed": "تعذر تغيير البروفايل.",
+  "error_invalid_url": "الرابط غير صحيح. مثال: http://10.10.30.47:2604",
+  "error_invalid_device_id": "رقم الجهاز غير صحيح.",
+  "error_confirm_save_settings": "تعذر تأكيد حفظ إعدادات الإرسال.",
+  "success_save_settings": "تم حفظ إعدادات الإرسال بنجاح.\n{url}",
+  "@success_save_settings": {
+    "placeholders": {
+      "url": {
+        "type": "String"
+      }
+    }
+  },
+  "error_save_settings": "تعذر حفظ الإعدادات.",
+  "error_post_no_connection": "فشل الإرسال. لا يوجد اتصال بالخادم. تأكد من نفس الشبكة والرابط.",
+  "error_post_server_connection": "فشل الإرسال. تعذر الاتصال بالخادم. {details}",
+  "@error_post_server_connection": {
+    "placeholders": {
+      "details": {
+        "type": "String"
+      }
+    }
+  },
+  "error_post_http_not_allowed": "فشل الإرسال. اتصال HTTP غير مسموح على الجهاز.",
+  "error_post_server_code": "فشل الإرسال. الخادم أرجع كود {code}.",
+  "@error_post_server_code": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "error_post_unknown": "فشل الإرسال. سبب الخطأ: {details}",
+  "@error_post_unknown": {
+    "placeholders": {
+      "details": {
+        "type": "String"
+      }
+    }
+  },
+  "yes": "نعم",
+  "no": "لا",
+  "ok": "موافق"
 }

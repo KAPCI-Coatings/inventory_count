@@ -235,6 +235,246 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Clear'**
   String get clear;
+
+  /// No description provided for @error.
+  ///
+  /// In en, this message translates to:
+  /// **'Error'**
+  String get error;
+
+  /// No description provided for @close.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get close;
+
+  /// No description provided for @retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retry;
+
+  /// No description provided for @errorInitialization.
+  ///
+  /// In en, this message translates to:
+  /// **'Error initializing'**
+  String get errorInitialization;
+
+  /// No description provided for @errorEmptyPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Password cannot be empty.'**
+  String get errorEmptyPassword;
+
+  /// No description provided for @errorInvalidCredentials.
+  ///
+  /// In en, this message translates to:
+  /// **'Login data is incorrect.'**
+  String get errorInvalidCredentials;
+
+  /// No description provided for @errorLoginFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Login failed.'**
+  String get errorLoginFailed;
+
+  /// No description provided for @errorPasswordUpdateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Password update failed. Admin privileges required.'**
+  String get errorPasswordUpdateFailed;
+
+  /// No description provided for @successPasswordUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Password updated successfully.'**
+  String get successPasswordUpdated;
+
+  /// No description provided for @username.
+  ///
+  /// In en, this message translates to:
+  /// **'Username'**
+  String get username;
+
+  /// No description provided for @password.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get password;
+
+  /// No description provided for @login.
+  ///
+  /// In en, this message translates to:
+  /// **'Login'**
+  String get login;
+
+  /// No description provided for @inventoryCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Inventory Count'**
+  String get inventoryCount;
+
+  /// No description provided for @confirm_duplicate_pallet.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to duplicate this pallet?'**
+  String get confirm_duplicate_pallet;
+
+  /// No description provided for @error_duplicate_barcode.
+  ///
+  /// In en, this message translates to:
+  /// **'This barcode is duplicated in the same order.'**
+  String get error_duplicate_barcode;
+
+  /// No description provided for @error_invalid_barcode_format.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid barcode. Must be exactly 20 or 21 characters.'**
+  String get error_invalid_barcode_format;
+
+  /// No description provided for @error_unexpected_scan.
+  ///
+  /// In en, this message translates to:
+  /// **'An unexpected error occurred during scan processing.'**
+  String get error_unexpected_scan;
+
+  /// No description provided for @error_scan_failed.
+  ///
+  /// In en, this message translates to:
+  /// **'An error occurred while reading the barcode.'**
+  String get error_scan_failed;
+
+  /// No description provided for @error_scanner_init.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to initialize scanner. Check settings.'**
+  String get error_scanner_init;
+
+  /// No description provided for @error_no_scanned_data.
+  ///
+  /// In en, this message translates to:
+  /// **'No scanned data to post.'**
+  String get error_no_scanned_data;
+
+  /// No description provided for @success_post_clear_cache.
+  ///
+  /// In en, this message translates to:
+  /// **'Posted successfully and cache cleared.'**
+  String get success_post_clear_cache;
+
+  /// No description provided for @error_scanner_restart.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to restart scanner.'**
+  String get error_scanner_restart;
+
+  /// No description provided for @success_scanner_stopped.
+  ///
+  /// In en, this message translates to:
+  /// **'Scanner stopped.'**
+  String get success_scanner_stopped;
+
+  /// No description provided for @error_scanner_status_change.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to change scanner status.'**
+  String get error_scanner_status_change;
+
+  /// No description provided for @error_profile_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile name cannot be empty.'**
+  String get error_profile_empty;
+
+  /// No description provided for @success_profile_changed.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile changed successfully.'**
+  String get success_profile_changed;
+
+  /// No description provided for @error_profile_change_failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to change profile.'**
+  String get error_profile_change_failed;
+
+  /// No description provided for @error_invalid_url.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid URL. Example: http://10.10.30.47:2604'**
+  String get error_invalid_url;
+
+  /// No description provided for @error_invalid_device_id.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid device ID.'**
+  String get error_invalid_device_id;
+
+  /// No description provided for @error_confirm_save_settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not confirm saving settings.'**
+  String get error_confirm_save_settings;
+
+  /// No description provided for @success_save_settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings saved successfully.\n{url}'**
+  String success_save_settings(String url);
+
+  /// No description provided for @error_save_settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save settings.'**
+  String get error_save_settings;
+
+  /// No description provided for @error_post_no_connection.
+  ///
+  /// In en, this message translates to:
+  /// **'Post failed. No connection to server. Check network and URL.'**
+  String get error_post_no_connection;
+
+  /// No description provided for @error_post_server_connection.
+  ///
+  /// In en, this message translates to:
+  /// **'Post failed. Could not connect to server. {details}'**
+  String error_post_server_connection(String details);
+
+  /// No description provided for @error_post_http_not_allowed.
+  ///
+  /// In en, this message translates to:
+  /// **'Post failed. Cleartext HTTP traffic not permitted.'**
+  String get error_post_http_not_allowed;
+
+  /// No description provided for @error_post_server_code.
+  ///
+  /// In en, this message translates to:
+  /// **'Post failed. Server returned code {code}.'**
+  String error_post_server_code(String code);
+
+  /// No description provided for @error_post_unknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Post failed. Error reason: {details}'**
+  String error_post_unknown(String details);
+
+  /// No description provided for @yes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get yes;
+
+  /// No description provided for @no.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get no;
+
+  /// No description provided for @ok.
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get ok;
 }
 
 class _AppLocalizationsDelegate
