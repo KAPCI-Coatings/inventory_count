@@ -12,6 +12,8 @@ class DefaultButton extends StatelessWidget {
   final Color? backgroundColor;
   final Color? textColor;
   final Color? borderColor;
+  final FocusNode? focusNode;
+  final bool canRequestFocus;
 
   const DefaultButton({
     super.key,
@@ -24,6 +26,8 @@ class DefaultButton extends StatelessWidget {
     this.backgroundColor,
     this.textColor,
     this.borderColor,
+    this.focusNode,
+    this.canRequestFocus = false,
   });
 
   @override
@@ -43,33 +47,38 @@ class DefaultButton extends StatelessWidget {
           ),
         ],
       ),
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: backgroundColor ?? AppColors.button,
-          foregroundColor: textColor ?? AppColors.text,
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(radius),
-            side: BorderSide(color: borderColor ?? Colors.black, width: 2),
+      child: Focus(
+        canRequestFocus: canRequestFocus,
+        skipTraversal: !canRequestFocus,
+        child: ElevatedButton(
+          focusNode: focusNode,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: backgroundColor ?? AppColors.button,
+            foregroundColor: textColor ?? AppColors.text,
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(radius),
+              side: BorderSide(color: borderColor ?? Colors.black, width: 2),
+            ),
           ),
+          onPressed: isLoading ? null : onPressed,
+          child: isLoading
+              ? const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.5,
+                    color: Colors.black,
+                  ),
+                )
+              : Text(
+                  text,
+                  style: textTheme.titleMedium?.copyWith(
+                    fontSize: textSize,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
         ),
-        onPressed: isLoading ? null : onPressed,
-        child: isLoading
-            ? const SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2.5,
-                  color: Colors.black,
-                ),
-              )
-            : Text(
-                text,
-                style: textTheme.titleMedium?.copyWith(
-                  fontSize: textSize,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
       ),
     );
   }

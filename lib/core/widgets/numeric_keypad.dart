@@ -33,11 +33,19 @@ class NumericKeypad extends StatelessWidget {
             const SizedBox(height: 8),
             Row(
               children: [
-                _buildButton('', onPressed: null), // Empty space
+                Expanded(
+                  child: onSubmitPressed != null
+                      ? _buildIconButton(Icons.check, onPressed: onSubmitPressed, color: Colors.grey[400])
+                      : _buildButton('', onPressed: null), // Empty space
+                ),
                 const SizedBox(width: 8),
-                _buildButton('0', onPressed: () => onDigitPressed('0')),
+                Expanded(
+                  child: _buildButton('0', onPressed: () => onDigitPressed('0')),
+                ),
                 const SizedBox(width: 8),
-                _buildButton('⌫', onPressed: onDeletePressed, color: Colors.grey[400]),
+                Expanded(
+                  child: _buildButton('⌫', onPressed: onDeletePressed, color: Colors.grey[400]),
+                ),
               ],
             ),
           ],
@@ -61,28 +69,47 @@ class NumericKeypad extends StatelessWidget {
     );
   }
 
+  Widget _buildIconButton(IconData icon, {VoidCallback? onPressed, Color? color}) {
+    return Material(
+      color: color ?? Colors.white,
+      borderRadius: BorderRadius.circular(8),
+      elevation: 1,
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          height: 55,
+          alignment: Alignment.center,
+          child: Icon(
+            icon,
+            size: 28,
+            color: Colors.black87,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildButton(String text, {VoidCallback? onPressed, Color? color}) {
     if (text.isEmpty) {
-      return const Expanded(child: SizedBox.shrink());
+      return const SizedBox(height: 55);
     }
-    return Expanded(
-      child: Material(
-        color: color ?? Colors.white,
+    return Material(
+      color: color ?? Colors.white,
+      borderRadius: BorderRadius.circular(8),
+      elevation: 1,
+      child: InkWell(
+        onTap: onPressed,
         borderRadius: BorderRadius.circular(8),
-        elevation: 1,
-        child: InkWell(
-          onTap: onPressed,
-          borderRadius: BorderRadius.circular(8),
-          child: Container(
-            height: 55,
-            alignment: Alignment.center,
-            child: Text(
-              text,
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
+        child: Container(
+          height: 55,
+          alignment: Alignment.center,
+          child: Text(
+            text,
+            style: const TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
             ),
           ),
         ),

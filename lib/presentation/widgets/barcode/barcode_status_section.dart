@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inventory_count_flutter_app/core/resources/responsive_utils.dart';
+import 'package:inventory_count_flutter_app/presentation/view_models/barcode/barcode_bloc.dart';
+import 'package:inventory_count_flutter_app/presentation/view_models/barcode/barcode_state.dart';
+import 'package:inventory_count_flutter_app/l10n/app_localizations.dart';
 
 class BarcodeStatusSection extends StatelessWidget {
   const BarcodeStatusSection({super.key});
@@ -15,50 +19,55 @@ class BarcodeStatusSection extends StatelessWidget {
           fontWeight: FontWeight.w800,
         );
 
-    final String material = '-';
-    final String batch = '-';
-    final String serial = '-';
-    final String palletBox = '-';
-    final int qty = 0;
+    return BlocBuilder<BarcodeBloc, BarcodeState>(
+      builder: (context, state) {
+        final lastScan = state.lastScan;
+        final String material = lastScan?.matnr.isNotEmpty == true ? lastScan!.matnr : '-';
+        final String batch = lastScan?.batchNo.isNotEmpty == true ? lastScan!.batchNo : '-';
+        final String serial = lastScan?.serialNo.isNotEmpty == true ? lastScan!.serialNo : '-';
+        final String palletBox = lastScan?.palletBox.isNotEmpty == true ? lastScan!.palletBox : '-';
+        final int qty = lastScan?.qty ?? 0;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
         SizedBox(height: spacing),
-        _InfoRow(label: 'Material', value: material, style: style),
+        _InfoRow(label: AppLocalizations.of(context)!.material, value: material, style: style),
         SizedBox(height: spacing),
-        _InfoRow(label: 'Batch No', value: batch, style: style),
+        _InfoRow(label: AppLocalizations.of(context)!.batchNo, value: batch, style: style),
         SizedBox(height: spacing),
-        _InfoRow(label: 'Serial No', value: serial, style: style),
+        _InfoRow(label: AppLocalizations.of(context)!.serialNo, value: serial, style: style),
         SizedBox(height: spacing),
-        _InfoRow(label: 'Qty', value: qty.toString(), style: style),
+        _InfoRow(label: AppLocalizations.of(context)!.qty, value: qty.toString(), style: style),
         SizedBox(height: spacing),
-        _InfoRow(label: 'Pallet Box', value: palletBox, style: style),
+        _InfoRow(label: AppLocalizations.of(context)!.palletBox, value: palletBox, style: style),
         SizedBox(height: spacing),
         const Divider(thickness: 2, color: Colors.black),
         SizedBox(height: spacing),
         _InfoRow(
-          label: 'Pallet Box Count',
-          value: '0',
+          label: AppLocalizations.of(context)!.palletBoxCount,
+          value: state.palletBoxCount.toString(),
           style: style,
         ),
         SizedBox(height: spacing),
         const Divider(thickness: 2, color: Colors.black),
         SizedBox(height: spacing),
         _InfoRow(
-          label: 'Box Count',
-          value: '0',
+          label: AppLocalizations.of(context)!.boxCount,
+          value: state.boxCount.toString(),
           style: style,
         ),
         SizedBox(height: spacing),
         _InfoRow(
-          label: 'Pallet Count',
-          value: '-',
+          label: AppLocalizations.of(context)!.palletCount,
+          value: state.palletCount.toString(),
           style: style,
         ),
       ],
     );
+  },
+);
   }
 }
 

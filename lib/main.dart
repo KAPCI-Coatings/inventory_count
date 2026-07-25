@@ -4,12 +4,15 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inventory_count_flutter_app/core/di/di.dart';
+import 'package:inventory_count_flutter_app/core/services/scanner_service.dart';
 import 'package:inventory_count_flutter_app/core/routes_manger/route_generator.dart';
 import 'package:inventory_count_flutter_app/core/routes_manger/routes.dart';
 import 'package:inventory_count_flutter_app/presentation/view_models/auth/auth_bloc.dart';
 import 'package:inventory_count_flutter_app/presentation/view_models/auth/auth_event.dart';
 import 'package:inventory_count_flutter_app/presentation/view_models/barcode/barcode_bloc.dart';
 import 'package:inventory_count_flutter_app/presentation/view_models/barcode/barcode_event.dart';
+import 'package:inventory_count_flutter_app/presentation/view_models/search/search_bloc.dart';
+import 'package:inventory_count_flutter_app/presentation/view_models/search/search_event.dart';
 import 'package:inventory_count_flutter_app/presentation/view_models/settings/settings_bloc.dart';
 import 'package:inventory_count_flutter_app/presentation/view_models/settings/settings_event.dart';
 import 'package:inventory_count_flutter_app/l10n/app_localizations.dart';
@@ -25,6 +28,13 @@ void main() async {
   }
 
   await initAppModule();
+  
+  try {
+    await instance<ScannerService>().initialize();
+  } on ScannerUnavailableException catch (e) {
+    debugPrint(e.message);
+  }
+  
   runApp(const MyApp());
 }
 
@@ -46,6 +56,10 @@ class MyApp extends StatelessWidget {
         BlocProvider<SettingsBloc>(
           create: (BuildContext context) =>
               instance<SettingsBloc>()..add(SettingsLoaded()),
+        ),
+        BlocProvider<SearchBloc>(
+          create: (BuildContext context) =>
+              instance<SearchBloc>()..add(SearchInitialized()),
         ),
       ],
       child: MaterialApp(

@@ -19,6 +19,10 @@ abstract class AuthLocalDataSource {
   Future<void> saveSession({required String role});
 
   Future<String?> getLastRole();
+
+  Future<bool> isLoggedIn();
+
+  Future<void> clearSession();
 }
 
 class AuthLocalDataSourceImpl implements AuthLocalDataSource {
@@ -118,5 +122,16 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
   @override
   Future<String?> getLastRole() async {
     return _prefs.getString(_prefLastRole);
+  }
+
+  @override
+  Future<bool> isLoggedIn() async {
+    return _prefs.getBool(_prefIsLoggedIn) ?? false;
+  }
+
+  @override
+  Future<void> clearSession() async {
+    await _prefs.setBool(_prefIsLoggedIn, false);
+    // Optionally clear other auth prefs if needed
   }
 }

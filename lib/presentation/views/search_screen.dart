@@ -6,7 +6,11 @@ import 'package:inventory_count_flutter_app/core/widgets/numeric_keypad.dart';
 import 'package:inventory_count_flutter_app/core/widgets/default_button.dart';
 import 'package:inventory_count_flutter_app/core/widgets/screen_title.dart';
 import 'package:inventory_count_flutter_app/l10n/app_localizations.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inventory_count_flutter_app/presentation/widgets/search/search_results_table.dart';
+import 'package:inventory_count_flutter_app/presentation/view_models/search/search_bloc.dart';
+import 'package:inventory_count_flutter_app/presentation/view_models/search/search_event.dart';
+import 'package:inventory_count_flutter_app/presentation/view_models/search/search_state.dart';
 
 class SearchScreen extends StatelessWidget {
   const SearchScreen({super.key});
@@ -37,6 +41,11 @@ class _SearchContentViewState extends State<_SearchContentView> {
     super.initState();
     _materialFocus.addListener(_onFocusChange);
     _batchFocus.addListener(_onFocusChange);
+    
+    // Automatically load all scanned barcodes on screen open
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _dispatchSearch();
+    });
   }
 
   void _onFocusChange() {
@@ -58,6 +67,13 @@ class _SearchContentViewState extends State<_SearchContentView> {
     super.dispose();
   }
 
+  void _dispatchSearch() {
+    context.read<SearchBloc>().add(SearchQueryChanged(
+      matnr: _materialController.text,
+      batchNo: _batchController.text,
+    ));
+  }
+
   void _onDigitPressed(String digit) {
     final controller = _activeController;
     if (controller == null) return;
@@ -65,15 +81,25 @@ class _SearchContentViewState extends State<_SearchContentView> {
     final text = controller.text;
     final selection = controller.selection;
     
+    String resultingText;
     if (selection.start >= 0 && selection.end >= 0) {
-      final newText = text.replaceRange(selection.start, selection.end, digit);
+      resultingText = text.replaceRange(selection.start, selection.end, digit);
+    } else {
+      resultingText = text + digit;
+    }
+
+    if (controller == _materialController && resultingText.length > 6) return;
+    if (controller == _batchController && resultingText.length > 10) return;
+
+    if (selection.start >= 0 && selection.end >= 0) {
       controller.value = TextEditingValue(
-        text: newText,
+        text: resultingText,
         selection: TextSelection.collapsed(offset: selection.start + 1),
       );
     } else {
-      controller.text = text + digit;
+      controller.text = resultingText;
     }
+    _dispatchSearch();
   }
 
   void _onDeletePressed() {
@@ -96,6 +122,7 @@ class _SearchContentViewState extends State<_SearchContentView> {
         selection: TextSelection.collapsed(offset: selection.start),
       );
     }
+    _dispatchSearch();
   }
 
   @override
@@ -146,9 +173,12 @@ class _SearchContentViewState extends State<_SearchContentView> {
                       focusNode: _materialFocus,
                       labelText: AppLocalizations.of(context)!.material,
                       keyboardType: TextInputType.none,
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        LengthLimitingTextInputFormatter(6),
+                      ],
                       height: 45,
-                      onChanged: (value) {},
+                      onChanged: (value) => _dispatchSearch(),
                     ),
                   ),
                   SizedBox(
@@ -161,9 +191,12 @@ class _SearchContentViewState extends State<_SearchContentView> {
                       focusNode: _batchFocus,
                       labelText: AppLocalizations.of(context)!.filterPatch,
                       keyboardType: TextInputType.none,
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        LengthLimitingTextInputFormatter(10),
+                      ],
                       height: 45,
-                      onChanged: (value) {},
+                      onChanged: (value) => _dispatchSearch(),
                     ),
                   ),
                 ],
@@ -173,10 +206,14 @@ class _SearchContentViewState extends State<_SearchContentView> {
               ),
 
               // 4. Table
-              const Expanded(
-                child: SearchResultsTable(
-                  items: [],
-                  totalQty: 0,
+              Expanded(
+                child: BlocBuilder<SearchBloc, SearchState>(
+                  builder: (context, state) {
+                    return SearchResultsTable(
+                      items: state.items,
+                      totalQty: state.totalQty,
+                    );
+                  },
                 ),
               ),
               SizedBox(
@@ -202,6 +239,7 @@ class _SearchContentViewState extends State<_SearchContentView> {
                       onPressed: () {
                         _materialController.clear();
                         _batchController.clear();
+                        _dispatchSearch();
                       },
                     ),
                   ),
@@ -223,7 +261,11 @@ class _SearchContentViewState extends State<_SearchContentView> {
                         0xFFAFAFAF,
                       ), // Grey button
                       textColor: Colors.black,
-                      onPressed: () {},
+                      onPressed: () {
+                        _dispatchSearch();
+                        _materialFocus.unfocus();
+                        _batchFocus.unfocus();
+                      },
                     ),
                   ),
                 ],

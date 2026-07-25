@@ -148,8 +148,9 @@ class LoginForm extends StatelessWidget {
                   controller: passwordController,
                   focusNode: passwordFocusNode,
                   enabled: !isLoading,
+                  readOnly: true,
+                  showCursor: true,
                   obscureText: true,
-                  keyboardType: TextInputType.none,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   style: textTheme.bodyMedium?.copyWith(
                     fontSize: fieldFont,

@@ -68,4 +68,10 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<String?> getLastRole() => _localDataSource.getLastRole();
+
+  @override
+  Future<bool> isLoggedIn() => _localDataSource.isLoggedIn();
+
+  @override
+  Future<void> logout() => _localDataSource.clearSession();
 }

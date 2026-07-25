@@ -13,4 +13,8 @@ abstract class AuthRepository {
   });
 
   Future<String?> getLastRole();
+
+  Future<bool> isLoggedIn();
+
+  Future<void> logout();
 }

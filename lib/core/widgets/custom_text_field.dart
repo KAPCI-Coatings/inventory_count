@@ -6,6 +6,7 @@ class CustomTextField extends StatelessWidget {
   final TextEditingController? controller;
   final FocusNode? focusNode;
   final String labelText;
+  final String? hintText;
   final ValueChanged<String>? onChanged;
   final String? initialValue;
   final TextInputType? keyboardType;
@@ -22,6 +23,7 @@ class CustomTextField extends StatelessWidget {
     this.controller,
     this.focusNode,
     required this.labelText,
+    this.hintText,
     this.onChanged,
     this.initialValue,
     this.keyboardType,
@@ -70,6 +72,7 @@ class CustomTextField extends StatelessWidget {
         decoration: InputDecoration(
           isDense: true,
           labelText: labelText,
+          hintText: hintText,
           floatingLabelBehavior: FloatingLabelBehavior.always,
           labelStyle: TextStyle(
             fontSize: ResponsiveUtils.responsiveFontSize(context, 22),
@@ -79,8 +82,8 @@ class CustomTextField extends StatelessWidget {
           filled: true,
           fillColor: Colors.white,
           contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 10,
+            horizontal: 24,
+            vertical: 14,
           ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),

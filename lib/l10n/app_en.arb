@@ -90,5 +90,22 @@
   },
   "yes": "Yes",
   "no": "No",
-  "ok": "OK"
+  "ok": "OK",
+  "baseUrl": "Base URL",
+  "send": "Send",
+  "export": "Export",
+  "post": "Post",
+  "numberOfScan": "Number of Scan",
+  "noScannedBarcodesYet": "No scanned barcodes yet.",
+  "columnNo": "No.",
+  "columnBarcodeFull": "Barcode Full",
+  "batchNo": "Batch No",
+  "serialNo": "Serial No",
+  "palletBox": "Pallet Box",
+  "palletBoxCount": "Pallet Box Count",
+  "boxCount": "Box Count",
+  "palletCount": "Pallet Count",
+  "warning": "Warning",
+  "success": "Success",
+  "confirm_clear_screen": "Reset the screen? Scanned data will remain saved in the database."
 }

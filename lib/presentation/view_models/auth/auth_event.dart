@@ -43,3 +43,7 @@ class AuthPasswordChangeRequested extends AuthEvent {
   @override
   List<Object?> get props => [actorRole, targetRole, newPassword];
 }
+
+class AuthLogoutRequested extends AuthEvent {
+  const AuthLogoutRequested();
+}

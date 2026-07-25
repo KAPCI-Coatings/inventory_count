@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inventory_count_flutter_app/presentation/view_models/barcode/barcode_bloc.dart';
 import 'package:inventory_count_flutter_app/presentation/view_models/barcode/barcode_state.dart';
+import 'package:inventory_count_flutter_app/l10n/app_localizations.dart';
 
 import '../../../core/resources/responsive_utils.dart';
 
@@ -58,7 +59,7 @@ class BarcodeHistoryTableSection extends StatelessWidget {
 
         if (rows.isEmpty) {
           return Text(
-            'No scanned barcodes yet.',
+            AppLocalizations.of(context)!.noScannedBarcodesYet,
             style: emptyStateStyle,
           );
         }
@@ -93,13 +94,13 @@ class BarcodeHistoryTableSection extends StatelessWidget {
                     columns: <DataColumn>[
                       DataColumn(
                         label: Text(
-                          'No.',
+                          AppLocalizations.of(context)!.columnNo,
                           style: columnHeaderStyle,
                         ),
                       ),
                       DataColumn(
                         label: Text(
-                          'Barcode Full',
+                          AppLocalizations.of(context)!.columnBarcodeFull,
                           style: columnHeaderStyle,
                         ),
                       ),

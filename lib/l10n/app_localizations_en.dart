@@ -216,4 +216,56 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get ok => 'OK';
+
+  @override
+  String get baseUrl => 'Base URL';
+
+  @override
+  String get send => 'Send';
+
+  @override
+  String get export => 'Export';
+
+  @override
+  String get post => 'Post';
+
+  @override
+  String get numberOfScan => 'Number of Scan';
+
+  @override
+  String get noScannedBarcodesYet => 'No scanned barcodes yet.';
+
+  @override
+  String get columnNo => 'No.';
+
+  @override
+  String get columnBarcodeFull => 'Barcode Full';
+
+  @override
+  String get batchNo => 'Batch No';
+
+  @override
+  String get serialNo => 'Serial No';
+
+  @override
+  String get palletBox => 'Pallet Box';
+
+  @override
+  String get palletBoxCount => 'Pallet Box Count';
+
+  @override
+  String get boxCount => 'Box Count';
+
+  @override
+  String get palletCount => 'Pallet Count';
+
+  @override
+  String get warning => 'Warning';
+
+  @override
+  String get success => 'Success';
+
+  @override
+  String get confirm_clear_screen =>
+      'Reset the screen? Scanned data will remain saved in the database.';
 }

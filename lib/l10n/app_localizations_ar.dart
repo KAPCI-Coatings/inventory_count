@@ -211,4 +211,56 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get ok => 'موافق';
+
+  @override
+  String get baseUrl => 'الرابط الأساسي';
+
+  @override
+  String get send => 'إرسال';
+
+  @override
+  String get export => 'تصدير';
+
+  @override
+  String get post => 'نشر';
+
+  @override
+  String get numberOfScan => 'عدد المسح';
+
+  @override
+  String get noScannedBarcodesYet => 'لا توجد باركودات ممسوحة بعد.';
+
+  @override
+  String get columnNo => 'م.';
+
+  @override
+  String get columnBarcodeFull => 'الباركود بالكامل';
+
+  @override
+  String get batchNo => 'رقم التشغيلة';
+
+  @override
+  String get serialNo => 'الرقم التسلسلي';
+
+  @override
+  String get palletBox => 'باليتة/صندوق';
+
+  @override
+  String get palletBoxCount => 'عدد الباليتات/الصناديق';
+
+  @override
+  String get boxCount => 'عدد الصناديق';
+
+  @override
+  String get palletCount => 'عدد الباليتات';
+
+  @override
+  String get warning => 'تحذير';
+
+  @override
+  String get success => 'نجاح';
+
+  @override
+  String get confirm_clear_screen =>
+      'إعادة ضبط الشاشة؟ ستظل البيانات الممسوحة محفوظة في قاعدة البيانات.';
 }

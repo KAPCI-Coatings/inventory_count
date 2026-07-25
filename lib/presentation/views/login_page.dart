@@ -24,10 +24,33 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   final FocusNode _passwordFocus = FocusNode();
 
+  /// Prevents double-navigation when both postFrameCallback and
+  /// BlocConsumer listener detect an authenticated state.
+  bool _hasNavigated = false;
+
   @override
   void initState() {
     super.initState();
     _passwordFocus.addListener(_onFocusChange);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _hasNavigated) return;
+      final state = context.read<AuthBloc>().state;
+      if (state.status == AuthStatus.authenticated) {
+        _navigateBasedOnRole(context);
+      }
+    });
+  }
+
+  void _navigateBasedOnRole(BuildContext context) {
+    if (_hasNavigated) return;
+    _hasNavigated = true;
+    final SettingsState settingsState = context.read<SettingsBloc>().state;
+    if (settingsState.selectedOption == SettingsOption.asset) {
+      Navigator.of(context).pushReplacementNamed(Routes.assets);
+    } else {
+      Navigator.of(context).pushReplacementNamed(Routes.barcode);
+    }
   }
 
   void _onFocusChange() {
@@ -91,12 +114,7 @@ class _LoginPageState extends State<LoginPage> {
         },
         listener: (BuildContext context, AuthState state) {
           if (state.status == AuthStatus.authenticated) {
-            final SettingsState settingsState = context.read<SettingsBloc>().state;
-            if (settingsState.selectedOption == SettingsOption.asset) {
-              Navigator.of(context).pushReplacementNamed(Routes.assets);
-            } else {
-              Navigator.of(context).pushReplacementNamed(Routes.barcode);
-            }
+            _navigateBasedOnRole(context);
             return;
           }
         },

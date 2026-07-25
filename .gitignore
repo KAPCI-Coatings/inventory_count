@@ -34,6 +34,8 @@ docs/
 .pub/
 /build/
 /coverage/
+Backend/
+
 
 # Symbolication related
 app.*.symbols

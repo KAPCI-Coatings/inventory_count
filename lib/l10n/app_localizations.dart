@@ -475,6 +475,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'OK'**
   String get ok;
+
+  /// No description provided for @baseUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Base URL'**
+  String get baseUrl;
+
+  /// No description provided for @send.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get send;
+
+  /// No description provided for @export.
+  ///
+  /// In en, this message translates to:
+  /// **'Export'**
+  String get export;
+
+  /// No description provided for @post.
+  ///
+  /// In en, this message translates to:
+  /// **'Post'**
+  String get post;
+
+  /// No description provided for @numberOfScan.
+  ///
+  /// In en, this message translates to:
+  /// **'Number of Scan'**
+  String get numberOfScan;
+
+  /// No description provided for @noScannedBarcodesYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No scanned barcodes yet.'**
+  String get noScannedBarcodesYet;
+
+  /// No description provided for @columnNo.
+  ///
+  /// In en, this message translates to:
+  /// **'No.'**
+  String get columnNo;
+
+  /// No description provided for @columnBarcodeFull.
+  ///
+  /// In en, this message translates to:
+  /// **'Barcode Full'**
+  String get columnBarcodeFull;
+
+  /// No description provided for @batchNo.
+  ///
+  /// In en, this message translates to:
+  /// **'Batch No'**
+  String get batchNo;
+
+  /// No description provided for @serialNo.
+  ///
+  /// In en, this message translates to:
+  /// **'Serial No'**
+  String get serialNo;
+
+  /// No description provided for @palletBox.
+  ///
+  /// In en, this message translates to:
+  /// **'Pallet Box'**
+  String get palletBox;
+
+  /// No description provided for @palletBoxCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Pallet Box Count'**
+  String get palletBoxCount;
+
+  /// No description provided for @boxCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Box Count'**
+  String get boxCount;
+
+  /// No description provided for @palletCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Pallet Count'**
+  String get palletCount;
+
+  /// No description provided for @warning.
+  ///
+  /// In en, this message translates to:
+  /// **'Warning'**
+  String get warning;
+
+  /// No description provided for @success.
+  ///
+  /// In en, this message translates to:
+  /// **'Success'**
+  String get success;
+
+  /// No description provided for @confirm_clear_screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset the screen? Scanned data will remain saved in the database.'**
+  String get confirm_clear_screen;
 }
 
 class _AppLocalizationsDelegate

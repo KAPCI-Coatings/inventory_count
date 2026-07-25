@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inventory_count_flutter_app/core/routes_manger/routes.dart';
+import 'package:inventory_count_flutter_app/presentation/view_models/auth/auth_bloc.dart';
+import 'package:inventory_count_flutter_app/presentation/view_models/auth/auth_event.dart';
 
 
 class BarcodeAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -23,7 +26,10 @@ class BarcodeAppBar extends StatelessWidget implements PreferredSizeWidget {
       leading: showBack
           ? IconButton(
               icon: const Icon(Icons.arrow_back),
-              onPressed: () => Navigator.of(context).pushReplacementNamed(Routes.login),
+              onPressed: () {
+                context.read<AuthBloc>().add(const AuthLogoutRequested());
+                Navigator.of(context).pushReplacementNamed(Routes.login);
+              },
             )
           : null,
       title: title.isEmpty
