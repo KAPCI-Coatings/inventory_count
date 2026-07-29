@@ -56,6 +56,7 @@ class BarcodeBloc extends Bloc<BarcodeEvent, BarcodeState> {
     });
 
     on<BarcodeClearMessageRequested>((event, emit) {
+      _scannerService.enableScanner().catchError((_) {});
       emit(state.copyWith(
         message: null,
         centeredErrorMessage: null,
@@ -66,6 +67,7 @@ class BarcodeBloc extends Bloc<BarcodeEvent, BarcodeState> {
     });
 
     on<BarcodeDismissCenteredMessageRequested>((event, emit) {
+      _scannerService.enableScanner().catchError((_) {});
       emit(state.copyWith(
         centeredErrorMessage: null,
         centeredSuccessMessage: null,
@@ -106,8 +108,6 @@ class BarcodeBloc extends Bloc<BarcodeEvent, BarcodeState> {
         centeredWarningMessage: null,
       ));
 
-      // Resume our own subscription and re-enable the hardware scanner.
-      _scanSubscription?.resume();
       _scannerService.enableScanner().catchError((_) {});
     });
 
@@ -116,17 +116,16 @@ class BarcodeBloc extends Bloc<BarcodeEvent, BarcodeState> {
         status: BarcodeStatus.initial,
         centeredWarningMessage: null,
       ));
-      // Resume our own subscription and re-enable the hardware scanner.
-      _scanSubscription?.resume();
       _scannerService.enableScanner().catchError((_) {});
     });
 
     // ── Send to Backend ─────────────────────────────────────────────────────
     on<BarcodePostCurrentOrderRequested>(_onPostCurrentOrder);
 
-    // ── Clear Screen (keep cache) ────────────────────────────────────────────
-    on<BarcodeNewOrderRequested>((event, emit) {
-      debugPrint('[BarcodeBloc] BarcodeNewOrderRequested — resetting screen, keeping DB data');
+    // ── Clear Screen & Cache ──────────────────────────────────────────────────
+    on<BarcodeNewOrderRequested>((event, emit) async {
+      debugPrint('[BarcodeBloc] BarcodeNewOrderRequested — clearing cache DB and resetting screen');
+      await _barcodeRepository.clearSession();
       emit(const BarcodeState());
       // Re-enable scanner after reset so the next scan works immediately
       _scannerService.enableScanner().catchError((_) {});
@@ -142,19 +141,7 @@ class BarcodeBloc extends Bloc<BarcodeEvent, BarcodeState> {
     on<BarcodeScannerEnableRequested>((event, emit) async {
       debugPrint('[BarcodeBloc] BarcodeScannerEnableRequested received');
       try {
-        // If subscription is paused (e.g. after an error), resume it.
-        if (_scanSubscription != null) {
-          if (_scanSubscription!.isPaused) {
-            _scanSubscription!.resume();
-          }
-          await _scannerService.enableScanner();
-          debugPrint('[BarcodeBloc] Scanner subscription resumed/already active');
-          return;
-        }
-
-        // We assign the stream listener BEFORE awaiting enableScanner
-        // to prevent race conditions where this handler runs concurrently.
-        _scanSubscription = _scannerService.onScan.listen(
+        _scanSubscription ??= _scannerService.onScan.listen(
           (result) {
             debugPrint(
               '[BarcodeBloc] ★ SCAN RECEIVED from stream: "${result.data}" label=${result.labelType}',
@@ -165,6 +152,7 @@ class BarcodeBloc extends Bloc<BarcodeEvent, BarcodeState> {
             debugPrint('[BarcodeBloc] ★ SCAN STREAM ERROR: $error');
           },
         );
+        debugPrint('[BarcodeBloc] Scanner stream listener active');
 
         await _scannerService.enableScanner();
         debugPrint('[BarcodeBloc] Scanner enabled successfully');
@@ -174,16 +162,7 @@ class BarcodeBloc extends Bloc<BarcodeEvent, BarcodeState> {
     });
 
     on<BarcodeScannerDisableRequested>((event, emit) async {
-      debugPrint('[BarcodeBloc] BarcodeScannerDisableRequested received');
-      try {
-        // Cancel only our own subscription. Do NOT disable the hardware scanner
-        // because other screens (e.g. AssetsScreen) share the same singleton.
-        await _scanSubscription?.cancel();
-        _scanSubscription = null;
-        debugPrint('[BarcodeBloc] Scanner subscription cancelled successfully');
-      } catch (e) {
-        debugPrint('[BarcodeBloc] ERROR cancelling scanner subscription: $e');
-      }
+      debugPrint('[BarcodeBloc] BarcodeScannerDisableRequested received (no-op)');
     });
 
     // ── Barcode Scanned ──────────────────────────────────────────────────────
@@ -196,8 +175,8 @@ class BarcodeBloc extends Bloc<BarcodeEvent, BarcodeState> {
     BarcodeScanned event,
     Emitter<BarcodeState> emit,
   ) async {
-    if (_isProcessingScan) {
-      debugPrint('[BarcodeBloc] Ignored concurrent scan event: "${event.barcode}"');
+    if (_isProcessingScan || state.status == BarcodeStatus.warning || state.status == BarcodeStatus.posting) {
+      debugPrint('[BarcodeBloc] Ignored scan while processing/warning/posting: "${event.barcode}"');
       return;
     }
     
@@ -222,10 +201,6 @@ class BarcodeBloc extends Bloc<BarcodeEvent, BarcodeState> {
 
       if (result.isDuplicate) {
         debugPrint('[BarcodeBloc] DUPLICATE detected: $cleanBarcode');
-        // Pause our own subscription — do NOT call disableScanner() on the
-        // shared hardware scanner, as other screens (e.g. AssetsScreen) also
-        // depend on it.
-        _scanSubscription?.pause();
         // Do NOT update lists or counters yet. Save it in lastScan for confirmation.
         emit(state.copyWith(
           status: BarcodeStatus.warning,
@@ -262,11 +237,6 @@ class BarcodeBloc extends Bloc<BarcodeEvent, BarcodeState> {
       }
     } on InvalidBarcodeFormatException catch (e) {
       debugPrint('[BarcodeBloc] INVALID FORMAT: ${e.message}');
-      // Pause our own subscription — do NOT disable the hardware scanner
-      // because other screens (e.g. AssetsScreen) share the same singleton.
-      // The BarcodeScreen's error popup has a Retry button that will call
-      // BarcodeScannerEnableRequested which resumes the subscription.
-      _scanSubscription?.pause();
       emit(BarcodeState(
         status: BarcodeStatus.error,
         itemBoxes: state.itemBoxes,
@@ -279,8 +249,6 @@ class BarcodeBloc extends Bloc<BarcodeEvent, BarcodeState> {
       ));
     } catch (e, stackTrace) {
       debugPrint('[BarcodeBloc] UNEXPECTED ERROR: $e\n$stackTrace');
-      // Pause our own subscription — do NOT disable the hardware scanner.
-      _scanSubscription?.pause();
       emit(BarcodeState(
         status: BarcodeStatus.error,
         itemBoxes: state.itemBoxes,
@@ -339,9 +307,8 @@ class BarcodeBloc extends Bloc<BarcodeEvent, BarcodeState> {
     );
 
     if (result.success) {
-      debugPrint('[BarcodeBloc] POST success — clearing cache session DB');
-      await _barcodeRepository.clearSession();
-      emit(const BarcodeState(
+      debugPrint('[BarcodeBloc] POST success — keeping data in cache & on screen');
+      emit(state.copyWith(
         status: BarcodeStatus.success,
         isSending: false,
         sendResultMessage: 'success_post_clear_cache',

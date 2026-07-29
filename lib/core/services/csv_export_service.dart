@@ -1,16 +1,21 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
-import 'package:file_saver/file_saver.dart';
+import 'package:flutter/material.dart';
 import 'package:inventory_count_flutter_app/domain/entities/barcode.dart';
 import 'package:inventory_count_flutter_app/domain/entities/asset_scan.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:flutter_email_sender/flutter_email_sender.dart';
+import 'package:share_plus/share_plus.dart';
+
+const String _exportEmail = 'aminmohamedkhames@gmail.com';
 
 class CsvExportService {
-  /// Exports the given items to a CSV file and triggers the native share dialog.
-  /// The CSV file will contain two tables: one for box data, one for pallet data.
+  /// Exports inventory barcode data to a CSV and shares it via the native
+  /// share sheet (user can pick Gmail or any email app).
   Future<void> exportToCsv(List<ItemBox> items) async {
     final StringBuffer buffer = StringBuffer();
 
-    // Separate items into boxes and pallets
     final List<ItemBox> boxes = items.where((item) => !item.isPallet).toList();
     final List<ItemBox> pallets = items.where((item) => item.isPallet).toList();
 
@@ -23,7 +28,7 @@ class CsvExportService {
       );
     }
 
-    buffer.writeln(); // Empty line between tables
+    buffer.writeln();
 
     // --- Table 2: Pallet Data ---
     buffer.writeln('PALLET DATA');
@@ -34,21 +39,13 @@ class CsvExportService {
       );
     }
 
-    // Add UTF-8 BOM for Excel compatibility, then encode the CSV string
-    final List<int> bom = [0xEF, 0xBB, 0xBF];
-    final List<int> bytes = utf8.encode(buffer.toString());
-    final Uint8List fileBytes = Uint8List.fromList(bom + bytes);
-
-    // Save to device using file_saver
-    await FileSaver.instance.saveAs(
-      name:
-          'inventory_export_${DateTime.now().toIso8601String().replaceAll(':', '-')}',
-      bytes: fileBytes,
-      fileExtension: 'csv',
-      mimeType: MimeType.csv,
+    await _shareAsCsv(
+      buffer.toString(),
+      'inventory_export_${_timestamp()}',
     );
   }
 
+  /// Exports asset scan data to a CSV and shares it via the native share sheet.
   Future<void> exportAssetScansToCsv(List<AssetScan> items) async {
     final StringBuffer buffer = StringBuffer();
 
@@ -60,24 +57,52 @@ class CsvExportService {
       );
     }
 
-    // Add UTF-8 BOM for Excel compatibility, then encode the CSV string
-    final List<int> bom = [0xEF, 0xBB, 0xBF];
-    final List<int> bytes = utf8.encode(buffer.toString());
-    final Uint8List fileBytes = Uint8List.fromList(bom + bytes);
-
-    await FileSaver.instance.saveAs(
-      name:
-          'asset_export_${DateTime.now().toIso8601String().replaceAll(':', '-')}',
-      bytes: fileBytes,
-      fileExtension: 'csv',
-      mimeType: MimeType.csv,
+    await _shareAsCsv(
+      buffer.toString(),
+      'asset_export_${_timestamp()}',
     );
   }
 
-  /// Helper to safely escape CSV strings that might contain commas
+  // ── Helpers ───────────────────────────────────────────────────────────────
+
+  Future<void> _shareAsCsv(String csvContent, String fileName) async {
+    // Add UTF-8 BOM for Excel compatibility
+    final List<int> bom = [0xEF, 0xBB, 0xBF];
+    final List<int> bytes = utf8.encode(csvContent);
+    final Uint8List fileBytes = Uint8List.fromList(bom + bytes);
+
+    // Write to a temporary file so email client can attach it
+    final Directory tempDir = await getTemporaryDirectory();
+    final File tempFile = File('${tempDir.path}/$fileName.csv');
+    await tempFile.writeAsBytes(fileBytes);
+
+    final Email email = Email(
+      body: 'بيانات تصدير ملفات الجرد مرفقة في هذا الإيميل.',
+      subject: 'INC Export — $fileName',
+      recipients: [_exportEmail],
+      attachmentPaths: [tempFile.path],
+      isHTML: false,
+    );
+
+    try {
+      await FlutterEmailSender.send(email);
+    } catch (e) {
+      debugPrint('[CsvExportService] FlutterEmailSender failed, falling back to Share: $e');
+      final XFile xFile = XFile(tempFile.path, mimeType: 'text/csv');
+      await Share.shareXFiles(
+        [xFile],
+        subject: 'INC Export — $fileName',
+        text: 'إرسال إلى: $_exportEmail',
+      );
+    }
+  }
+
+  String _timestamp() =>
+      DateTime.now().toIso8601String().replaceAll(':', '-').split('.').first;
+
   String _escapeCsv(String value) {
-    if (value.contains(',')) {
-      return '"$value"';
+    if (value.contains(',') || value.contains('"') || value.contains('\n')) {
+      return '"${value.replaceAll('"', '""')}"';
     }
     return value;
   }

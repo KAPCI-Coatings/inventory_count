@@ -101,7 +101,7 @@ abstract class AppLocalizations {
   /// No description provided for @settings.
   ///
   /// In en, this message translates to:
-  /// **'Settings'**
+  /// **'الإعدادات'**
   String get settings;
 
   /// No description provided for @language.
@@ -185,13 +185,13 @@ abstract class AppLocalizations {
   /// No description provided for @exit.
   ///
   /// In en, this message translates to:
-  /// **'Exit'**
+  /// **'خروج'**
   String get exit;
 
   /// No description provided for @search.
   ///
   /// In en, this message translates to:
-  /// **'Search'**
+  /// **'بحث'**
   String get search;
 
   /// No description provided for @material.
@@ -233,7 +233,7 @@ abstract class AppLocalizations {
   /// No description provided for @clear.
   ///
   /// In en, this message translates to:
-  /// **'Clear'**
+  /// **'مسح'**
   String get clear;
 
   /// No description provided for @error.
@@ -305,7 +305,7 @@ abstract class AppLocalizations {
   /// No description provided for @login.
   ///
   /// In en, this message translates to:
-  /// **'Login'**
+  /// **'تسجيل الدخول'**
   String get login;
 
   /// No description provided for @inventoryCount.
@@ -485,13 +485,13 @@ abstract class AppLocalizations {
   /// No description provided for @send.
   ///
   /// In en, this message translates to:
-  /// **'Send'**
+  /// **'إرسال'**
   String get send;
 
   /// No description provided for @export.
   ///
   /// In en, this message translates to:
-  /// **'Export'**
+  /// **'ارفاق ملف'**
   String get export;
 
   /// No description provided for @post.
@@ -575,8 +575,14 @@ abstract class AppLocalizations {
   /// No description provided for @confirm_clear_screen.
   ///
   /// In en, this message translates to:
-  /// **'Reset the screen? Scanned data will remain saved in the database.'**
+  /// **'هل انت متاكد من مسح جميع البيانات من الجهاز'**
   String get confirm_clear_screen;
+
+  /// No description provided for @confirm_duplicate_barcode.
+  ///
+  /// In en, this message translates to:
+  /// **'هل تريد تكرار هذا الباركود'**
+  String get confirm_duplicate_barcode;
 }
 
 class _AppLocalizationsDelegate

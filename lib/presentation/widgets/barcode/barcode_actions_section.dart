@@ -9,6 +9,7 @@ import 'package:inventory_count_flutter_app/presentation/view_models/barcode/bar
 import 'package:inventory_count_flutter_app/presentation/view_models/barcode/barcode_state.dart';
 import 'package:inventory_count_flutter_app/core/di/di.dart';
 import 'package:inventory_count_flutter_app/core/services/csv_export_service.dart';
+import 'package:inventory_count_flutter_app/core/services/scanner_service.dart';
 import 'package:inventory_count_flutter_app/domain/repositories/barcode_repository.dart';
 import 'package:inventory_count_flutter_app/l10n/app_localizations.dart';
 
@@ -37,38 +38,47 @@ class _BarcodeActionsSectionState extends State<BarcodeActionsSection> {
   }
 
   Future<void> _showClearConfirmation(BuildContext context) async {
-    final l10n = AppLocalizations.of(context);
-    final bool? confirmed = await showDialog<bool>(
-      context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        title: Text(
-          l10n?.clear ?? 'Clear',
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        content: Text(
-          l10n?.confirm_clear_screen ?? 'Reset the screen? Scanned data will remain saved.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: Text(l10n?.no ?? 'No'),
+    try {
+      await instance<ScannerService>().disableScanner();
+    } catch (_) {}
+    try {
+      if (!context.mounted) return;
+      final bool? confirmed = await showDialog<bool>(
+        context: context,
+        barrierDismissible: false,
+        builder: (dialogContext) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          title: const Text(
+            'مسح البيانات',
+            style: TextStyle(fontWeight: FontWeight.bold),
           ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.black87),
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: Text(
-              l10n?.yes ?? 'Yes',
-              style: const TextStyle(color: Colors.white),
+          content: const Text(
+            'هل انت متاكد من مسح جميع البيانات من الجهاز',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: const Text('لا'),
             ),
-          ),
-        ],
-      ),
-    );
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.black87),
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: const Text(
+                'نعم',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+      );
 
-    if (confirmed == true && context.mounted) {
-      context.read<BarcodeBloc>().add(BarcodeNewOrderRequested());
+      if (confirmed == true && context.mounted) {
+        context.read<BarcodeBloc>().add(BarcodeNewOrderRequested());
+      }
+    } finally {
+      try {
+        await instance<ScannerService>().enableScanner();
+      } catch (_) {}
     }
   }
 
@@ -80,22 +90,65 @@ class _BarcodeActionsSectionState extends State<BarcodeActionsSection> {
         final bool isUser = authState.selectedRole.toLowerCase() == 'user';
 
         if (isUser) {
-          return Center(
-            child: DefaultButton(
-              text: AppLocalizations.of(context)!.exit,
-              onPressed: () {
-                context.read<AuthBloc>().add(const AuthLogoutRequested());
-                Navigator.of(context).pushReplacementNamed(Routes.login);
-              },
-              backgroundColor: Colors.grey.shade400,
-              textColor: Colors.black,
-              textSize: ResponsiveUtils.responsiveFontSize(context, 16),
-              width: ResponsiveUtils.responsiveWidth(context, 0.4),
-              height: ResponsiveUtils.responsiveHeight(
-                context,
-                0.07,
-              ).clamp(48, 64),
-            ),
+          final double gap = ResponsiveUtils.responsiveSpacing(context, 8);
+          return Column(
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: DefaultButton(
+                      text: AppLocalizations.of(context)!.search,
+                      onPressed: () => _navigateToRoute(Routes.search),
+                      backgroundColor: Colors.grey.shade400,
+                      textColor: Colors.black,
+                      textSize: ResponsiveUtils.responsiveFontSize(context, 16),
+                    ),
+                  ),
+                  SizedBox(width: gap),
+                  Expanded(
+                    child: BlocBuilder<BarcodeBloc, BarcodeState>(
+                      buildWhen: (p, c) => false,
+                      builder: (ctx, s) => DefaultButton(
+                        text: AppLocalizations.of(context)!.export,
+                        onPressed: _isExporting
+                            ? null
+                            : () async {
+                                setState(() => _isExporting = true);
+                                try {
+                                  final items = await instance<BarcodeRepository>()
+                                      .getScannedItems();
+                                  await instance<CsvExportService>()
+                                      .exportToCsv(items);
+                                } finally {
+                                  if (mounted) {
+                                    setState(() => _isExporting = false);
+                                  }
+                                }
+                              },
+                        backgroundColor: Colors.grey.shade400,
+                        textColor: Colors.black,
+                        textSize: ResponsiveUtils.responsiveFontSize(context, 16),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: gap),
+              Center(
+                child: DefaultButton(
+                  text: AppLocalizations.of(context)!.exit,
+                  onPressed: () {
+                    context.read<AuthBloc>().add(const AuthLogoutRequested());
+                    Navigator.of(context).pushReplacementNamed(Routes.login);
+                  },
+                  backgroundColor: Colors.grey.shade400,
+                  textColor: Colors.black,
+                  textSize: ResponsiveUtils.responsiveFontSize(context, 16),
+                  width: ResponsiveUtils.responsiveWidth(context, 0.4),
+                  height: ResponsiveUtils.responsiveHeight(context, 0.07).clamp(48, 64),
+                ),
+              ),
+            ],
           );
         }
 

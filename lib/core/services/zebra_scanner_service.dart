@@ -188,8 +188,9 @@ class ZebraScannerService with WidgetsBindingObserver implements ScannerService 
     _assertInitialised();
     _scannerEnabled = true;
     try {
+      await _dw.switchToProfile(profileName);
       await _dw.enableScanner();
-      debugPrint('[ZebraScannerService] Scanner enabled');
+      debugPrint('[ZebraScannerService] Scanner enabled & profile active');
     } catch (e) {
       throw ScannerOperationException('Failed to enable scanner', cause: e);
     }
@@ -322,6 +323,10 @@ class ZebraScannerService with WidgetsBindingObserver implements ScannerService 
 
   void _handleEvent(DataWedgeEvent event) {
     if (event.isScan) {
+      if (!_scannerEnabled) {
+        debugPrint('[ZebraScannerService] Ignored scan because scanner is disabled by app state (e.g. popup is open).');
+        return;
+      }
       final String? data = event.scanData;
       final String? label = event.labelType;
 

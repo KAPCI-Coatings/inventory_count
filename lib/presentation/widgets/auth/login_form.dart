@@ -177,7 +177,7 @@ class LoginForm extends StatelessWidget {
                 ),
               SizedBox(height: buttonGap),
               DefaultButton(
-                text: l10n?.login ?? 'Login',
+                text: l10n?.login ?? 'تسجيل الدخول',
                 onPressed: () {
                   if (formKey.currentState?.validate() ?? false) {
                     context.read<AuthBloc>().add(

@@ -18,17 +18,19 @@ class BarcodeScreen extends StatefulWidget {
 }
 
 class _BarcodeScreenState extends State<BarcodeScreen> {
+  BarcodeBloc? _bloc;
+
   @override
   void initState() {
     super.initState();
-    context.read<BarcodeBloc>()
+    _bloc = context.read<BarcodeBloc>();
+    _bloc!
       ..add(BarcodeInitializeRequested())
       ..add(BarcodeScannerEnableRequested());
   }
 
   @override
   void dispose() {
-    context.read<BarcodeBloc>().add(BarcodeScannerDisableRequested());
     super.dispose();
   }
 
@@ -98,9 +100,8 @@ class _BarcodeScreenState extends State<BarcodeScreen> {
                 if (state.status == BarcodeStatus.warning &&
                     state.centeredWarningMessage != null &&
                     state.centeredWarningMessage!.isNotEmpty) {
-                  
-                  final message = _translate(context, state.centeredWarningMessage!);
-                  final confirmMessage = '${AppLocalizations.of(context)?.confirm_duplicate_pallet ?? "Are you sure you want to add this duplicate?"}\n\n$message';
+
+                  const String confirmMessage = 'هل تريد تكرار هذا الباركود\nنعم او لا';
 
                   ErrorPopup.showWarning(context, confirmMessage).then((confirmed) {
                     if (!context.mounted) return;
@@ -109,9 +110,8 @@ class _BarcodeScreenState extends State<BarcodeScreen> {
                     } else {
                       context.read<BarcodeBloc>().add(BarcodeDuplicateRejected());
                     }
+                    context.read<BarcodeBloc>().add(BarcodeDismissCenteredMessageRequested());
                   });
-                  
-                  context.read<BarcodeBloc>().add(BarcodeDismissCenteredMessageRequested());
                   return;
                 }
 
@@ -128,8 +128,10 @@ class _BarcodeScreenState extends State<BarcodeScreen> {
                           BarcodeScannerEnableRequested(),
                         );
                       },
-                    );
-                    context.read<BarcodeBloc>().add(BarcodeDismissCenteredMessageRequested());
+                    ).then((_) {
+                      if (!context.mounted) return;
+                      context.read<BarcodeBloc>().add(BarcodeDismissCenteredMessageRequested());
+                    });
                   }
                   return;
                 }
@@ -138,11 +140,14 @@ class _BarcodeScreenState extends State<BarcodeScreen> {
                 if (state.status == BarcodeStatus.success &&
                     state.centeredSuccessMessage != null &&
                     state.centeredSuccessMessage!.isNotEmpty) {
-                  ErrorPopup.showSuccess(
+                  ErrorPopup.show(
                     context,
                     _translate(context, state.centeredSuccessMessage!),
-                  );
-                  context.read<BarcodeBloc>().add(BarcodeDismissCenteredMessageRequested());
+                    variant: PopupVariant.success,
+                  ).then((_) {
+                    if (!context.mounted) return;
+                    context.read<BarcodeBloc>().add(BarcodeDismissCenteredMessageRequested());
+                  });
                 }
               },
               child: Stack(

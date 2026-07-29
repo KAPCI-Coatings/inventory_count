@@ -1,4 +1,4 @@
-package com.kapci.inventory_count_flutter_app
+package com.kapci.inventory
 
 import io.flutter.embedding.android.FlutterActivity
 

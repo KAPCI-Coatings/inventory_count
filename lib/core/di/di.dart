@@ -29,7 +29,7 @@ final GetIt instance = GetIt.instance;
 
 /// The Android applicationId of this app — must match the value in
 /// android/app/build.gradle (applicationId / namespace).
-const String _androidPackageName = 'com.kapci.inventory_count_flutter_app';
+const String _androidPackageName = 'com.kapci.inventory';
 
 Future<void> initAppModule() async {
   // ── Scanner Service ─────────────────────────────────────────────────────

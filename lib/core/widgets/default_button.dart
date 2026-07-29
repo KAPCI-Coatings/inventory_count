@@ -71,11 +71,14 @@ class DefaultButton extends StatelessWidget {
                     color: Colors.black,
                   ),
                 )
-              : Text(
-                  text,
-                  style: textTheme.titleMedium?.copyWith(
-                    fontSize: textSize,
-                    fontWeight: FontWeight.bold,
+              : FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    text,
+                    style: textTheme.titleMedium?.copyWith(
+                      fontSize: textSize ?? ResponsiveUtils.responsiveFontSize(context, 16),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
         ),

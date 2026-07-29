@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:inventory_count_flutter_app/core/widgets/custom_dropdown_field.dart';
 import 'package:inventory_count_flutter_app/core/widgets/default_button.dart';
 import 'package:inventory_count_flutter_app/l10n/app_localizations.dart';
 import 'package:inventory_count_flutter_app/core/routes_manger/routes.dart';
@@ -13,36 +12,6 @@ import 'package:inventory_count_flutter_app/presentation/view_models/settings/se
 import 'package:inventory_count_flutter_app/presentation/view_models/settings/settings_event.dart';
 import 'package:inventory_count_flutter_app/presentation/view_models/settings/settings_state.dart';
 
-class _AppInputDecoration {
-  static InputDecoration compact() {
-    return InputDecoration(
-      floatingLabelBehavior: FloatingLabelBehavior.always,
-      labelStyle: const TextStyle(
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
-        color: Colors.black,
-      ),
-      contentPadding: const EdgeInsets.symmetric(
-        horizontal: 12,
-        vertical: 6,
-      ),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: Colors.black),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: Colors.black),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: Colors.black, width: 2),
-      ),
-      fillColor: Colors.white,
-      filled: true,
-    );
-  }
-}
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -189,26 +158,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           // ── Title ──────────────────────────────────────────────────
                           ScreenTitle(title: AppLocalizations.of(context)!.settings),
                   const SizedBox(height: 12),
-
-                  // ── Language ───────────────────────────────────────────────
-                  CustomDropdownField<String>(
-                    value: state.language,
-                    items: const <String>['en', 'ar'],
-                    itemLabelBuilder: (String value) => value == 'ar'
-                        ? AppLocalizations.of(context)!.arabic
-                        : AppLocalizations.of(context)!.english,
-                    labelText: AppLocalizations.of(context)!.language,
-                    fontSize: 16,
-                    decoration: _AppInputDecoration.compact(),
-                    onChanged: (String? newValue) {
-                      if (newValue != null) {
-                        context
-                            .read<SettingsBloc>()
-                            .add(SettingsLanguageChanged(newValue));
-                      }
-                    },
-                  ),
-                  const SizedBox(height: 10),
 
                   // ── Dev ID ─────────────────────────────────────────────────
                   CustomTextField(

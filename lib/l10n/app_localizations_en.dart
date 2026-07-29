@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get settings => 'Settings';
+  String get settings => 'الإعدادات';
 
   @override
   String get language => 'Language';
@@ -51,10 +51,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get assetCount => 'Asset Count';
 
   @override
-  String get exit => 'Exit';
+  String get exit => 'خروج';
 
   @override
-  String get search => 'Search';
+  String get search => 'بحث';
 
   @override
   String get material => 'Matiral';
@@ -75,7 +75,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get totalQty => 'Total Qty';
 
   @override
-  String get clear => 'Clear';
+  String get clear => 'مسح';
 
   @override
   String get error => 'Error';
@@ -112,7 +112,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get password => 'Password';
 
   @override
-  String get login => 'Login';
+  String get login => 'تسجيل الدخول';
 
   @override
   String get inventoryCount => 'Inventory Count';
@@ -221,10 +221,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get baseUrl => 'Base URL';
 
   @override
-  String get send => 'Send';
+  String get send => 'إرسال';
 
   @override
-  String get export => 'Export';
+  String get export => 'ارفاق ملف';
 
   @override
   String get post => 'Post';
@@ -267,5 +267,8 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get confirm_clear_screen =>
-      'Reset the screen? Scanned data will remain saved in the database.';
+      'هل انت متاكد من مسح جميع البيانات من الجهاز';
+
+  @override
+  String get confirm_duplicate_barcode => 'هل تريد تكرار هذا الباركود';
 }

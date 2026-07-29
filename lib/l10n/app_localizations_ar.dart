@@ -262,5 +262,8 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get confirm_clear_screen =>
-      'إعادة ضبط الشاشة؟ ستظل البيانات الممسوحة محفوظة في قاعدة البيانات.';
+      'هل انت متاكد من مسح جميع البيانات من الجهاز';
+
+  @override
+  String get confirm_duplicate_barcode => 'هل تريد تكرار هذا الباركود';
 }

@@ -101,45 +101,55 @@ class _AssetsScreenState extends State<AssetsScreen> {
   }
 
   Future<void> _confirmAndClear(BuildContext context) async {
-    final l10n = AppLocalizations.of(context);
-    final bool? confirmed = await showDialog<bool>(
-      context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        title: Text(l10n?.clear ?? 'Clear',
-            style: const TextStyle(fontWeight: FontWeight.bold)),
-        content: Text(l10n?.confirm_clear_screen ??
-            'Reset the screen? Scanned data will remain saved.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: Text(l10n?.no ?? 'No'),
+    try {
+      await _scannerService.disableScanner();
+    } catch (_) {}
+    try {
+      if (!context.mounted) return;
+      final bool? confirmed = await showDialog<bool>(
+        context: context,
+        barrierDismissible: false,
+        builder: (dialogContext) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          title: const Text(
+            'مسح البيانات',
+            style: TextStyle(fontWeight: FontWeight.bold),
           ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.black87),
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: Text(l10n?.yes ?? 'Yes',
-                style: const TextStyle(color: Colors.white)),
+          content: const Text(
+            'هل انت متاكد من مسح جميع البيانات من الجهاز',
           ),
-        ],
-      ),
-    );
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: const Text('لا'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.black87),
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: const Text('نعم',
+                  style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        ),
+      );
 
-    if (confirmed == true && mounted) {
-      setState(() {
-        _assetCount = 0;
-        _lastAssetNo = '-';
-      });
+      if (confirmed == true && mounted) {
+        setState(() {
+          _assetCount = 0;
+          _lastAssetNo = '-';
+        });
+      }
+    } finally {
+      try {
+        await _scannerService.enableScanner();
+      } catch (_) {}
     }
   }
 
   @override
   void dispose() {
     _scanSubscription?.cancel();
-    // Do NOT call disableScanner() here — the ScannerService is a shared
-    // singleton. Disabling the hardware from one screen would break all
-    // other screens that also depend on the same scanner.
+    _scanSubscription = null;
     super.dispose();
   }
 
@@ -194,24 +204,53 @@ class _AssetsScreenState extends State<AssetsScreen> {
                         ResponsiveUtils.responsiveSpacing(context, 8);
 
                     if (isUser) {
-                      return Center(
-                        child: DefaultButton(
-                          text: AppLocalizations.of(context)!.exit,
-                          width: ResponsiveUtils.responsiveWidth(context, 0.4),
-                          height: ResponsiveUtils.responsiveHeight(context, 0.07)
-                              .clamp(48, 64),
-                          textSize:
-                              ResponsiveUtils.responsiveFontSize(context, 16),
-                          backgroundColor: Colors.grey.shade400,
-                          textColor: Colors.black,
-                          onPressed: () {
-                            context
-                                .read<AuthBloc>()
-                                .add(const AuthLogoutRequested());
-                            Navigator.of(context)
-                                .pushReplacementNamed(Routes.login);
-                          },
-                        ),
+                      final double userGap = ResponsiveUtils.responsiveSpacing(context, 8);
+                      return Column(
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: DefaultButton(
+                                  text: AppLocalizations.of(context)!.search,
+                                  height: ResponsiveUtils.responsiveHeight(context, 0.07).clamp(48, 64),
+                                  textSize: ResponsiveUtils.responsiveFontSize(context, 16),
+                                  backgroundColor: Colors.grey.shade400,
+                                  textColor: Colors.black,
+                                  onPressed: () => _navigateToRoute(Routes.search),
+                                ),
+                              ),
+                              SizedBox(width: userGap),
+                              Expanded(
+                                child: DefaultButton(
+                                  text: AppLocalizations.of(context)!.export,
+                                  height: ResponsiveUtils.responsiveHeight(context, 0.07).clamp(48, 64),
+                                  textSize: ResponsiveUtils.responsiveFontSize(context, 16),
+                                  backgroundColor: Colors.grey.shade400,
+                                  textColor: Colors.black,
+                                  onPressed: () async {
+                                    final items = await _assetDataSource.getAssetScans();
+                                    await instance<CsvExportService>().exportAssetScansToCsv(items);
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: userGap),
+                          Center(
+                            child: DefaultButton(
+                              text: AppLocalizations.of(context)!.exit,
+                              width: ResponsiveUtils.responsiveWidth(context, 0.4),
+                              height: ResponsiveUtils.responsiveHeight(context, 0.07).clamp(48, 64),
+                              textSize: ResponsiveUtils.responsiveFontSize(context, 16),
+                              backgroundColor: Colors.grey.shade400,
+                              textColor: Colors.black,
+                              onPressed: () {
+                                context.read<AuthBloc>().add(const AuthLogoutRequested());
+                                Navigator.of(context).pushReplacementNamed(Routes.login);
+                              },
+                            ),
+                          ),
+                        ],
                       );
                     }
 
