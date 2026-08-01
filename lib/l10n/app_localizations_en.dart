@@ -224,7 +224,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get send => 'إرسال';
 
   @override
-  String get export => 'ارفاق ملف';
+  String get export => 'حفظ كملف';
 
   @override
   String get post => 'Post';

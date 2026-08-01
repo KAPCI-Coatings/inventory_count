@@ -93,7 +93,7 @@
   "ok": "OK",
   "baseUrl": "Base URL",
   "send": "إرسال",
-  "export": "ارفاق ملف",
+  "export": "حفظ كملف",
   "post": "Post",
   "numberOfScan": "Number of Scan",
   "noScannedBarcodesYet": "No scanned barcodes yet.",

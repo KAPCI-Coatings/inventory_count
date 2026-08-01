@@ -491,7 +491,7 @@ abstract class AppLocalizations {
   /// No description provided for @export.
   ///
   /// In en, this message translates to:
-  /// **'ارفاق ملف'**
+  /// **'حفظ كملف'**
   String get export;
 
   /// No description provided for @post.
