@@ -54,6 +54,8 @@ class _BarcodeScreenState extends State<BarcodeScreen> {
       // Duplicate warning
       case 'warning_duplicate_barcode':
         return l10n.error_duplicate_barcode;
+      case 'error_box_duplicate':
+        return 'لايمكن قرائه الصندوق مرتين';
 
       // Network / post errors
       case 'error_no_scanned_data':

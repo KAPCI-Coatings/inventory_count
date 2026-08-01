@@ -55,10 +55,15 @@ Future<void> initAppModule() async {
   final String path = join(await getDatabasesPath(), 'inventory_count.db');
   final Database database = await openDatabase(
     path, 
-    version: 2,
+    version: 3,
     onUpgrade: (db, oldVersion, newVersion) async {
       if (oldVersion < 2) {
         await db.execute('DROP TABLE IF EXISTS barcodes');
+      }
+      if (oldVersion < 3) {
+        try {
+          await db.execute('ALTER TABLE barcodes ADD COLUMN isSent INTEGER DEFAULT 0');
+        } catch (_) {}
       }
     },
   );
@@ -73,7 +78,8 @@ Future<void> initAppModule() async {
       serialNo TEXT,
       palletBox TEXT,
       qty INTEGER,
-      isPallet INTEGER
+      isPallet INTEGER,
+      isSent INTEGER DEFAULT 0
     )
   ''');
 

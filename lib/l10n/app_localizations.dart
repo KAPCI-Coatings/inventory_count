@@ -583,6 +583,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'هل تريد تكرار هذا الباركود'**
   String get confirm_duplicate_barcode;
+
+  /// No description provided for @columnSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent'**
+  String get columnSent;
 }
 
 class _AppLocalizationsDelegate

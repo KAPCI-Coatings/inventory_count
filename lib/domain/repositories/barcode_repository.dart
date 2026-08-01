@@ -4,6 +4,9 @@ abstract class BarcodeRepository {
   /// Saves a scanned barcode to the current session.
   Future<void> saveScannedBarcode(ItemBox item);
 
+  /// Marks a list of barcodes as sent.
+  Future<void> markAsSent(List<String> barcodes);
+
   /// Checks if a barcode string has already been scanned in the current session.
   Future<bool> isDuplicate(String barcodeNo);
 

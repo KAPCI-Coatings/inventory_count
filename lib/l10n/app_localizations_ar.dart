@@ -266,4 +266,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get confirm_duplicate_barcode => 'هل تريد تكرار هذا الباركود';
+
+  @override
+  String get columnSent => 'حالة الإرسال';
 }

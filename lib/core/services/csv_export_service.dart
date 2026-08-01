@@ -1,18 +1,12 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:inventory_count_flutter_app/domain/entities/barcode.dart';
 import 'package:inventory_count_flutter_app/domain/entities/asset_scan.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:flutter_email_sender/flutter_email_sender.dart';
-import 'package:share_plus/share_plus.dart';
-
-const String _exportEmail = 'aminmohamedkhames@gmail.com';
+import 'package:file_saver/file_saver.dart';
 
 class CsvExportService {
-  /// Exports inventory barcode data to a CSV and shares it via the native
-  /// share sheet (user can pick Gmail or any email app).
+  /// Exports inventory barcode data to a CSV and saves it on the local storage.
   Future<void> exportToCsv(List<ItemBox> items) async {
     final StringBuffer buffer = StringBuffer();
 
@@ -39,13 +33,10 @@ class CsvExportService {
       );
     }
 
-    await _shareAsCsv(
-      buffer.toString(),
-      'inventory_export_${_timestamp()}',
-    );
+    await _shareAsCsv(buffer.toString(), 'inventory_export_${_timestamp()}');
   }
 
-  /// Exports asset scan data to a CSV and shares it via the native share sheet.
+  /// Exports asset scan data to a CSV and saves it to local storage.
   Future<void> exportAssetScansToCsv(List<AssetScan> items) async {
     final StringBuffer buffer = StringBuffer();
 
@@ -57,10 +48,7 @@ class CsvExportService {
       );
     }
 
-    await _shareAsCsv(
-      buffer.toString(),
-      'asset_export_${_timestamp()}',
-    );
+    await _shareAsCsv(buffer.toString(), 'asset_export_${_timestamp()}');
   }
 
   // ── Helpers ───────────────────────────────────────────────────────────────
@@ -71,29 +59,17 @@ class CsvExportService {
     final List<int> bytes = utf8.encode(csvContent);
     final Uint8List fileBytes = Uint8List.fromList(bom + bytes);
 
-    // Write to a temporary file so email client can attach it
-    final Directory tempDir = await getTemporaryDirectory();
-    final File tempFile = File('${tempDir.path}/$fileName.csv');
-    await tempFile.writeAsBytes(fileBytes);
-
-    final Email email = Email(
-      body: 'بيانات تصدير ملفات الجرد مرفقة في هذا الإيميل.',
-      subject: 'INC Export — $fileName',
-      recipients: [_exportEmail],
-      attachmentPaths: [tempFile.path],
-      isHTML: false,
-    );
-
     try {
-      await FlutterEmailSender.send(email);
-    } catch (e) {
-      debugPrint('[CsvExportService] FlutterEmailSender failed, falling back to Share: $e');
-      final XFile xFile = XFile(tempFile.path, mimeType: 'text/csv');
-      await Share.shareXFiles(
-        [xFile],
-        subject: 'INC Export — $fileName',
-        text: 'إرسال إلى: $_exportEmail',
+      await FileSaver.instance.saveAs(
+        name: fileName,
+        fileExtension: 'csv',
+        bytes: fileBytes,
+        mimeType: MimeType.csv,
       );
+      debugPrint('[CsvExportService] Saved to local storage: $fileName.csv');
+    } catch (e) {
+      debugPrint('[CsvExportService] Error saving file: $e');
+      rethrow;
     }
   }
 

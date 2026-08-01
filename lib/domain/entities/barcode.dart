@@ -7,6 +7,7 @@ class ItemBox {
   final int qty;
   final bool isPallet;
   final int? palletNo;
+  final bool isSent;
 
   const ItemBox({
     this.barCodeNo = '',
@@ -17,6 +18,7 @@ class ItemBox {
     this.qty = 0,
     this.isPallet = false,
     this.palletNo,
+    this.isSent = false,
   });
 
   @override

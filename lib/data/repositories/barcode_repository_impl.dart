@@ -26,5 +26,9 @@ class BarcodeRepositoryImpl implements BarcodeRepository {
   Future<void> clearSession() async {
     await _localDataSource.clearBarcodes();
   }
-}
 
+  @override
+  Future<void> markAsSent(List<String> barcodes) async {
+    await _localDataSource.markAsSent(barcodes);
+  }
+}

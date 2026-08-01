@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inventory_count_flutter_app/core/error/barcode_exceptions.dart';
 import 'package:inventory_count_flutter_app/core/services/api_service.dart';
 import 'package:inventory_count_flutter_app/core/services/scanner_service.dart';
+import 'package:inventory_count_flutter_app/domain/entities/barcode.dart';
 import 'package:inventory_count_flutter_app/data/datasources/settings_local_datasource.dart';
 import 'package:inventory_count_flutter_app/domain/repositories/barcode_repository.dart';
 import 'package:inventory_count_flutter_app/domain/uescases/process_barcode_usecase.dart';
@@ -175,8 +176,8 @@ class BarcodeBloc extends Bloc<BarcodeEvent, BarcodeState> {
     BarcodeScanned event,
     Emitter<BarcodeState> emit,
   ) async {
-    if (_isProcessingScan || state.status == BarcodeStatus.warning || state.status == BarcodeStatus.posting) {
-      debugPrint('[BarcodeBloc] Ignored scan while processing/warning/posting: "${event.barcode}"');
+    if (_isProcessingScan || state.status == BarcodeStatus.warning) {
+      debugPrint('[BarcodeBloc] Ignored scan while processing/warning: "${event.barcode}"');
       return;
     }
     
@@ -201,6 +202,17 @@ class BarcodeBloc extends Bloc<BarcodeEvent, BarcodeState> {
 
       if (result.isDuplicate) {
         debugPrint('[BarcodeBloc] DUPLICATE detected: $cleanBarcode');
+        
+        if (!itemBox.isPallet) {
+          debugPrint('[BarcodeBloc] Box duplicate. Emitting error state.');
+          await _scannerService.disableScanner();
+          emit(state.copyWith(
+            status: BarcodeStatus.error,
+            centeredErrorMessage: 'error_box_duplicate',
+          ));
+          return;
+        }
+
         // Do NOT update lists or counters yet. Save it in lastScan for confirmation.
         emit(state.copyWith(
           status: BarcodeStatus.warning,
@@ -270,7 +282,9 @@ class BarcodeBloc extends Bloc<BarcodeEvent, BarcodeState> {
   ) async {
     // Always load cached items from SQLite DB to ensure all cached items are sent
     final dbItems = await _barcodeRepository.getScannedItems();
-    final itemsToSend = dbItems.isNotEmpty ? dbItems : state.itemBoxes;
+    final allItems = dbItems.isNotEmpty ? dbItems : state.itemBoxes;
+    
+    final itemsToSend = allItems.where((item) => !item.isSent).toList();
 
     if (itemsToSend.isEmpty) {
       emit(state.copyWith(
@@ -291,25 +305,44 @@ class BarcodeBloc extends Bloc<BarcodeEvent, BarcodeState> {
       return;
     }
 
-    int palletBoxCountToSend = state.palletBoxCount;
-    if (palletBoxCountToSend == 0) {
-      palletBoxCountToSend = itemsToSend.length;
-    }
+    final int countToSend = itemsToSend.length;
 
-    debugPrint('[BarcodeBloc] Sending ${itemsToSend.length} items to $baseUrl (Count=$palletBoxCountToSend)');
+    debugPrint('[BarcodeBloc] Sending ${itemsToSend.length} items to $baseUrl (Count=$countToSend)');
     emit(state.copyWith(status: BarcodeStatus.posting, isSending: true));
 
     final ApiPostResult result = await _apiService.sendInventoryData(
       baseUrl: baseUrl,
       devId: devId,
       items: itemsToSend,
-      count: palletBoxCountToSend,
+      count: countToSend,
     );
 
     if (result.success) {
       debugPrint('[BarcodeBloc] POST success — keeping data in cache & on screen');
+      
+      final sentBarcodes = itemsToSend.map((e) => e.barCodeNo).toList();
+      await _barcodeRepository.markAsSent(sentBarcodes);
+      
+      final updatedItemBoxes = state.itemBoxes.map((item) {
+        if (sentBarcodes.contains(item.barCodeNo)) {
+          return ItemBox(
+            barCodeNo: item.barCodeNo,
+            matnr: item.matnr,
+            batchNo: item.batchNo,
+            serialNo: item.serialNo,
+            palletBox: item.palletBox,
+            qty: item.qty,
+            isPallet: item.isPallet,
+            palletNo: item.palletNo,
+            isSent: true,
+          );
+        }
+        return item;
+      }).toList();
+      
       emit(state.copyWith(
         status: BarcodeStatus.success,
+        itemBoxes: updatedItemBoxes,
         isSending: false,
         sendResultMessage: 'success_post_clear_cache',
         centeredSuccessMessage: 'success_post_clear_cache',

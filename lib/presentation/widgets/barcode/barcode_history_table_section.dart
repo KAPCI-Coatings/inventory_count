@@ -15,12 +15,14 @@ class BarcodeHistoryTableSection extends StatelessWidget {
       buildWhen: (previous, current) => previous.itemBoxes != current.itemBoxes,
       builder: (context, state) {
         final Map<String, int> groupedCounts = <String, int>{};
+        final Map<String, bool> barcodeSentStatus = <String, bool>{};
         for (final itemBox in state.itemBoxes) {
           groupedCounts.update(
             itemBox.barCodeNo,
             (int currentCount) => currentCount + 1,
             ifAbsent: () => 1,
           );
+          barcodeSentStatus[itemBox.barCodeNo] = itemBox.isSent;
         }
 
         final List<String> sortedBarcodes = groupedCounts.keys.toList()
@@ -29,11 +31,13 @@ class BarcodeHistoryTableSection extends StatelessWidget {
         int nextRowNo = 1;
         for (final String barcode in sortedBarcodes) {
           final int count = groupedCounts[barcode] ?? 0;
+          final bool isSent = barcodeSentStatus[barcode] ?? false;
           for (int i = 1; i <= count; i++) {
             rows.add(
               ScanItemRow(
                 rowNo: nextRowNo,
                 fullBarcode: i == 1 ? barcode : '',
+                isSent: i == 1 ? isSent : null,
               ),
             );
             nextRowNo++;
@@ -104,6 +108,12 @@ class BarcodeHistoryTableSection extends StatelessWidget {
                           style: columnHeaderStyle,
                         ),
                       ),
+                      DataColumn(
+                        label: Text(
+                          AppLocalizations.of(context)!.columnSent,
+                          style: columnHeaderStyle,
+                        ),
+                      ),
                     ],
                     rows: rows
                         .map(
@@ -119,6 +129,15 @@ class BarcodeHistoryTableSection extends StatelessWidget {
                                 Text(
                                   row.fullBarcode,
                                   style: barcodeCellStyle,
+                                ),
+                              ),
+                              DataCell(
+                                Text(
+                                  row.isSent == null ? '' : (row.isSent! ? '1' : '0'),
+                                  style: barcodeCellStyle.copyWith(
+                                    color: row.isSent == null ? Colors.transparent : (row.isSent! ? Colors.green : Colors.red),
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
                             ],
@@ -139,6 +158,11 @@ class BarcodeHistoryTableSection extends StatelessWidget {
 class ScanItemRow {
   final int rowNo;
   final String fullBarcode;
+  final bool? isSent;
 
-  const ScanItemRow({required this.rowNo, required this.fullBarcode});
+  const ScanItemRow({
+    required this.rowNo,
+    required this.fullBarcode,
+    this.isSent,
+  });
 }

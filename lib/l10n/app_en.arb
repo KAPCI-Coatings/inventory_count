@@ -108,5 +108,6 @@
   "warning": "Warning",
   "success": "Success",
   "confirm_clear_screen": "هل انت متاكد من مسح جميع البيانات من الجهاز",
-  "confirm_duplicate_barcode": "هل تريد تكرار هذا الباركود"
+  "confirm_duplicate_barcode": "هل تريد تكرار هذا الباركود",
+  "columnSent": "Sent"
 }
