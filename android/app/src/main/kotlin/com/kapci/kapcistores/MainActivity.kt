@@ -1,4 +1,4 @@
-package com.kapci.inventory
+package com.kapci.kapcistores
 
 import io.flutter.embedding.android.FlutterActivity
 
