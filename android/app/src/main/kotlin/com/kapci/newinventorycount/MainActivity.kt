@@ -1,4 +1,4 @@
-package com.kapci.newinventorycount
+package com.kapci.inventorycount
 
 import io.flutter.embedding.android.FlutterActivity
 

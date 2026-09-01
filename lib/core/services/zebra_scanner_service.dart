@@ -25,13 +25,15 @@ import 'scanner_service.dart';
 ///   3. Listen to [onScan] / [onStatusChange] wherever you need events.
 ///   4. Use [enableScanner] / [disableScanner] to gate scanning per screen.
 ///   5. Call [dispose] when shutting down.
-class ZebraScannerService with WidgetsBindingObserver implements ScannerService {
+class ZebraScannerService
+    with WidgetsBindingObserver
+    implements ScannerService {
   ZebraScannerService({
     required this.androidPackageName,
     this.profileName = 'KAPCI_INVENTORY_PROFILE',
   });
 
-  /// Your Android applicationId (e.g. 'com.kapci.newinventorycount').
+  /// Your Android applicationId (e.g. 'com.kapci.inventorycount').
   final String androidPackageName;
 
   /// DataWedge profile name that will be created / updated on init.
@@ -86,65 +88,68 @@ class ZebraScannerService with WidgetsBindingObserver implements ScannerService 
       debugPrint('[ZebraScannerService] ★★★ RAW EVENT: $rawEvent');
     });
 
-    _eventSub = _dw.events.listen(
-      (DataWedgeEvent event) {
-        debugPrint('[ZebraScannerService] ▶ EVENT type=${event.type}, isScan=${event.isScan}');
-        _handleEvent(event);
-      },
-      onError: _handleStreamError,
-    );
+    _eventSub = _dw.events.listen((DataWedgeEvent event) {
+      debugPrint(
+        '[ZebraScannerService] ▶ EVENT type=${event.type}, isScan=${event.isScan}',
+      );
+      _handleEvent(event);
+    }, onError: _handleStreamError);
     debugPrint('[ZebraScannerService] Subscribed to event stream');
 
     // 3. Configure the DataWedge profile manually with OVERWRITE mode.
     // Overwrite mode fixes the "APP_ALREADY_ASSOCIATED" error by replacing
     // any existing corrupt profile.
-    final configuration = DataWedgeProfileBuilder(
-      profileName: profileName,
-      configMode: DataWedgeConfigMode.overwrite, // CRITICAL: OVERWRITE
-    )
-        .setProfileEnabled(true)
-        .addPlugin(
-          DataWedgePluginConfiguration(
-            pluginName: DataWedgePluginName.barcode,
-            resetConfig: true,
-            paramList: <String, dynamic>{
-              'scanner_selection': 'auto',
-              'scanner_selection_by_identifier': DataWedgeScannerIdentifier.auto,
-              'scanner_input_enabled': dataWedgeBool(true),
-            },
-          ),
-        )
-        .addPlugin(
-          DataWedgePluginConfiguration(
-            pluginName: DataWedgePluginName.intent,
-            resetConfig: true,
-            paramList: <String, dynamic>{
-              'intent_output_enabled': dataWedgeBool(true),
-              'intent_action': '$androidPackageName.SCAN',
-              'intent_category': DataWedgeApi.defaultIntentCategory,
-              'intent_delivery': DataWedgeIntentDelivery.broadcast,
-            },
-          ),
-        )
-        .addPlugin(
-          DataWedgePluginConfiguration(
-            pluginName: DataWedgePluginName.keystroke,
-            resetConfig: true,
-            paramList: <String, dynamic>{
-              'keystroke_output_enabled': dataWedgeBool(false),
-            },
-          ),
-        )
-        .addAppAssociation(
-          DataWedgeAppAssociation(
-            packageName: androidPackageName,
-            activityList: const <String>[DataWedgeApi.wildcard],
-          ),
-        )
-        .build();
+    final configuration =
+        DataWedgeProfileBuilder(
+              profileName: profileName,
+              configMode: DataWedgeConfigMode.overwrite, // CRITICAL: OVERWRITE
+            )
+            .setProfileEnabled(true)
+            .addPlugin(
+              DataWedgePluginConfiguration(
+                pluginName: DataWedgePluginName.barcode,
+                resetConfig: true,
+                paramList: <String, dynamic>{
+                  'scanner_selection': 'auto',
+                  'scanner_selection_by_identifier':
+                      DataWedgeScannerIdentifier.auto,
+                  'scanner_input_enabled': dataWedgeBool(true),
+                },
+              ),
+            )
+            .addPlugin(
+              DataWedgePluginConfiguration(
+                pluginName: DataWedgePluginName.intent,
+                resetConfig: true,
+                paramList: <String, dynamic>{
+                  'intent_output_enabled': dataWedgeBool(true),
+                  'intent_action': '$androidPackageName.SCAN',
+                  'intent_category': DataWedgeApi.defaultIntentCategory,
+                  'intent_delivery': DataWedgeIntentDelivery.broadcast,
+                },
+              ),
+            )
+            .addPlugin(
+              DataWedgePluginConfiguration(
+                pluginName: DataWedgePluginName.keystroke,
+                resetConfig: true,
+                paramList: <String, dynamic>{
+                  'keystroke_output_enabled': dataWedgeBool(false),
+                },
+              ),
+            )
+            .addAppAssociation(
+              DataWedgeAppAssociation(
+                packageName: androidPackageName,
+                activityList: const <String>[DataWedgeApi.wildcard],
+              ),
+            )
+            .build();
 
     await _dw.setConfig(configuration);
-    debugPrint('[ZebraScannerService] Profile configured with OVERWRITE: $profileName');
+    debugPrint(
+      '[ZebraScannerService] Profile configured with OVERWRITE: $profileName',
+    );
 
     // 4. Force DataWedge to switch to our profile.
     await _dw.switchToProfile(profileName);
@@ -155,9 +160,13 @@ class ZebraScannerService with WidgetsBindingObserver implements ScannerService 
     await Future.delayed(const Duration(milliseconds: 500));
     try {
       await _dw.disableScanner();
-      debugPrint('[ZebraScannerService] Successfully sent initial DISABLE_PLUGIN');
+      debugPrint(
+        '[ZebraScannerService] Successfully sent initial DISABLE_PLUGIN',
+      );
     } catch (e) {
-      debugPrint('[ZebraScannerService] Warning: Could not disable scanner initially: $e');
+      debugPrint(
+        '[ZebraScannerService] Warning: Could not disable scanner initially: $e',
+      );
     }
 
     WidgetsBinding.instance.addObserver(this);
@@ -276,7 +285,10 @@ class ZebraScannerService with WidgetsBindingObserver implements ScannerService 
       await _dw.switchToProfile(name);
       debugPrint('[ZebraScannerService] Switched to profile: $name');
     } catch (e) {
-      throw ScannerOperationException('Failed to switch profile to $name', cause: e);
+      throw ScannerOperationException(
+        'Failed to switch profile to $name',
+        cause: e,
+      );
     }
   }
 
@@ -297,7 +309,9 @@ class ZebraScannerService with WidgetsBindingObserver implements ScannerService 
     _assertInitialised();
     try {
       await _dw.setDataWedgeEnabled(enabled);
-      debugPrint('[ZebraScannerService] DataWedge ${enabled ? 'enabled' : 'disabled'}');
+      debugPrint(
+        '[ZebraScannerService] DataWedge ${enabled ? 'enabled' : 'disabled'}',
+      );
     } catch (e) {
       throw ScannerOperationException(
         'Failed to ${enabled ? 'enable' : 'disable'} DataWedge',
@@ -324,7 +338,9 @@ class ZebraScannerService with WidgetsBindingObserver implements ScannerService 
   void _handleEvent(DataWedgeEvent event) {
     if (event.isScan) {
       if (!_scannerEnabled) {
-        debugPrint('[ZebraScannerService] Ignored scan because scanner is disabled by app state (e.g. popup is open).');
+        debugPrint(
+          '[ZebraScannerService] Ignored scan because scanner is disabled by app state (e.g. popup is open).',
+        );
         return;
       }
       final String? data = event.scanData;
@@ -333,7 +349,7 @@ class ZebraScannerService with WidgetsBindingObserver implements ScannerService 
       if (data != null && data.isNotEmpty) {
         final now = DateTime.now();
 
-        // Hardware scanners can sometimes emit multiple broadcast intents for 
+        // Hardware scanners can sometimes emit multiple broadcast intents for
         // a single physical button press. Debounce identical scans within 500ms.
         if (_lastScanData == data &&
             _lastScanTime != null &&
@@ -412,18 +428,30 @@ class ZebraScannerService with WidgetsBindingObserver implements ScannerService 
 
     if (state == AppLifecycleState.resumed) {
       if (_scannerEnabled) {
-        debugPrint('[ZebraScannerService] App resumed — restoring hardware scanner state');
-        _dw.switchToProfile(profileName).then((_) {
-          return _dw.enableScanner();
-        }).catchError((e) {
-          debugPrint('[ZebraScannerService] Failed to restore hardware scanner on resume: $e');
-        });
+        debugPrint(
+          '[ZebraScannerService] App resumed — restoring hardware scanner state',
+        );
+        _dw
+            .switchToProfile(profileName)
+            .then((_) {
+              return _dw.enableScanner();
+            })
+            .catchError((e) {
+              debugPrint(
+                '[ZebraScannerService] Failed to restore hardware scanner on resume: $e',
+              );
+            });
       }
-    } else if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
+    } else if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
       if (_scannerEnabled) {
-        debugPrint('[ZebraScannerService] App paused/inactive — suspending hardware scanner');
+        debugPrint(
+          '[ZebraScannerService] App paused/inactive — suspending hardware scanner',
+        );
         _dw.disableScanner().catchError((e) {
-          debugPrint('[ZebraScannerService] Failed to suspend hardware scanner on pause: $e');
+          debugPrint(
+            '[ZebraScannerService] Failed to suspend hardware scanner on pause: $e',
+          );
         });
       }
     }

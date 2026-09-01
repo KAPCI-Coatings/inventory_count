@@ -29,7 +29,7 @@ final GetIt instance = GetIt.instance;
 
 /// The Android applicationId of this app — must match the value in
 /// android/app/build.gradle (applicationId / namespace).
-const String _androidPackageName = 'com.kapci.newinventorycount';
+const String _androidPackageName = 'com.kapci.inventorycount';
 
 Future<void> initAppModule() async {
   // ── Scanner Service ─────────────────────────────────────────────────────
@@ -54,7 +54,7 @@ Future<void> initAppModule() async {
 
   final String path = join(await getDatabasesPath(), 'inventory_count.db');
   final Database database = await openDatabase(
-    path, 
+    path,
     version: 3,
     onUpgrade: (db, oldVersion, newVersion) async {
       if (oldVersion < 2) {
@@ -62,7 +62,9 @@ Future<void> initAppModule() async {
       }
       if (oldVersion < 3) {
         try {
-          await db.execute('ALTER TABLE barcodes ADD COLUMN isSent INTEGER DEFAULT 0');
+          await db.execute(
+            'ALTER TABLE barcodes ADD COLUMN isSent INTEGER DEFAULT 0',
+          );
         } catch (_) {}
       }
     },
@@ -154,9 +156,7 @@ Future<void> initAppModule() async {
     ),
   );
 
-  instance.registerFactory<SettingsBloc>(
-    () => SettingsBloc(instance()),
-  );
+  instance.registerFactory<SettingsBloc>(() => SettingsBloc(instance()));
 
   instance.registerFactory<SearchBloc>(() => SearchBloc(instance()));
 }
