@@ -31,7 +31,7 @@ class ZebraScannerService with WidgetsBindingObserver implements ScannerService 
     this.profileName = 'KAPCI_INVENTORY_PROFILE',
   });
 
-  /// Your Android applicationId (e.g. 'com.kapci.kapcistores').
+  /// Your Android applicationId (e.g. 'com.kapci.newinventorycount').
   final String androidPackageName;
 
   /// DataWedge profile name that will be created / updated on init.
