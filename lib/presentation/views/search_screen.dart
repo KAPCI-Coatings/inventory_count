@@ -7,6 +7,8 @@ import 'package:inventory_count_flutter_app/core/widgets/default_button.dart';
 import 'package:inventory_count_flutter_app/core/widgets/screen_title.dart';
 import 'package:inventory_count_flutter_app/l10n/app_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:inventory_count_flutter_app/core/di/di.dart';
+import 'package:inventory_count_flutter_app/core/services/scanner_service.dart';
 import 'package:inventory_count_flutter_app/presentation/widgets/search/search_results_table.dart';
 import 'package:inventory_count_flutter_app/presentation/view_models/search/search_bloc.dart';
 import 'package:inventory_count_flutter_app/presentation/view_models/search/search_event.dart';
@@ -42,6 +44,15 @@ class _SearchContentViewState extends State<_SearchContentView> {
     _materialFocus.addListener(_onFocusChange);
     _batchFocus.addListener(_onFocusChange);
     
+    // Disable scanner in search screen
+    try {
+      instance<ScannerService>().disableScanner().catchError((e) {
+        debugPrint('[SearchScreen] Error disabling scanner: $e');
+      });
+    } catch (e) {
+      debugPrint('[SearchScreen] Could not disable scanner: $e');
+    }
+
     // Automatically load all scanned barcodes on screen open
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _dispatchSearch();
@@ -64,6 +75,16 @@ class _SearchContentViewState extends State<_SearchContentView> {
     _batchController.dispose();
     _materialFocus.dispose();
     _batchFocus.dispose();
+    
+    // Re-enable scanner when leaving search screen
+    try {
+      instance<ScannerService>().enableScanner().catchError((e) {
+        debugPrint('[SearchScreen] Error re-enabling scanner: $e');
+      });
+    } catch (e) {
+      debugPrint('[SearchScreen] Could not re-enable scanner: $e');
+    }
+
     super.dispose();
   }
 

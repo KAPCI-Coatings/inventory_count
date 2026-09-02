@@ -790,10 +790,10 @@ packages:
     dependency: "direct main"
     description:
       name: zebra_wedge_scanner
-      sha256: ff6cc95e72166d041c075fc049dd4618aa457696f3ee10ba2e905d7d584b5a49
+      sha256: "213882e32414815cd02cbb0301204b4eca5852f36455dcb0286d44bc81736d8c"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.0"
+    version: "1.0.1"
 sdks:
   dart: ">=3.8.1 <4.0.0"
   flutter: ">=3.32.0"

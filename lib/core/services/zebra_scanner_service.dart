@@ -99,33 +99,39 @@ class ZebraScannerService
     // 3. Configure the DataWedge profile manually with OVERWRITE mode.
     // Overwrite mode fixes the "APP_ALREADY_ASSOCIATED" error by replacing
     // any existing corrupt profile.
+    //
+    // Device configuration spec:
+    //  • Profile              → enabled
+    //  • Barcode input        → enabled
+    //  • Hardware trigger     → enabled
+    //  • Scanner selection    → auto (falls back to auto if imported scanner is unsupported)
+    //  • Keystroke output     → enabled
+    //  • Intent output        → enabled
+    //      – intent_action    → com.basicintent.ACTION
+    //      – intent_delivery  → Broadcast Intent
+    //  • IP output (remote wedge) → enabled
     final configuration =
         DataWedgeProfileBuilder(
               profileName: profileName,
               configMode: DataWedgeConfigMode.overwrite, // CRITICAL: OVERWRITE
             )
-            .setProfileEnabled(true)
+            .setProfileEnabled(true) // ① Profile → enable
             .addPlugin(
               DataWedgePluginConfiguration(
                 pluginName: DataWedgePluginName.barcode,
                 resetConfig: true,
                 paramList: <String, dynamic>{
+                  // ② Barcode input → enable
+                  //    (enabling scanner_input also enables the hardware trigger
+                  //     automatically — DataWedge has no separate param for it)
+                  'scanner_input_enabled': dataWedgeBool(true),
+                  // ③ Hardware trigger → enabled implicitly via scanner_input_enabled
+                  // ④ Scanner selection → auto
+                  //    If an imported scanner is unsupported, DataWedge
+                  //    automatically falls back to the built-in auto scanner.
                   'scanner_selection': 'auto',
                   'scanner_selection_by_identifier':
                       DataWedgeScannerIdentifier.auto,
-                  'scanner_input_enabled': dataWedgeBool(true),
-                },
-              ),
-            )
-            .addPlugin(
-              DataWedgePluginConfiguration(
-                pluginName: DataWedgePluginName.intent,
-                resetConfig: true,
-                paramList: <String, dynamic>{
-                  'intent_output_enabled': dataWedgeBool(true),
-                  'intent_action': '$androidPackageName.SCAN',
-                  'intent_category': DataWedgeApi.defaultIntentCategory,
-                  'intent_delivery': DataWedgeIntentDelivery.broadcast,
                 },
               ),
             )
@@ -134,7 +140,36 @@ class ZebraScannerService
                 pluginName: DataWedgePluginName.keystroke,
                 resetConfig: true,
                 paramList: <String, dynamic>{
-                  'keystroke_output_enabled': dataWedgeBool(false),
+                  // ⑤ Keystroke output → enable
+                  'keystroke_output_enabled': dataWedgeBool(true),
+                },
+              ),
+            )
+            .addPlugin(
+              DataWedgePluginConfiguration(
+                pluginName: DataWedgePluginName.intent,
+                resetConfig: true,
+                paramList: <String, dynamic>{
+                  // ⑥ Intent output → enable
+                  'intent_output_enabled': dataWedgeBool(true),
+                  // ⑦ Intent action → com.basicintent.ACTION
+                  //   The Kotlin receiver (ZebraDatawedgePlugin.kt) now listens
+                  //   for both this action AND '${packageName}.SCAN'.
+                  'intent_action': 'com.basicintent.ACTION',
+                  'intent_category': DataWedgeApi.defaultIntentCategory,
+                  // ⑧ Intent delivery → Broadcast Intent
+                  'intent_delivery': DataWedgeIntentDelivery.broadcast,
+                },
+              ),
+            )
+            .addPlugin(
+              DataWedgePluginConfiguration(
+                // ⑨ IP output (remote wedge) → enable
+                pluginName: DataWedgePluginName.ip,
+                resetConfig: true,
+                paramList: <String, dynamic>{
+                  'ip_output_enabled': dataWedgeBool(true),
+                  'remote_wedge_enabled': dataWedgeBool(true),
                 },
               ),
             )
