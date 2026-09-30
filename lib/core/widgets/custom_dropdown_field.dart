@@ -35,9 +35,8 @@ class CustomDropdownField<T> extends StatelessWidget {
       context: context,
       labelText: labelText ?? itemLabelBuilder(value),
     );
-    final appliedDecoration = decoration?.copyWith(
-          labelText: labelText ?? itemLabelBuilder(value),
-        ) ??
+    final appliedDecoration =
+        decoration?.copyWith(labelText: labelText ?? itemLabelBuilder(value)) ??
         defaultDeco;
 
     return Container(
@@ -53,7 +52,7 @@ class CustomDropdownField<T> extends StatelessWidget {
         ],
       ),
       child: DropdownButtonFormField<T>(
-        value: value,
+        initialValue: value,
         style: textTheme.bodyMedium?.copyWith(
           fontSize: fontSize,
           color: Colors.black,

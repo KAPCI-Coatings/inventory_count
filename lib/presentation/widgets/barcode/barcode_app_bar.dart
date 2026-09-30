@@ -3,8 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inventory_count_flutter_app/core/routes_manger/routes.dart';
 import 'package:inventory_count_flutter_app/presentation/view_models/auth/auth_bloc.dart';
 import 'package:inventory_count_flutter_app/presentation/view_models/auth/auth_event.dart';
-import 'package:inventory_count_flutter_app/presentation/view_models/barcode/barcode_bloc.dart';
-import 'package:inventory_count_flutter_app/presentation/view_models/barcode/barcode_event.dart';
 
 class BarcodeAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -37,12 +35,12 @@ class BarcodeAppBar extends StatelessWidget implements PreferredSizeWidget {
           ? null
           : Text(title, style: const TextStyle(color: Colors.black87)),
       actions: <Widget>[
-        IconButton(
+        /*IconButton(
           tooltip: 'Generate test barcodes (2,000–5,000 boxes)',
           icon: const Icon(Icons.science_outlined),
           onPressed: () =>
               context.read<BarcodeBloc>().add(BarcodeDummyDataRequested()),
-        ),
+        ),*/
       ],
     );
   }
