@@ -13,6 +13,9 @@ class BarcodeDuplicateRejected extends BarcodeEvent {}
 /// Sends all scanned barcodes to the backend configured in Settings.
 class BarcodePostCurrentOrderRequested extends BarcodeEvent {}
 
+/// Generates scanner-shaped test data and stores it through the normal flow.
+class BarcodeDummyDataRequested extends BarcodeEvent {}
+
 /// Resets the current screen state (counts, last scan, messages) but does
 /// NOT delete data from the database cache.
 class BarcodeNewOrderRequested extends BarcodeEvent {}

@@ -11,6 +11,7 @@ import 'package:inventory_count_flutter_app/presentation/view_models/settings/se
 import 'package:inventory_count_flutter_app/core/widgets/numeric_keypad.dart';
 
 import '../view_models/auth/auth_bloc.dart';
+import '../view_models/auth/auth_event.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -33,12 +34,12 @@ class _LoginPageState extends State<LoginPage> {
     super.initState();
     _passwordFocus.addListener(_onFocusChange);
 
+    // Re-dispatch AuthInitializeRequested so the bloc re-checks login
+    // status.  After a logout the `_isInitialized` flag was reset, so
+    // this will correctly evaluate `isLoggedIn()` again (returns false).
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted || _hasNavigated) return;
-      final state = context.read<AuthBloc>().state;
-      if (state.status == AuthStatus.authenticated) {
-        _navigateBasedOnRole(context);
-      }
+      if (!mounted) return;
+      context.read<AuthBloc>().add(const AuthInitializeRequested());
     });
   }
 

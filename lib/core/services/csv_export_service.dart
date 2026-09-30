@@ -1,39 +1,92 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:excel_plus/excel_plus.dart' as xlsx;
 import 'package:flutter/material.dart';
 import 'package:inventory_count_flutter_app/domain/entities/barcode.dart';
 import 'package:inventory_count_flutter_app/domain/entities/asset_scan.dart';
 import 'package:file_saver/file_saver.dart';
 
 class CsvExportService {
-  /// Exports inventory barcode data to a CSV and saves it on the local storage.
-  Future<void> exportToCsv(List<ItemBox> items) async {
-    final StringBuffer buffer = StringBuffer();
+  /// Exports inventory with copyable batch codes and numeric quantities.
+  Future<void> exportToXlsx(List<ItemBox> items) async {
+    await FileSaver.instance.saveAs(
+      name: 'inventory_export_${_timestamp()}',
+      fileExtension: 'xlsx',
+      bytes: buildInventoryXlsx(items),
+      mimeType: MimeType.microsoftExcel,
+    );
+  }
 
-    final List<ItemBox> boxes = items.where((item) => !item.isPallet).toList();
-    final List<ItemBox> pallets = items.where((item) => item.isPallet).toList();
-
-    // --- Table 1: Box Data ---
-    buffer.writeln('BOX DATA');
-    buffer.writeln('Barcode,Material,Batch No,Serial No,Pallet/Box,Quantity');
-    for (final box in boxes) {
-      buffer.writeln(
-        '${_escapeCsv(box.barCodeNo)},${_escapeCsv(box.matnr)},${_escapeCsv(box.batchNo)},${_escapeCsv(box.serialNo)},${_escapeCsv(box.palletBox)},${box.qty}',
+  Uint8List buildInventoryXlsx(List<ItemBox> items) {
+    final book = xlsx.Excel.createExcel();
+    book.rename('Sheet1', 'Inventory');
+    final sheet = book['Inventory'];
+    final headers = [
+      'Material',
+      'Batch No',
+      'Serial No',
+      'Pallet/Box',
+      'Quantity',
+    ];
+    final formats = ['000000', 'General', '0000', 'General', '0'];
+    for (var column = 0; column < headers.length; column++) {
+      sheet.updateCell(
+        xlsx.CellIndex.indexByColumnRow(columnIndex: column, rowIndex: 0),
+        xlsx.TextCellValue(headers[column]),
+        cellStyle: xlsx.CellStyle(bold: true),
       );
+      sheet.setColumnWidth(column, column == 1 ? 18 : 14);
     }
-
-    buffer.writeln();
-
-    // --- Table 2: Pallet Data ---
-    buffer.writeln('PALLET DATA');
-    buffer.writeln('Barcode,Material,Batch No,Serial No,Pallet/Box,Quantity');
-    for (final pallet in pallets) {
-      buffer.writeln(
-        '${_escapeCsv(pallet.barCodeNo)},${_escapeCsv(pallet.matnr)},${_escapeCsv(pallet.batchNo)},${_escapeCsv(pallet.serialNo)},${_escapeCsv(pallet.palletBox)},${pallet.qty}',
-      );
+    for (var row = 0; row < items.length; row++) {
+      final item = items[row];
+      final values = <xlsx.CellValue?>[
+        _numericIdentifier(item.matnr),
+        // Leading zeros must be in the stored value, not only its display format.
+        xlsx.TextCellValue(item.batchNo),
+        item.isPallet ? null : _numericIdentifier(item.serialNo),
+        xlsx.TextCellValue(item.isPallet ? 'P' : 'B'),
+        xlsx.IntCellValue(item.qty),
+      ];
+      for (var column = 0; column < values.length; column++) {
+        sheet.updateCell(
+          xlsx.CellIndex.indexByColumnRow(
+            columnIndex: column,
+            rowIndex: row + 1,
+          ),
+          values[column],
+          cellStyle: xlsx.CellStyle(
+            numberFormat: xlsx.NumFormat.custom(formatCode: formats[column]),
+          ),
+        );
+      }
     }
+    final totalRow = items.length + 2;
+    sheet.updateCell(
+      xlsx.CellIndex.indexByString('D$totalRow'),
+      xlsx.TextCellValue('Total'),
+      cellStyle: xlsx.CellStyle(bold: true),
+    );
+    sheet.updateCell(
+      xlsx.CellIndex.indexByString('E$totalRow'),
+      items.isEmpty
+          ? xlsx.IntCellValue(0)
+          : xlsx.FormulaCellValue('SUM(E2:E${totalRow - 1})'),
+      cellStyle: xlsx.CellStyle(
+        bold: true,
+        numberFormat: xlsx.NumFormat.custom(formatCode: '0'),
+      ),
+    );
+    book.recalculate();
+    return Uint8List.fromList(book.encode()!);
+  }
 
-    await _shareAsCsv(buffer.toString(), 'inventory_export_${_timestamp()}');
+  xlsx.CellValue? _numericIdentifier(String value) {
+    if (value.isEmpty) return null;
+    // Preserve unexpected non-numeric identifiers instead of losing their data.
+    final number = int.tryParse(value);
+    return number == null
+        ? xlsx.TextCellValue(value)
+        : xlsx.IntCellValue(number);
   }
 
   /// Exports asset scan data to a CSV and saves it to local storage.

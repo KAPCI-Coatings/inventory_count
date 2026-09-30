@@ -18,6 +18,9 @@ class BarcodeState extends Equatable {
 
   /// True while a POST request to the backend is in progress.
   final bool isSending;
+  final int sentCount;
+  final int totalToSend;
+  bool get hasPendingItems => itemBoxes.any((item) => !item.isSent);
 
   /// Human-readable feedback from the last send attempt.
   final String? sendResultMessage;
@@ -35,6 +38,8 @@ class BarcodeState extends Equatable {
     this.dailyScanCount = 0,
     this.itemBoxes = const [],
     this.isSending = false,
+    this.sentCount = 0,
+    this.totalToSend = 0,
     this.sendResultMessage,
   });
 
@@ -51,13 +56,17 @@ class BarcodeState extends Equatable {
     int? dailyScanCount,
     List<ItemBox>? itemBoxes,
     bool? isSending,
+    int? sentCount,
+    int? totalToSend,
     String? sendResultMessage,
   }) {
     return BarcodeState(
       message: message ?? this.message,
       centeredErrorMessage: centeredErrorMessage ?? this.centeredErrorMessage,
-      centeredSuccessMessage: centeredSuccessMessage ?? this.centeredSuccessMessage,
-      centeredWarningMessage: centeredWarningMessage ?? this.centeredWarningMessage,
+      centeredSuccessMessage:
+          centeredSuccessMessage ?? this.centeredSuccessMessage,
+      centeredWarningMessage:
+          centeredWarningMessage ?? this.centeredWarningMessage,
       status: status ?? this.status,
       lastScan: lastScan ?? this.lastScan,
       palletBoxCount: palletBoxCount ?? this.palletBoxCount,
@@ -66,24 +75,28 @@ class BarcodeState extends Equatable {
       dailyScanCount: dailyScanCount ?? this.dailyScanCount,
       itemBoxes: itemBoxes ?? this.itemBoxes,
       isSending: isSending ?? this.isSending,
+      sentCount: sentCount ?? this.sentCount,
+      totalToSend: totalToSend ?? this.totalToSend,
       sendResultMessage: sendResultMessage ?? this.sendResultMessage,
     );
   }
 
   @override
   List<Object?> get props => [
-        message,
-        centeredErrorMessage,
-        centeredSuccessMessage,
-        centeredWarningMessage,
-        status,
-        lastScan,
-        palletBoxCount,
-        boxCount,
-        palletCount,
-        dailyScanCount,
-        itemBoxes,
-        isSending,
-        sendResultMessage,
-      ];
+    message,
+    centeredErrorMessage,
+    centeredSuccessMessage,
+    centeredWarningMessage,
+    status,
+    lastScan,
+    palletBoxCount,
+    boxCount,
+    palletCount,
+    dailyScanCount,
+    itemBoxes,
+    isSending,
+    sentCount,
+    totalToSend,
+    sendResultMessage,
+  ];
 }

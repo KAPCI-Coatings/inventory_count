@@ -47,14 +47,14 @@ class _BarcodeActionsSectionState extends State<BarcodeActionsSection> {
         context: context,
         barrierDismissible: false,
         builder: (dialogContext) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           title: const Text(
             'مسح البيانات',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
-          content: const Text(
-            'هل انت متاكد من مسح جميع البيانات من الجهاز',
-          ),
+          content: const Text('هل انت متاكد من مسح جميع البيانات من الجهاز'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(false),
@@ -63,10 +63,7 @@ class _BarcodeActionsSectionState extends State<BarcodeActionsSection> {
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: Colors.black87),
               onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: const Text(
-                'نعم',
-                style: TextStyle(color: Colors.white),
-              ),
+              child: const Text('نعم', style: TextStyle(color: Colors.white)),
             ),
           ],
         ),
@@ -115,10 +112,11 @@ class _BarcodeActionsSectionState extends State<BarcodeActionsSection> {
                             : () async {
                                 setState(() => _isExporting = true);
                                 try {
-                                  final items = await instance<BarcodeRepository>()
-                                      .getScannedItems();
+                                  final items =
+                                      await instance<BarcodeRepository>()
+                                          .getScannedItems();
                                   await instance<CsvExportService>()
-                                      .exportToCsv(items);
+                                      .exportToXlsx(items);
                                 } finally {
                                   if (mounted) {
                                     setState(() => _isExporting = false);
@@ -127,7 +125,10 @@ class _BarcodeActionsSectionState extends State<BarcodeActionsSection> {
                               },
                         backgroundColor: Colors.grey.shade400,
                         textColor: Colors.black,
-                        textSize: ResponsiveUtils.responsiveFontSize(context, 16),
+                        textSize: ResponsiveUtils.responsiveFontSize(
+                          context,
+                          16,
+                        ),
                       ),
                     ),
                   ),
@@ -145,7 +146,10 @@ class _BarcodeActionsSectionState extends State<BarcodeActionsSection> {
                   textColor: Colors.black,
                   textSize: ResponsiveUtils.responsiveFontSize(context, 16),
                   width: ResponsiveUtils.responsiveWidth(context, 0.4),
-                  height: ResponsiveUtils.responsiveHeight(context, 0.07).clamp(48, 64),
+                  height: ResponsiveUtils.responsiveHeight(
+                    context,
+                    0.07,
+                  ).clamp(48, 64),
                 ),
               ),
             ],
@@ -153,7 +157,9 @@ class _BarcodeActionsSectionState extends State<BarcodeActionsSection> {
         }
 
         return BlocBuilder<BarcodeBloc, BarcodeState>(
-          buildWhen: (prev, curr) => prev.isSending != curr.isSending,
+          buildWhen: (prev, curr) =>
+              prev.isSending != curr.isSending ||
+              prev.hasPendingItems != curr.hasPendingItems,
           builder: (context, barcodeState) {
             return Column(
               children: [
@@ -165,8 +171,10 @@ class _BarcodeActionsSectionState extends State<BarcodeActionsSection> {
                         onPressed: () => _navigateToRoute(Routes.settings),
                         backgroundColor: Colors.grey.shade400,
                         textColor: Colors.black,
-                        textSize:
-                            ResponsiveUtils.responsiveFontSize(context, 16),
+                        textSize: ResponsiveUtils.responsiveFontSize(
+                          context,
+                          16,
+                        ),
                       ),
                     ),
                     SizedBox(width: gap),
@@ -176,8 +184,10 @@ class _BarcodeActionsSectionState extends State<BarcodeActionsSection> {
                         onPressed: () => _navigateToRoute(Routes.search),
                         backgroundColor: Colors.grey.shade400,
                         textColor: Colors.black,
-                        textSize:
-                            ResponsiveUtils.responsiveFontSize(context, 16),
+                        textSize: ResponsiveUtils.responsiveFontSize(
+                          context,
+                          16,
+                        ),
                       ),
                     ),
                   ],
@@ -190,7 +200,9 @@ class _BarcodeActionsSectionState extends State<BarcodeActionsSection> {
                       child: DefaultButton(
                         text: AppLocalizations.of(context)!.send,
                         isLoading: barcodeState.isSending,
-                        onPressed: barcodeState.isSending
+                        onPressed:
+                            (barcodeState.isSending ||
+                                !barcodeState.hasPendingItems)
                             ? null
                             : () {
                                 context.read<BarcodeBloc>().add(
@@ -199,8 +211,10 @@ class _BarcodeActionsSectionState extends State<BarcodeActionsSection> {
                               },
                         backgroundColor: Colors.grey.shade400,
                         textColor: Colors.black,
-                        textSize:
-                            ResponsiveUtils.responsiveFontSize(context, 16),
+                        textSize: ResponsiveUtils.responsiveFontSize(
+                          context,
+                          16,
+                        ),
                       ),
                     ),
                     SizedBox(width: gap),
@@ -215,10 +229,11 @@ class _BarcodeActionsSectionState extends State<BarcodeActionsSection> {
                             : () async {
                                 setState(() => _isExporting = true);
                                 try {
-                                  final items = await instance<BarcodeRepository>()
-                                      .getScannedItems();
+                                  final items =
+                                      await instance<BarcodeRepository>()
+                                          .getScannedItems();
                                   await instance<CsvExportService>()
-                                      .exportToCsv(items);
+                                      .exportToXlsx(items);
                                 } finally {
                                   if (mounted) {
                                     setState(() => _isExporting = false);
@@ -227,8 +242,10 @@ class _BarcodeActionsSectionState extends State<BarcodeActionsSection> {
                               },
                         backgroundColor: Colors.grey.shade400,
                         textColor: Colors.black,
-                        textSize:
-                            ResponsiveUtils.responsiveFontSize(context, 16),
+                        textSize: ResponsiveUtils.responsiveFontSize(
+                          context,
+                          16,
+                        ),
                       ),
                     ),
                     SizedBox(width: gap),
@@ -240,8 +257,10 @@ class _BarcodeActionsSectionState extends State<BarcodeActionsSection> {
                         onPressed: () => _showClearConfirmation(context),
                         backgroundColor: Colors.grey.shade400,
                         textColor: Colors.black,
-                        textSize:
-                            ResponsiveUtils.responsiveFontSize(context, 16),
+                        textSize: ResponsiveUtils.responsiveFontSize(
+                          context,
+                          16,
+                        ),
                       ),
                     ),
                   ],

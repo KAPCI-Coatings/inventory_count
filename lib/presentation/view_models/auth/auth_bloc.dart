@@ -172,6 +172,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(state.copyWith(status: AuthStatus.loading, message: null));
     try {
       await _logoutUseCase();
+      // Reset initialization flag so the next login page visit can
+      // re-run AuthInitializeRequested successfully.
+      _isInitialized = false;
       emit(
         state.copyWith(
           status: AuthStatus.initial,

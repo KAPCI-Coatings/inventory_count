@@ -5,6 +5,7 @@ import 'package:inventory_count_flutter_app/presentation/view_models/barcode/bar
 import 'package:inventory_count_flutter_app/presentation/widgets/barcode/barcode_actions_section.dart';
 import 'package:inventory_count_flutter_app/presentation/widgets/barcode/barcode_status_section.dart';
 import 'package:inventory_count_flutter_app/core/widgets/error_popup.dart';
+import 'package:inventory_count_flutter_app/core/widgets/sending_progress_popup.dart';
 import 'package:inventory_count_flutter_app/presentation/view_models/barcode/barcode_state.dart';
 import 'package:inventory_count_flutter_app/l10n/app_localizations.dart';
 import '../../core/resources/responsive_utils.dart';
@@ -19,6 +20,9 @@ class BarcodeScreen extends StatefulWidget {
 
 class _BarcodeScreenState extends State<BarcodeScreen> {
   BarcodeBloc? _bloc;
+
+  /// Tracks whether the sending progress popup is currently showing.
+  bool _isProgressDialogOpen = false;
 
   @override
   void initState() {
@@ -82,6 +86,14 @@ class _BarcodeScreenState extends State<BarcodeScreen> {
     }
   }
 
+  /// Closes the progress popup if it is currently open.
+  void _dismissProgressDialog() {
+    if (_isProgressDialogOpen && mounted) {
+      _isProgressDialogOpen = false;
+      Navigator.of(context, rootNavigator: true).pop();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -91,86 +103,125 @@ class _BarcodeScreenState extends State<BarcodeScreen> {
         child: SafeArea(
           child: Builder(
             builder: (context) {
-            final double pagePadding = ResponsiveUtils.responsiveSpacing(
-              context,
-              16,
-            );
+              final double pagePadding = ResponsiveUtils.responsiveSpacing(
+                context,
+                16,
+              );
 
-            return BlocListener<BarcodeBloc, BarcodeState>(
-              listener: (context, state) {
-                // ── Warning (duplicate) — popup with Yes/No ──
-                if (state.status == BarcodeStatus.warning &&
-                    state.centeredWarningMessage != null &&
-                    state.centeredWarningMessage!.isNotEmpty) {
-
-                  const String confirmMessage = 'هل تريد تكرار هذا الباركود\nنعم او لا';
-
-                  ErrorPopup.showWarning(context, confirmMessage).then((confirmed) {
-                    if (!context.mounted) return;
-                    if (confirmed == true) {
-                      context.read<BarcodeBloc>().add(BarcodeDuplicateConfirmed());
-                    } else {
-                      context.read<BarcodeBloc>().add(BarcodeDuplicateRejected());
+              return BlocListener<BarcodeBloc, BarcodeState>(
+                listener: (context, state) {
+                  // ── Posting — show confirmed upload progress ──────────────
+                  if (state.isSending) {
+                    if (!_isProgressDialogOpen) {
+                      _isProgressDialogOpen = true;
+                      showDialog<void>(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (_) => BlocBuilder<BarcodeBloc, BarcodeState>(
+                          bloc: _bloc,
+                          builder: (_, uploadState) => SendingProgressPopup(
+                            sentCount: uploadState.sentCount,
+                            totalToSend: uploadState.totalToSend,
+                          ),
+                        ),
+                      ).then((_) {
+                        // Dialog was closed (either by us or navigator pop).
+                        _isProgressDialogOpen = false;
+                      });
                     }
-                    context.read<BarcodeBloc>().add(BarcodeDismissCenteredMessageRequested());
-                  });
-                  return;
-                }
+                    return;
+                  }
 
-                // ── Error — red popup ─────────────────────────────────────────
-                if (state.status == BarcodeStatus.error) {
-                  if (state.centeredErrorMessage != null &&
-                      state.centeredErrorMessage!.isNotEmpty) {
+                  // ── If we transitioned away from posting, close the popup ─
+                  if (_isProgressDialogOpen) {
+                    _dismissProgressDialog();
+                  }
+
+                  // ── Warning (duplicate) — popup with Yes/No ──
+                  if (state.status == BarcodeStatus.warning &&
+                      state.centeredWarningMessage != null &&
+                      state.centeredWarningMessage!.isNotEmpty) {
+                    const String confirmMessage =
+                        'هل تريد تكرار هذا الباركود\nنعم او لا';
+
+                    ErrorPopup.showWarning(context, confirmMessage).then((
+                      confirmed,
+                    ) {
+                      if (!context.mounted) return;
+                      if (confirmed == true) {
+                        context.read<BarcodeBloc>().add(
+                          BarcodeDuplicateConfirmed(),
+                        );
+                      } else {
+                        context.read<BarcodeBloc>().add(
+                          BarcodeDuplicateRejected(),
+                        );
+                      }
+                      context.read<BarcodeBloc>().add(
+                        BarcodeDismissCenteredMessageRequested(),
+                      );
+                    });
+                    return;
+                  }
+
+                  // ── Error — red popup ─────────────────────────────────────────
+                  if (state.status == BarcodeStatus.error) {
+                    if (state.centeredErrorMessage != null &&
+                        state.centeredErrorMessage!.isNotEmpty) {
+                      ErrorPopup.show(
+                        context,
+                        _translate(context, state.centeredErrorMessage!),
+                        variant: PopupVariant.error,
+                        onRetry: () {
+                          context.read<BarcodeBloc>().add(
+                            BarcodeScannerEnableRequested(),
+                          );
+                        },
+                      ).then((_) {
+                        if (!context.mounted) return;
+                        context.read<BarcodeBloc>().add(
+                          BarcodeDismissCenteredMessageRequested(),
+                        );
+                      });
+                    }
+                    return;
+                  }
+
+                  // ── Success / Send result ─────────────────────────────────────
+                  if (state.status == BarcodeStatus.success &&
+                      state.centeredSuccessMessage != null &&
+                      state.centeredSuccessMessage!.isNotEmpty) {
                     ErrorPopup.show(
                       context,
-                      _translate(context, state.centeredErrorMessage!),
-                      variant: PopupVariant.error,
-                      onRetry: () {
-                        context.read<BarcodeBloc>().add(
-                          BarcodeScannerEnableRequested(),
-                        );
-                      },
+                      _translate(context, state.centeredSuccessMessage!),
+                      variant: PopupVariant.success,
                     ).then((_) {
                       if (!context.mounted) return;
-                      context.read<BarcodeBloc>().add(BarcodeDismissCenteredMessageRequested());
+                      context.read<BarcodeBloc>().add(
+                        BarcodeDismissCenteredMessageRequested(),
+                      );
                     });
                   }
-                  return;
-                }
-
-                // ── Success / Send result ─────────────────────────────────────
-                if (state.status == BarcodeStatus.success &&
-                    state.centeredSuccessMessage != null &&
-                    state.centeredSuccessMessage!.isNotEmpty) {
-                  ErrorPopup.show(
-                    context,
-                    _translate(context, state.centeredSuccessMessage!),
-                    variant: PopupVariant.success,
-                  ).then((_) {
-                    if (!context.mounted) return;
-                    context.read<BarcodeBloc>().add(BarcodeDismissCenteredMessageRequested());
-                  });
-                }
-              },
-              child: Stack(
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.all(pagePadding),
-                    child: Column(
-                      children: <Widget>[
-                        const BarcodeStatusSection(),
-                        const Spacer(),
-                        const BarcodeActionsSection(),
-                      ],
+                },
+                child: Stack(
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.all(pagePadding),
+                      child: Column(
+                        children: <Widget>[
+                          const BarcodeStatusSection(),
+                          const Spacer(),
+                          const BarcodeActionsSection(),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            );
-          },
+                  ],
+                ),
+              );
+            },
+          ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 }
