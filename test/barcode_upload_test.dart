@@ -1,6 +1,9 @@
+import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 import 'package:inventory_count_flutter_app/core/services/dummy_barcode_generator.dart';
 import 'package:inventory_count_flutter_app/core/widgets/sending_progress_popup.dart';
 import 'package:inventory_count_flutter_app/core/services/api_service.dart';
@@ -216,4 +219,89 @@ void main() {
     );
     expect(find.text('00:00'), findsNothing);
   });
+
+  test(
+    'pallet barcode with different letters at index 17 is saved as P only and box as B',
+    () async {
+      final repo = EmptyRepository();
+      final processUseCase = ProcessBarcodeUseCase(repo);
+
+      // Pallet barcodes with different letters ('A', 'C', 'Z') at index 17
+      final resultA = await processUseCase('P1234560000000001A050');
+      expect(resultA.itemBox.isPallet, isTrue);
+      expect(resultA.itemBox.palletBox, 'P');
+      expect(resultA.itemBox.serialNo, 'A050');
+      expect(resultA.itemBox.qty, 50);
+      expect(repo.items.last.palletBox, 'P');
+      expect(repo.items.last.serialNo, 'A050');
+
+      final resultC = await processUseCase('P1234560000000001C100');
+      expect(resultC.itemBox.isPallet, isTrue);
+      expect(resultC.itemBox.palletBox, 'P');
+      expect(resultC.itemBox.serialNo, 'C100');
+      expect(resultC.itemBox.qty, 100);
+      expect(repo.items.last.palletBox, 'P');
+      expect(repo.items.last.serialNo, 'C100');
+
+      final resultZ = await processUseCase('P1234560000000001Z025');
+      expect(resultZ.itemBox.isPallet, isTrue);
+      expect(resultZ.itemBox.palletBox, 'P');
+      expect(resultZ.itemBox.serialNo, 'Z025');
+      expect(resultZ.itemBox.qty, 25);
+      expect(repo.items.last.palletBox, 'P');
+      expect(repo.items.last.serialNo, 'Z025');
+
+      // Box barcode (20 digits)
+      final resultBox = await processUseCase('12345600000000010001');
+      expect(resultBox.itemBox.isPallet, isFalse);
+      expect(resultBox.itemBox.palletBox, 'B');
+      expect(resultBox.itemBox.serialNo, '0001');
+      expect(resultBox.itemBox.qty, 1);
+      expect(repo.items.last.palletBox, 'B');
+      expect(repo.items.last.serialNo, '0001');
+    },
+  );
+
+  test(
+    'ApiService sends Z025 as serialNo for pallet even if item had 0000 stored',
+    () async {
+      late List<dynamic> capturedPayload;
+      final mockClient = MockClient((request) async {
+        capturedPayload = jsonDecode(request.body) as List<dynamic>;
+        return http.Response('[]', 200);
+      });
+
+      final apiService = ApiService(client: mockClient);
+
+      // Simulating a pallet item previously saved with serialNo '0000'
+      final palletItem = const ItemBox(
+        barCodeNo: 'P1122335566000000Z025',
+        matnr: '112233',
+        batchNo: '5566000000',
+        serialNo: '0000', // old value
+        palletBox: 'P',
+        qty: 25,
+        isPallet: true,
+      );
+
+      final result = await apiService.sendInventoryData(
+        baseUrl: 'http://test.api',
+        devId: '555',
+        items: [palletItem],
+        count: 1,
+      );
+
+      expect(result.success, isTrue);
+      expect(capturedPayload.length, 1);
+      expect(capturedPayload[0]['devId'], '555');
+      expect(capturedPayload[0]['matnr'], '112233');
+      expect(capturedPayload[0]['batchNo'], '5566000000');
+      expect(capturedPayload[0]['qty'], 25.0);
+      expect(capturedPayload[0]['serialNo'], 'Z025'); // Must be Z025, not 0000!
+      expect(capturedPayload[0]['palletBox'], 'P');
+      expect(capturedPayload[0]['palletNo'], 1);
+    },
+  );
 }
+
+

@@ -47,18 +47,21 @@ class ProcessBarcodeUseCase {
         matnr: matnr,
         batchNo: batchNo,
         serialNo: serialNo,
+        palletBox: 'B',
         qty: 1,
         isPallet: false,
       );
     } else {
-      // PALLET FORMAT (21 digits): P (1) | matnr (6) | batch (10) | palletBox (1) | qty (3)
+      // PALLET FORMAT (21 digits): P (1) | matnr (6) | batch (10) | letter (1) | qty (3)
       if (!rawBarcode.startsWith('P') && !rawBarcode.startsWith('p')) {
         throw const InvalidBarcodeFormatException('invalid_pallet_prefix');
       }
 
       final matnr = rawBarcode.substring(1, 7);
       final batchNo = rawBarcode.substring(7, 17);
-      final palletBox = rawBarcode.substring(17, 18);
+      // Pallet has no separate box serial number; the last 4 characters (e.g. Z025)
+      // contain the letter and 3-digit quantity.
+      final serialNo = rawBarcode.substring(17, 21);
       final qtyString = rawBarcode.substring(18, 21);
       final qty = int.tryParse(qtyString) ?? 0;
 
@@ -66,8 +69,9 @@ class ProcessBarcodeUseCase {
         barCodeNo: rawBarcode,
         matnr: matnr,
         batchNo: batchNo,
-        palletBox: palletBox,
-        palletNo: int.tryParse(palletBox),
+        serialNo: serialNo,
+        palletBox: 'P',
+        palletNo: 1,
         qty: qty,
         isPallet: true,
       );

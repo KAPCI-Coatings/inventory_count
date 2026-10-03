@@ -17,16 +17,22 @@ class BarcodeLocalDataSourceImpl implements BarcodeLocalDataSource {
 
   @override
   Future<void> saveBarcode(ItemBox item) async {
+    final bool isPallet = item.isPallet || item.barCodeNo.toUpperCase().startsWith('P');
+    final String palletBox = isPallet ? 'P' : (item.palletBox.isNotEmpty ? item.palletBox : 'B');
+    final String serialNo = isPallet && item.barCodeNo.length == 21
+        ? item.barCodeNo.substring(17, 21)
+        : item.serialNo;
+
     await database.insert(
       tableName,
       {
         'barCodeNo': item.barCodeNo,
         'matnr': item.matnr,
         'batchNo': item.batchNo,
-        'serialNo': item.serialNo,
-        'palletBox': item.palletBox,
+        'serialNo': serialNo,
+        'palletBox': palletBox,
         'qty': item.qty,
-        'isPallet': item.isPallet ? 1 : 0,
+        'isPallet': isPallet ? 1 : 0,
         'isSent': item.isSent ? 1 : 0,
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
@@ -70,14 +76,26 @@ class BarcodeLocalDataSourceImpl implements BarcodeLocalDataSource {
     );
 
     return List.generate(maps.length, (i) {
+      final barcode = maps[i]['barCodeNo'] as String;
+      final isPallet = (maps[i]['isPallet'] as int) == 1 || barcode.toUpperCase().startsWith('P');
+      String serialNo = maps[i]['serialNo'] as String;
+      String palletBox = maps[i]['palletBox'] as String;
+
+      if (isPallet) {
+        palletBox = 'P';
+        if (barcode.length == 21) {
+          serialNo = barcode.substring(17, 21);
+        }
+      }
+
       return ItemBox(
-        barCodeNo: maps[i]['barCodeNo'] as String,
+        barCodeNo: barcode,
         matnr: maps[i]['matnr'] as String,
         batchNo: maps[i]['batchNo'] as String,
-        serialNo: maps[i]['serialNo'] as String,
-        palletBox: maps[i]['palletBox'] as String,
+        serialNo: serialNo,
+        palletBox: palletBox,
         qty: maps[i]['qty'] as int,
-        isPallet: (maps[i]['isPallet'] as int) == 1,
+        isPallet: isPallet,
         isSent: (maps[i]['isSent'] as int?) == 1,
       );
     });

@@ -28,17 +28,18 @@ class DummyBarcodeGenerator {
       final quantity = min(palletBoxesRemaining, 20 + _random.nextInt(81));
       palletBoxesRemaining -= quantity;
       final sectionLetter = String.fromCharCode(65 + _random.nextInt(26));
+      final serialNo = '$sectionLetter${quantity.toString().padLeft(3, '0')}';
       final fields = _uniqueFields(
         generatedBarcodes,
         (matnr, batch, serial) =>
-            'P$matnr$batch$sectionLetter${quantity.toString().padLeft(3, '0')}',
+            'P$matnr$batch$serialNo',
       );
       items.add(
         ItemBox(
           barCodeNo: fields.barcode,
           matnr: fields.matnr,
           batchNo: fields.batch,
-          serialNo: '0000',
+          serialNo: serialNo,
           palletBox: 'P',
           palletNo: palletNumber++,
           qty: quantity,

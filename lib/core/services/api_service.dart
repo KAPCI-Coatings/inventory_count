@@ -47,11 +47,33 @@ class ApiService {
 
   Map<String, dynamic> _itemToInventoryCountJson(ItemBox item, String devId) {
     // Backend requires ALL fields non-null and non-empty (including SerialNo, PalletBox).
-    final String palletBox = item.palletBox.isNotEmpty ? item.palletBox : 'B';
-    final String serialNo = item.serialNo.isNotEmpty ? item.serialNo : '0000';
+    final bool isPallet = item.isPallet || item.barCodeNo.toUpperCase().startsWith('P');
+    final String palletBox = isPallet ? 'P' : 'B';
+
+    String serialNo;
+    if (isPallet) {
+      if (item.barCodeNo.length == 21) {
+        serialNo = item.barCodeNo.substring(17, 21);
+      } else if (item.serialNo.isNotEmpty && item.serialNo != '0000') {
+        serialNo = item.serialNo;
+      } else if (item.barCodeNo.length >= 4) {
+        serialNo = item.barCodeNo.substring(item.barCodeNo.length - 4);
+      } else {
+        serialNo = '0000';
+      }
+    } else {
+      if (item.serialNo.isNotEmpty && item.serialNo != '0000') {
+        serialNo = item.serialNo;
+      } else if (item.barCodeNo.length >= 20) {
+        serialNo = item.barCodeNo.substring(16, 20);
+      } else {
+        serialNo = item.serialNo.isNotEmpty ? item.serialNo : '0000';
+      }
+    }
+
     final int palletNo = (item.palletNo != null && item.palletNo! > 0)
         ? item.palletNo!
-        : (int.tryParse(item.palletBox) ?? 1);
+        : 1;
 
     return {
       'devId': devId,
