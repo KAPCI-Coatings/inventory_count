@@ -98,6 +98,30 @@ abstract class AppLocalizations {
     Locale('en'),
   ];
 
+  /// No description provided for @scanPallets.
+  ///
+  /// In en, this message translates to:
+  /// **'Pallets'**
+  String get scanPallets;
+
+  /// No description provided for @scanBoxes.
+  ///
+  /// In en, this message translates to:
+  /// **'Boxes'**
+  String get scanBoxes;
+
+  /// No description provided for @errorScanPalletsOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Pallets is selected. Scan a pallet or select Boxes to scan a box.'**
+  String get errorScanPalletsOnly;
+
+  /// No description provided for @errorScanBoxesOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Boxes is selected. Scan a box or select Pallets to scan a pallet.'**
+  String get errorScanBoxesOnly;
+
   /// No description provided for @settings.
   ///
   /// In en, this message translates to:

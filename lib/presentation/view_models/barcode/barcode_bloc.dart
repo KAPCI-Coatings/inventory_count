@@ -33,6 +33,16 @@ class BarcodeBloc extends Bloc<BarcodeEvent, BarcodeState> {
   }) : _dummyBarcodeGenerator =
            dummyBarcodeGenerator ?? DummyBarcodeGenerator(),
        super(const BarcodeState()) {
+    on<BarcodeScanTypeChanged>((event, emit) {
+      if (_isProcessingScan ||
+          _uploadInProgress ||
+          state.status == BarcodeStatus.warning) {
+        return;
+      }
+      emit(
+        state.copyWith(scanType: event.scanType, status: BarcodeStatus.initial),
+      );
+    });
     on<BarcodeInitializeRequested>((event, emit) async {
       debugPrint(
         '[BarcodeBloc] BarcodeInitializeRequested — loading cached items from DB',
@@ -267,6 +277,15 @@ class BarcodeBloc extends Bloc<BarcodeEvent, BarcodeState> {
         '[BarcodeBloc] Clean barcode: "$cleanBarcode" (${cleanBarcode.length} chars)',
       );
 
+      // Reject the other type before the use case can save or flag duplicates.
+      if (state.scanType == ScanType.pallet && cleanBarcode.length == 20) {
+        throw const InvalidBarcodeFormatException('error_scan_pallets_only');
+      }
+      if (state.scanType == ScanType.box &&
+          cleanBarcode.length == 21 &&
+          cleanBarcode.toUpperCase().startsWith('P')) {
+        throw const InvalidBarcodeFormatException('error_scan_boxes_only');
+      }
       final result = await _processBarcodeUseCase(cleanBarcode);
       final itemBox = result.itemBox;
 
@@ -316,6 +335,7 @@ class BarcodeBloc extends Bloc<BarcodeEvent, BarcodeState> {
         // Success
         emit(
           BarcodeState(
+            scanType: state.scanType,
             status: BarcodeStatus.success,
             itemBoxes: updatedItems,
             lastScan: itemBox,
@@ -331,6 +351,7 @@ class BarcodeBloc extends Bloc<BarcodeEvent, BarcodeState> {
       debugPrint('[BarcodeBloc] INVALID FORMAT: ${e.message}');
       emit(
         BarcodeState(
+          scanType: state.scanType,
           status: BarcodeStatus.error,
           itemBoxes: state.itemBoxes,
           lastScan: state.lastScan,
@@ -345,6 +366,7 @@ class BarcodeBloc extends Bloc<BarcodeEvent, BarcodeState> {
       debugPrint('[BarcodeBloc] UNEXPECTED ERROR: $e\n$stackTrace');
       emit(
         BarcodeState(
+          scanType: state.scanType,
           status: BarcodeStatus.error,
           itemBoxes: state.itemBoxes,
           lastScan: state.lastScan,

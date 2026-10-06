@@ -46,6 +46,10 @@ class _BarcodeScreenState extends State<BarcodeScreen> {
 
     switch (key) {
       // Barcode errors
+      case 'error_scan_pallets_only':
+        return l10n.errorScanPalletsOnly;
+      case 'error_scan_boxes_only':
+        return l10n.errorScanBoxesOnly;
       case 'invalid_barcode_length':
         return l10n.error_invalid_barcode_format;
       case 'invalid_pallet_prefix':
@@ -207,12 +211,19 @@ class _BarcodeScreenState extends State<BarcodeScreen> {
                   children: <Widget>[
                     Padding(
                       padding: EdgeInsets.all(pagePadding),
-                      child: Column(
-                        children: <Widget>[
-                          const BarcodeStatusSection(),
-                          const Spacer(),
-                          const BarcodeActionsSection(),
-                        ],
+                      child: LayoutBuilder(
+                        builder: (context, constraints) => Column(
+                          children: <Widget>[
+                            Expanded(
+                              child: BarcodeStatusSection(
+                                compact: constraints.maxHeight < 500,
+                                fillAvailableHeight: true,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            const BarcodeActionsSection(),
+                          ],
+                        ),
                       ),
                     ),
                   ],

@@ -1,5 +1,9 @@
 {
   "@@locale": "en",
+  "scanPallets": "Pallets",
+  "scanBoxes": "Boxes",
+  "errorScanPalletsOnly": "Pallets is selected. Scan a pallet or select Boxes to scan a box.",
+  "errorScanBoxesOnly": "Boxes is selected. Scan a box or select Pallets to scan a pallet.",
   "settings": "الإعدادات",
   "language": "Language",
   "devId": "Dev_ID",

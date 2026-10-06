@@ -9,6 +9,20 @@ class AppLocalizationsAr extends AppLocalizations {
   AppLocalizationsAr([String locale = 'ar']) : super(locale);
 
   @override
+  String get scanPallets => 'بالتات';
+
+  @override
+  String get scanBoxes => 'صناديق';
+
+  @override
+  String get errorScanPalletsOnly =>
+      'تم اختيار البالتات. امسح باركود بالتة أو اختر الصناديق لمسح باركود صندوق.';
+
+  @override
+  String get errorScanBoxesOnly =>
+      'تم اختيار الصناديق. امسح باركود صندوق أو اختر البالتات لمسح باركود بالتة.';
+
+  @override
   String get settings => 'الإعدادات';
 
   @override

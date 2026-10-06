@@ -167,19 +167,6 @@ class _BarcodeActionsSectionState extends State<BarcodeActionsSection> {
                   children: <Widget>[
                     Expanded(
                       child: DefaultButton(
-                        text: AppLocalizations.of(context)!.settings,
-                        onPressed: () => _navigateToRoute(Routes.settings),
-                        backgroundColor: Colors.grey.shade400,
-                        textColor: Colors.black,
-                        textSize: ResponsiveUtils.responsiveFontSize(
-                          context,
-                          16,
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: gap),
-                    Expanded(
-                      child: DefaultButton(
                         text: AppLocalizations.of(context)!.search,
                         onPressed: () => _navigateToRoute(Routes.search),
                         backgroundColor: Colors.grey.shade400,

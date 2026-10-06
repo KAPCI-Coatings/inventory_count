@@ -14,6 +14,7 @@ import 'package:inventory_count_flutter_app/core/services/csv_export_service.dar
 import 'package:inventory_count_flutter_app/data/datasources/asset_local_datasource.dart';
 import 'package:inventory_count_flutter_app/domain/entities/asset_scan.dart';
 import 'package:inventory_count_flutter_app/core/services/scanner_service.dart';
+import 'package:inventory_count_flutter_app/presentation/widgets/barcode/barcode_app_bar.dart';
 
 class AssetsScreen extends StatefulWidget {
   const AssetsScreen({super.key});
@@ -155,8 +156,12 @@ class _AssetsScreenState extends State<AssetsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isAdmin = context.select(
+      (AuthBloc bloc) => bloc.state.selectedRole.toLowerCase() == 'admin',
+    );
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: isAdmin ? const BarcodeAppBar(showBack: false) : null,
       body: FocusScope(
         canRequestFocus: false,
         child: SafeArea(
@@ -258,20 +263,6 @@ class _AssetsScreenState extends State<AssetsScreen> {
                       children: [
                         Row(
                           children: [
-                            Expanded(
-                              child: DefaultButton(
-                                text: AppLocalizations.of(context)!.settings,
-                                height: ResponsiveUtils.responsiveHeight(
-                                        context, 0.07)
-                                    .clamp(48, 64),
-                                textSize:
-                                    ResponsiveUtils.responsiveFontSize(context, 16),
-                                backgroundColor: Colors.grey.shade400,
-                                textColor: Colors.black,
-                                onPressed: () => _navigateToRoute(Routes.settings),
-                              ),
-                            ),
-                          SizedBox(width: gap),
                           Expanded(
                             child: DefaultButton(
                               text: AppLocalizations.of(context)!.export,

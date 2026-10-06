@@ -1,4 +1,11 @@
+import 'barcode_state.dart';
+
 abstract class BarcodeEvent {}
+
+class BarcodeScanTypeChanged extends BarcodeEvent {
+  final ScanType scanType;
+  BarcodeScanTypeChanged(this.scanType);
+}
 
 class BarcodeInitializeRequested extends BarcodeEvent {}
 

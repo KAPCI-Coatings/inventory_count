@@ -3,7 +3,10 @@ import 'package:inventory_count_flutter_app/domain/entities/barcode.dart';
 
 enum BarcodeStatus { initial, loading, posting, success, warning, error }
 
+enum ScanType { pallet, box }
+
 class BarcodeState extends Equatable {
+  final ScanType scanType;
   final String? message;
   final String? centeredErrorMessage;
   final String? centeredSuccessMessage;
@@ -26,6 +29,7 @@ class BarcodeState extends Equatable {
   final String? sendResultMessage;
 
   const BarcodeState({
+    this.scanType = ScanType.pallet,
     this.message,
     this.centeredErrorMessage,
     this.centeredSuccessMessage,
@@ -44,6 +48,7 @@ class BarcodeState extends Equatable {
   });
 
   BarcodeState copyWith({
+    ScanType? scanType,
     String? message,
     String? centeredErrorMessage,
     String? centeredSuccessMessage,
@@ -61,6 +66,7 @@ class BarcodeState extends Equatable {
     String? sendResultMessage,
   }) {
     return BarcodeState(
+      scanType: scanType ?? this.scanType,
       message: message ?? this.message,
       centeredErrorMessage: centeredErrorMessage ?? this.centeredErrorMessage,
       centeredSuccessMessage:
@@ -83,6 +89,7 @@ class BarcodeState extends Equatable {
 
   @override
   List<Object?> get props => [
+    scanType,
     message,
     centeredErrorMessage,
     centeredSuccessMessage,

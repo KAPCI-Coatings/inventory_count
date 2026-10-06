@@ -9,6 +9,20 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get scanPallets => 'Pallets';
+
+  @override
+  String get scanBoxes => 'Boxes';
+
+  @override
+  String get errorScanPalletsOnly =>
+      'Pallets is selected. Scan a pallet or select Boxes to scan a box.';
+
+  @override
+  String get errorScanBoxesOnly =>
+      'Boxes is selected. Scan a box or select Pallets to scan a pallet.';
+
+  @override
   String get settings => 'الإعدادات';
 
   @override
