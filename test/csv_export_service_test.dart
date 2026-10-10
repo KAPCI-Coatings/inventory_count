@@ -16,7 +16,7 @@ void main() {
         ]),
       )['Inventory'];
       Data cell(String ref) => sheet.cell(CellIndex.indexByString(ref));
-      expect(cell('A1').value, TextCellValue('Pallet Number'));
+      expect(cell('A1').value, TextCellValue('Pallet Num'));
       expect(cell('B1').value, TextCellValue('Material'));
       expect(cell('A2').value, IntCellValue(1));
       expect(cell('A3').value, IntCellValue(2));

@@ -107,19 +107,19 @@ abstract class AppLocalizations {
   /// No description provided for @addNewPallet.
   ///
   /// In en, this message translates to:
-  /// **'Add New Pallet'**
+  /// **'اضافه بالته جديده'**
   String get addNewPallet;
 
   /// No description provided for @confirmNewPallet.
   ///
   /// In en, this message translates to:
-  /// **'Are you sure you want to add a new pallet?'**
+  /// **'هل أنت متأكد من إضافة بالتة جديدة؟'**
   String get confirmNewPallet;
 
   /// No description provided for @emptyPalletNotice.
   ///
   /// In en, this message translates to:
-  /// **'Scan at least one box for the current pallet before adding a new pallet.'**
+  /// **'يجب مسح صندوق واحد على الأقل للبالتة الحالية.'**
   String get emptyPalletNotice;
 
   /// No description provided for @currentPalletNumber.
@@ -137,13 +137,13 @@ abstract class AppLocalizations {
   /// No description provided for @errorScanPalletsOnly.
   ///
   /// In en, this message translates to:
-  /// **'Pallets is selected. Scan a pallet or select Boxes to scan a box.'**
+  /// **'تم اختيار البالتات. امسح باركود بالتة أو اختر الصناديق لمسح باركود صندوق.'**
   String get errorScanPalletsOnly;
 
   /// No description provided for @errorScanBoxesOnly.
   ///
   /// In en, this message translates to:
-  /// **'Boxes is selected. Scan a box or select Pallets to scan a pallet.'**
+  /// **'تم اختيار الصناديق. امسح باركود صندوق أو اختر البالتات لمسح باركود بالتة.'**
   String get errorScanBoxesOnly;
 
   /// No description provided for @settings.
@@ -185,7 +185,7 @@ abstract class AppLocalizations {
   /// No description provided for @submit.
   ///
   /// In en, this message translates to:
-  /// **'Submit'**
+  /// **'إرسال'**
   String get submit;
 
   /// No description provided for @english.
@@ -209,7 +209,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsSavedSuccessfully.
   ///
   /// In en, this message translates to:
-  /// **'Settings saved successfully'**
+  /// **'تم حفظ الإعدادات بنجاح'**
   String get settingsSavedSuccessfully;
 
   /// No description provided for @assetsTitle.
@@ -287,55 +287,55 @@ abstract class AppLocalizations {
   /// No description provided for @error.
   ///
   /// In en, this message translates to:
-  /// **'Error'**
+  /// **'خطأ'**
   String get error;
 
   /// No description provided for @close.
   ///
   /// In en, this message translates to:
-  /// **'Close'**
+  /// **'إغلاق'**
   String get close;
 
   /// No description provided for @retry.
   ///
   /// In en, this message translates to:
-  /// **'Retry'**
+  /// **'إعادة المحاولة'**
   String get retry;
 
   /// No description provided for @errorInitialization.
   ///
   /// In en, this message translates to:
-  /// **'Error initializing'**
+  /// **'خطأ في التهيئة'**
   String get errorInitialization;
 
   /// No description provided for @errorEmptyPassword.
   ///
   /// In en, this message translates to:
-  /// **'Password cannot be empty.'**
+  /// **'يرجى إدخال كلمة المرور.'**
   String get errorEmptyPassword;
 
   /// No description provided for @errorInvalidCredentials.
   ///
   /// In en, this message translates to:
-  /// **'Login data is incorrect.'**
+  /// **'بيانات الدخول غير صحيحة.'**
   String get errorInvalidCredentials;
 
   /// No description provided for @errorLoginFailed.
   ///
   /// In en, this message translates to:
-  /// **'Login failed.'**
+  /// **'فشل تسجيل الدخول.'**
   String get errorLoginFailed;
 
   /// No description provided for @errorPasswordUpdateFailed.
   ///
   /// In en, this message translates to:
-  /// **'Password update failed. Admin privileges required.'**
+  /// **'فشل تحديث كلمة المرور. يلزم صلاحية الأدمن.'**
   String get errorPasswordUpdateFailed;
 
   /// No description provided for @successPasswordUpdated.
   ///
   /// In en, this message translates to:
-  /// **'Password updated successfully.'**
+  /// **'تم تحديث كلمة المرور بنجاح.'**
   String get successPasswordUpdated;
 
   /// No description provided for @username.
@@ -365,163 +365,163 @@ abstract class AppLocalizations {
   /// No description provided for @confirm_duplicate_pallet.
   ///
   /// In en, this message translates to:
-  /// **'Are you sure you want to duplicate this pallet?'**
+  /// **'هل أنت متأكد أنك تريد تكرار هذا الباليت؟'**
   String get confirm_duplicate_pallet;
 
   /// No description provided for @error_duplicate_barcode.
   ///
   /// In en, this message translates to:
-  /// **'This barcode is duplicated in the same order.'**
+  /// **'هذا الباركود مكرر داخل نفس الأوردر.'**
   String get error_duplicate_barcode;
 
   /// No description provided for @error_invalid_barcode_format.
   ///
   /// In en, this message translates to:
-  /// **'Invalid barcode. Must be exactly 20 or 21 characters.'**
+  /// **'باركود غير صحيح. يجب أن يكون 20 أو 21 حرف بالضبط.'**
   String get error_invalid_barcode_format;
 
   /// No description provided for @error_unexpected_scan.
   ///
   /// In en, this message translates to:
-  /// **'An unexpected error occurred during scan processing.'**
+  /// **'حدث خطأ غير متوقع أثناء معالجة القراءة.'**
   String get error_unexpected_scan;
 
   /// No description provided for @error_scan_failed.
   ///
   /// In en, this message translates to:
-  /// **'An error occurred while reading the barcode.'**
+  /// **'حدث خطأ أثناء قراءة الباركود.'**
   String get error_scan_failed;
 
   /// No description provided for @error_scanner_init.
   ///
   /// In en, this message translates to:
-  /// **'Failed to initialize scanner. Check settings.'**
+  /// **'تعذر تهيئة الماسح. تأكد من الإعدادات.'**
   String get error_scanner_init;
 
   /// No description provided for @error_no_scanned_data.
   ///
   /// In en, this message translates to:
-  /// **'No scanned data to post.'**
+  /// **'لا توجد بيانات ممسوحة للإرسال.'**
   String get error_no_scanned_data;
 
   /// No description provided for @success_post_clear_cache.
   ///
   /// In en, this message translates to:
-  /// **'Posted successfully and cache cleared.'**
+  /// **'تم الإرسال بنجاح وتم مسح الكاش.'**
   String get success_post_clear_cache;
 
   /// No description provided for @error_scanner_restart.
   ///
   /// In en, this message translates to:
-  /// **'Failed to restart scanner.'**
+  /// **'تعذر إعادة تشغيل الماسح.'**
   String get error_scanner_restart;
 
   /// No description provided for @success_scanner_stopped.
   ///
   /// In en, this message translates to:
-  /// **'Scanner stopped.'**
+  /// **'تم إيقاف الماسح.'**
   String get success_scanner_stopped;
 
   /// No description provided for @error_scanner_status_change.
   ///
   /// In en, this message translates to:
-  /// **'Failed to change scanner status.'**
+  /// **'تعذر تغيير حالة الماسح.'**
   String get error_scanner_status_change;
 
   /// No description provided for @error_profile_empty.
   ///
   /// In en, this message translates to:
-  /// **'Profile name cannot be empty.'**
+  /// **'اسم البروفايل لا يمكن أن يكون فارغا.'**
   String get error_profile_empty;
 
   /// No description provided for @success_profile_changed.
   ///
   /// In en, this message translates to:
-  /// **'Profile changed successfully.'**
+  /// **'تم تغيير البروفايل بنجاح.'**
   String get success_profile_changed;
 
   /// No description provided for @error_profile_change_failed.
   ///
   /// In en, this message translates to:
-  /// **'Failed to change profile.'**
+  /// **'تعذر تغيير البروفايل.'**
   String get error_profile_change_failed;
 
   /// No description provided for @error_invalid_url.
   ///
   /// In en, this message translates to:
-  /// **'Invalid URL. Example: http://10.10.30.47:2604'**
+  /// **'الرابط غير صحيح. مثال: http://10.10.30.47:2604'**
   String get error_invalid_url;
 
   /// No description provided for @error_invalid_device_id.
   ///
   /// In en, this message translates to:
-  /// **'Invalid device ID.'**
+  /// **'رقم الجهاز غير صحيح.'**
   String get error_invalid_device_id;
 
   /// No description provided for @error_confirm_save_settings.
   ///
   /// In en, this message translates to:
-  /// **'Could not confirm saving settings.'**
+  /// **'تعذر تأكيد حفظ إعدادات الإرسال.'**
   String get error_confirm_save_settings;
 
   /// No description provided for @success_save_settings.
   ///
   /// In en, this message translates to:
-  /// **'Settings saved successfully.\n{url}'**
+  /// **'تم حفظ إعدادات الإرسال بنجاح.\n{url}'**
   String success_save_settings(String url);
 
   /// No description provided for @error_save_settings.
   ///
   /// In en, this message translates to:
-  /// **'Failed to save settings.'**
+  /// **'تعذر حفظ الإعدادات.'**
   String get error_save_settings;
 
   /// No description provided for @error_post_no_connection.
   ///
   /// In en, this message translates to:
-  /// **'Post failed. No connection to server. Check network and URL.'**
+  /// **'فشل الإرسال. لا يوجد اتصال بالخادم. تأكد من نفس الشبكة والرابط.'**
   String get error_post_no_connection;
 
   /// No description provided for @error_post_server_connection.
   ///
   /// In en, this message translates to:
-  /// **'Post failed. Could not connect to server. {details}'**
+  /// **'فشل الإرسال. تعذر الاتصال بالخادم. {details}'**
   String error_post_server_connection(String details);
 
   /// No description provided for @error_post_http_not_allowed.
   ///
   /// In en, this message translates to:
-  /// **'Post failed. Cleartext HTTP traffic not permitted.'**
+  /// **'فشل الإرسال. اتصال HTTP غير مسموح على الجهاز.'**
   String get error_post_http_not_allowed;
 
   /// No description provided for @error_post_server_code.
   ///
   /// In en, this message translates to:
-  /// **'Post failed. Server returned code {code}.'**
+  /// **'فشل الإرسال. الخادم أرجع كود {code}.'**
   String error_post_server_code(String code);
 
   /// No description provided for @error_post_unknown.
   ///
   /// In en, this message translates to:
-  /// **'Post failed. Error reason: {details}'**
+  /// **'فشل الإرسال. سبب الخطأ: {details}'**
   String error_post_unknown(String details);
 
   /// No description provided for @yes.
   ///
   /// In en, this message translates to:
-  /// **'Yes'**
+  /// **'نعم'**
   String get yes;
 
   /// No description provided for @no.
   ///
   /// In en, this message translates to:
-  /// **'No'**
+  /// **'لا'**
   String get no;
 
   /// No description provided for @ok.
   ///
   /// In en, this message translates to:
-  /// **'OK'**
+  /// **'موافق'**
   String get ok;
 
   /// No description provided for @baseUrl.
@@ -545,7 +545,7 @@ abstract class AppLocalizations {
   /// No description provided for @post.
   ///
   /// In en, this message translates to:
-  /// **'Post'**
+  /// **'نشر'**
   String get post;
 
   /// No description provided for @numberOfScan.
@@ -611,13 +611,13 @@ abstract class AppLocalizations {
   /// No description provided for @warning.
   ///
   /// In en, this message translates to:
-  /// **'Warning'**
+  /// **'تحذير'**
   String get warning;
 
   /// No description provided for @success.
   ///
   /// In en, this message translates to:
-  /// **'Success'**
+  /// **'نجاح'**
   String get success;
 
   /// No description provided for @confirm_clear_screen.

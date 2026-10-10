@@ -30,6 +30,25 @@ class DefaultButton extends StatelessWidget {
     this.canRequestFocus = false,
   });
 
+  static const Map<String, String> _arabicButtonLabels = {
+    'Add New Pallet': 'اضافه بالته جديده',
+    'Submit': 'إرسال',
+    'Search': 'بحث',
+    'Clear': 'مسح',
+    'Exit': 'خروج',
+    'Send': 'إرسال',
+    'Export': 'حفظ كملف',
+    'Post': 'نشر',
+    'Login': 'تسجيل الدخول',
+    'Yes': 'نعم',
+    'No': 'لا',
+    'OK': 'موافق',
+    'Close': 'إغلاق',
+    'Retry': 'إعادة المحاولة',
+  };
+
+  String get _displayLabel => _arabicButtonLabels[text] ?? text;
+
   @override
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
@@ -74,7 +93,7 @@ class DefaultButton extends StatelessWidget {
               : FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(
-                    text,
+                    _displayLabel,
                     style: textTheme.titleMedium?.copyWith(
                       fontSize: textSize ?? ResponsiveUtils.responsiveFontSize(context, 16),
                       fontWeight: FontWeight.bold,

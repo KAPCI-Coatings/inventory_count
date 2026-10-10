@@ -159,7 +159,7 @@ void main() {
         );
         await tester.pumpAndSettle();
         expect(tester.takeException(), isNull);
-        final boxes = find.text(locale == 'en' ? 'Boxes' : 'صناديق');
+        final boxes = find.text('Boxes');
         expect(find.byType(Scrollable), findsNothing);
         expect(boxes.hitTestable(), findsOneWidget);
         final statusSection = find.byType(BarcodeStatusSection);

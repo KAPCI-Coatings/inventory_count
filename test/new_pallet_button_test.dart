@@ -69,7 +69,7 @@ void main() {
             ),
           ),
         );
-        final label = language == 'ar' ? 'اضافه بالته جديده' : 'Add New Pallet';
+        final label = 'اضافه بالته جديده';
         final add = find.text(label);
         expect(add, findsOneWidget);
         final search = find.text('بحث');
@@ -80,7 +80,7 @@ void main() {
         await tester.tap(add);
         await tester.pumpAndSettle();
         expect(bloc.state.currentExportPalletNo, 0);
-        await tester.tap(find.text(language == 'ar' ? 'لا' : 'No'));
+        await tester.tap(find.text('لا'));
         await tester.pumpAndSettle();
         expect(bloc.state.currentExportPalletNo, 0);
         expect(bloc.state.scanType, ScanType.pallet);
@@ -89,7 +89,7 @@ void main() {
         bloc.add(BarcodeScanned('P1234560000000001Z025', ''));
         await tester.pumpAndSettle();
         expect(repo.items, isEmpty);
-        await tester.tap(find.text(language == 'ar' ? 'نعم' : 'Yes'));
+        await tester.tap(find.text('نعم'));
         await tester.pumpAndSettle();
         expect(bloc.state.scanType, ScanType.box);
         expect(bloc.state.currentExportPalletNo, 1);
@@ -101,7 +101,7 @@ void main() {
         );
         await tester.tap(add);
         await tester.pumpAndSettle();
-        await tester.tap(find.text(language == 'ar' ? 'نعم' : 'Yes'));
+        await tester.tap(find.text('نعم'));
         await tester.pumpAndSettle();
         expect(bloc.state.currentExportPalletNo, 1);
         expect(bloc.state.centeredErrorMessage, 'error_empty_pallet');
@@ -110,7 +110,7 @@ void main() {
         repo.gate = Completer<void>();
         await tester.tap(add);
         await tester.pumpAndSettle();
-        await tester.tap(find.text(language == 'ar' ? 'نعم' : 'Yes'));
+        await tester.tap(find.text('نعم'));
         await tester.pump();
         await tester.pump(const Duration(seconds: 1));
         final button = tester.widget<ElevatedButton>(

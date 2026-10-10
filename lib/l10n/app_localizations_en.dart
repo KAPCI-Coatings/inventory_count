@@ -12,14 +12,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get scanPallets => 'Pallets';
 
   @override
-  String get addNewPallet => 'Add New Pallet';
+  String get addNewPallet => 'اضافه بالته جديده';
 
   @override
-  String get confirmNewPallet => 'Are you sure you want to add a new pallet?';
+  String get confirmNewPallet => 'هل أنت متأكد من إضافة بالتة جديدة؟';
 
   @override
   String get emptyPalletNotice =>
-      'Scan at least one box for the current pallet before adding a new pallet.';
+      'يجب مسح صندوق واحد على الأقل للبالتة الحالية.';
 
   @override
   String get currentPalletNumber => 'Current Pallet Number';
@@ -29,11 +29,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorScanPalletsOnly =>
-      'Pallets is selected. Scan a pallet or select Boxes to scan a box.';
+      'تم اختيار البالتات. امسح باركود بالتة أو اختر الصناديق لمسح باركود صندوق.';
 
   @override
   String get errorScanBoxesOnly =>
-      'Boxes is selected. Scan a box or select Pallets to scan a pallet.';
+      'تم اختيار الصناديق. امسح باركود صندوق أو اختر البالتات لمسح باركود بالتة.';
 
   @override
   String get settings => 'الإعدادات';
@@ -54,7 +54,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get rowMaterial => 'Row Material';
 
   @override
-  String get submit => 'Submit';
+  String get submit => 'إرسال';
 
   @override
   String get english => 'English';
@@ -66,7 +66,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get french => 'French';
 
   @override
-  String get settingsSavedSuccessfully => 'Settings saved successfully';
+  String get settingsSavedSuccessfully => 'تم حفظ الإعدادات بنجاح';
 
   @override
   String get assetsTitle => 'Assets';
@@ -105,32 +105,32 @@ class AppLocalizationsEn extends AppLocalizations {
   String get clear => 'مسح';
 
   @override
-  String get error => 'Error';
+  String get error => 'خطأ';
 
   @override
-  String get close => 'Close';
+  String get close => 'إغلاق';
 
   @override
-  String get retry => 'Retry';
+  String get retry => 'إعادة المحاولة';
 
   @override
-  String get errorInitialization => 'Error initializing';
+  String get errorInitialization => 'خطأ في التهيئة';
 
   @override
-  String get errorEmptyPassword => 'Password cannot be empty.';
+  String get errorEmptyPassword => 'يرجى إدخال كلمة المرور.';
 
   @override
-  String get errorInvalidCredentials => 'Login data is incorrect.';
+  String get errorInvalidCredentials => 'بيانات الدخول غير صحيحة.';
 
   @override
-  String get errorLoginFailed => 'Login failed.';
+  String get errorLoginFailed => 'فشل تسجيل الدخول.';
 
   @override
   String get errorPasswordUpdateFailed =>
-      'Password update failed. Admin privileges required.';
+      'فشل تحديث كلمة المرور. يلزم صلاحية الأدمن.';
 
   @override
-  String get successPasswordUpdated => 'Password updated successfully.';
+  String get successPasswordUpdated => 'تم تحديث كلمة المرور بنجاح.';
 
   @override
   String get username => 'Username';
@@ -146,103 +146,98 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get confirm_duplicate_pallet =>
-      'Are you sure you want to duplicate this pallet?';
+      'هل أنت متأكد أنك تريد تكرار هذا الباليت؟';
 
   @override
-  String get error_duplicate_barcode =>
-      'This barcode is duplicated in the same order.';
+  String get error_duplicate_barcode => 'هذا الباركود مكرر داخل نفس الأوردر.';
 
   @override
   String get error_invalid_barcode_format =>
-      'Invalid barcode. Must be exactly 20 or 21 characters.';
+      'باركود غير صحيح. يجب أن يكون 20 أو 21 حرف بالضبط.';
 
   @override
-  String get error_unexpected_scan =>
-      'An unexpected error occurred during scan processing.';
+  String get error_unexpected_scan => 'حدث خطأ غير متوقع أثناء معالجة القراءة.';
 
   @override
-  String get error_scan_failed =>
-      'An error occurred while reading the barcode.';
+  String get error_scan_failed => 'حدث خطأ أثناء قراءة الباركود.';
 
   @override
-  String get error_scanner_init =>
-      'Failed to initialize scanner. Check settings.';
+  String get error_scanner_init => 'تعذر تهيئة الماسح. تأكد من الإعدادات.';
 
   @override
-  String get error_no_scanned_data => 'No scanned data to post.';
+  String get error_no_scanned_data => 'لا توجد بيانات ممسوحة للإرسال.';
 
   @override
-  String get success_post_clear_cache =>
-      'Posted successfully and cache cleared.';
+  String get success_post_clear_cache => 'تم الإرسال بنجاح وتم مسح الكاش.';
 
   @override
-  String get error_scanner_restart => 'Failed to restart scanner.';
+  String get error_scanner_restart => 'تعذر إعادة تشغيل الماسح.';
 
   @override
-  String get success_scanner_stopped => 'Scanner stopped.';
+  String get success_scanner_stopped => 'تم إيقاف الماسح.';
 
   @override
-  String get error_scanner_status_change => 'Failed to change scanner status.';
+  String get error_scanner_status_change => 'تعذر تغيير حالة الماسح.';
 
   @override
-  String get error_profile_empty => 'Profile name cannot be empty.';
+  String get error_profile_empty => 'اسم البروفايل لا يمكن أن يكون فارغا.';
 
   @override
-  String get success_profile_changed => 'Profile changed successfully.';
+  String get success_profile_changed => 'تم تغيير البروفايل بنجاح.';
 
   @override
-  String get error_profile_change_failed => 'Failed to change profile.';
+  String get error_profile_change_failed => 'تعذر تغيير البروفايل.';
 
   @override
   String get error_invalid_url =>
-      'Invalid URL. Example: http://10.10.30.47:2604';
+      'الرابط غير صحيح. مثال: http://10.10.30.47:2604';
 
   @override
-  String get error_invalid_device_id => 'Invalid device ID.';
+  String get error_invalid_device_id => 'رقم الجهاز غير صحيح.';
 
   @override
   String get error_confirm_save_settings =>
-      'Could not confirm saving settings.';
+      'تعذر تأكيد حفظ إعدادات الإرسال.';
 
   @override
   String success_save_settings(String url) {
-    return 'Settings saved successfully.\n$url';
+    return 'تم حفظ إعدادات الإرسال بنجاح.\n$url';
   }
 
   @override
-  String get error_save_settings => 'Failed to save settings.';
+  String get error_save_settings => 'تعذر حفظ الإعدادات.';
 
   @override
   String get error_post_no_connection =>
-      'Post failed. No connection to server. Check network and URL.';
+      'فشل الإرسال. لا يوجد اتصال بالخادم. تأكد من نفس الشبكة والرابط.';
 
   @override
   String error_post_server_connection(String details) {
-    return 'Post failed. Could not connect to server. $details';
+    return 'فشل الإرسال. تعذر الاتصال بالخادم. $details';
   }
 
   @override
   String get error_post_http_not_allowed =>
-      'Post failed. Cleartext HTTP traffic not permitted.';
+      'فشل الإرسال. اتصال HTTP غير مسموح على الجهاز.';
 
   @override
   String error_post_server_code(String code) {
-    return 'Post failed. Server returned code $code.';
+    return 'فشل الإرسال. الخادم أرجع كود $code.';
   }
 
   @override
   String error_post_unknown(String details) {
-    return 'Post failed. Error reason: $details';
+    return 'فشل الإرسال. سبب الخطأ: $details';
   }
 
   @override
-  String get yes => 'Yes';
+  String get yes => 'نعم';
 
   @override
-  String get no => 'No';
+  String get no => 'لا';
 
   @override
-  String get ok => 'OK';
+  String get ok => 'موافق';
 
   @override
   String get baseUrl => 'Base URL';
@@ -254,7 +249,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get export => 'حفظ كملف';
 
   @override
-  String get post => 'Post';
+  String get post => 'نشر';
 
   @override
   String get numberOfScan => 'Number of Scan';
@@ -287,10 +282,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get palletCount => 'Pallet Count';
 
   @override
-  String get warning => 'Warning';
+  String get warning => 'تحذير';
 
   @override
-  String get success => 'Success';
+  String get success => 'نجاح';
 
   @override
   String get confirm_clear_screen =>

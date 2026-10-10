@@ -157,7 +157,7 @@ class _SearchResultsTableState extends State<SearchResultsTable> {
     final bool isArabic = Localizations.localeOf(context).languageCode == 'ar';
     final l10n = AppLocalizations.of(context)!;
 
-    final String colPalletNo = isArabic ? 'رقم البالتة' : 'Pallet Number';
+    final String colPalletNo = isArabic ? 'رقم البالتة' : 'Pallet No';
     final String colMaterial = isArabic ? l10n.material : 'Material';
     final String colBatch = isArabic ? l10n.batchNo : 'Batch No';
     final String colSerial = isArabic ? l10n.serialNo : 'Serial No';
@@ -218,8 +218,8 @@ class _SearchResultsTableState extends State<SearchResultsTable> {
         (item.exportPalletNo != null && item.exportPalletNo! > 0)
         ? item.exportPalletNo.toString()
         : (item.palletNo != null && item.palletNo! > 0
-            ? item.palletNo.toString()
-            : '-');
+              ? item.palletNo.toString()
+              : '-');
     final String material = item.matnr.isNotEmpty ? item.matnr : '-';
     final String batch = item.batchNo.isNotEmpty ? item.batchNo : '-';
     final String serial = item.isPallet
@@ -251,11 +251,7 @@ class _SearchResultsTableState extends State<SearchResultsTable> {
     );
   }
 
-  Widget _buildDataCell(
-    String text,
-    int flex, {
-    bool isBold = false,
-  }) {
+  Widget _buildDataCell(String text, int flex, {bool isBold = false}) {
     return Expanded(
       flex: flex,
       child: Container(

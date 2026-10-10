@@ -1,11 +1,11 @@
 {
   "@@locale": "ar",
-  "scanPallets": "بالتات",
+  "scanPallets": "Pallets",
   "addNewPallet": "اضافه بالته جديده",
   "confirmNewPallet": "هل أنت متأكد من إضافة بالتة جديدة؟",
   "emptyPalletNotice": "يجب مسح صندوق واحد على الأقل للبالتة الحالية.",
   "currentPalletNumber": "رقم البالتة الحالية",
-  "scanBoxes": "صناديق",
+  "scanBoxes": "Boxes",
   "errorScanPalletsOnly": "تم اختيار البالتات. امسح باركود بالتة أو اختر الصناديق لمسح باركود صندوق.",
   "errorScanBoxesOnly": "تم اختيار الصناديق. امسح باركود صندوق أو اختر البالتات لمسح باركود بالتة.",
   "settings": "الإعدادات",

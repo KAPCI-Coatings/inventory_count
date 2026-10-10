@@ -9,7 +9,7 @@ class AppLocalizationsAr extends AppLocalizations {
   AppLocalizationsAr([String locale = 'ar']) : super(locale);
 
   @override
-  String get scanPallets => 'بالتات';
+  String get scanPallets => 'Pallets';
 
   @override
   String get addNewPallet => 'اضافه بالته جديده';
@@ -25,7 +25,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get currentPalletNumber => 'رقم البالتة الحالية';
 
   @override
-  String get scanBoxes => 'صناديق';
+  String get scanBoxes => 'Boxes';
 
   @override
   String get errorScanPalletsOnly =>

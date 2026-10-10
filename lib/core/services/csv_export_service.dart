@@ -22,7 +22,7 @@ class CsvExportService {
     book.rename('Sheet1', 'Inventory');
     final sheet = book['Inventory'];
     final headers = [
-      'Pallet Number',
+      'Pallet No',
       'Material',
       'Batch No',
       'Serial No',
