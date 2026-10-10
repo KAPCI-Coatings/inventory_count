@@ -1,3 +1,4 @@
+import 'package:inventory_count_flutter_app/core/widgets/scanner_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inventory_count_flutter_app/presentation/view_models/barcode/barcode_bloc.dart';
@@ -46,6 +47,8 @@ class _BarcodeScreenState extends State<BarcodeScreen> {
 
     switch (key) {
       // Barcode errors
+      case 'error_empty_pallet':
+        return l10n.emptyPalletNotice;
       case 'error_scan_pallets_only':
         return l10n.errorScanPalletsOnly;
       case 'error_scan_boxes_only':
@@ -113,12 +116,14 @@ class _BarcodeScreenState extends State<BarcodeScreen> {
               );
 
               return BlocListener<BarcodeBloc, BarcodeState>(
+                listenWhen: (_, state) =>
+                    !state.isInventoryMutationInProgress || state.isSending,
                 listener: (context, state) {
                   // ── Posting — show confirmed upload progress ──────────────
                   if (state.isSending) {
                     if (!_isProgressDialogOpen) {
                       _isProgressDialogOpen = true;
-                      showDialog<void>(
+                      showScannerDialog<void>(
                         context: context,
                         barrierDismissible: false,
                         builder: (_) => BlocBuilder<BarcodeBloc, BarcodeState>(

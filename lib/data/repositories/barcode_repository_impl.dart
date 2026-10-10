@@ -8,6 +8,13 @@ class BarcodeRepositoryImpl implements BarcodeRepository {
   BarcodeRepositoryImpl(this._localDataSource);
 
   @override
+  Future<int> getCurrentExportPalletNo() =>
+      _localDataSource.getCurrentExportPalletNo();
+
+  @override
+  Future<int> startNewExportPallet() => _localDataSource.startNewExportPallet();
+
+  @override
   Future<void> saveScannedBarcode(ItemBox item) async {
     await _localDataSource.saveBarcode(item);
   }
@@ -18,7 +25,10 @@ class BarcodeRepositoryImpl implements BarcodeRepository {
   }
 
   @override
-  Future<List<ItemBox>> getScannedItems({String? matnr, String? batchNo}) async {
+  Future<List<ItemBox>> getScannedItems({
+    String? matnr,
+    String? batchNo,
+  }) async {
     return await _localDataSource.getBarcodes(matnr: matnr, batchNo: batchNo);
   }
 

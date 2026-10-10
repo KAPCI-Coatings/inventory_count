@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:zebra_wedge_scanner/zebra_datawedge.dart';
 
 import 'scanner_service.dart';
+import 'scanner_popup_guard.dart';
 
 /// Concrete implementation of [ScannerService] built on top of the
 /// `zebra_wedge_scanner` package.
@@ -57,7 +58,8 @@ class ZebraScannerService
   // ── ScannerService interface ──────────────────────────────────────────────
 
   @override
-  Stream<ScanResult> get onScan => _scanController.stream;
+  Stream<ScanResult> get onScan =>
+      _scanController.stream.where((_) => !ScannerPopupGuard.isOpen);
 
   @override
   Stream<ScannerStatus> get onStatusChange => _statusController.stream;
@@ -229,10 +231,12 @@ class ZebraScannerService
 
   @override
   Future<void> enableScanner() async {
+    if (ScannerPopupGuard.isOpen) return;
     _assertInitialised();
     _scannerEnabled = true;
     try {
       await _dw.switchToProfile(profileName);
+      if (ScannerPopupGuard.isOpen) return;
       await _dw.enableScanner();
       debugPrint('[ZebraScannerService] Scanner enabled & profile active');
     } catch (e) {
@@ -267,6 +271,7 @@ class ZebraScannerService
 
   @override
   Future<void> resumeScanner() async {
+    if (ScannerPopupGuard.isOpen) return;
     _assertInitialised();
     try {
       await _dw.resumeScanner();
@@ -281,6 +286,7 @@ class ZebraScannerService
 
   @override
   Future<void> startSoftScan() async {
+    if (ScannerPopupGuard.isOpen) return;
     _assertInitialised();
     try {
       await _dw.startSoftScan();
@@ -303,6 +309,7 @@ class ZebraScannerService
 
   @override
   Future<void> toggleSoftScan() async {
+    if (ScannerPopupGuard.isOpen) return;
     _assertInitialised();
     try {
       await _dw.toggleSoftScan();
@@ -462,14 +469,15 @@ class ZebraScannerService
     if (!_initialised) return;
 
     if (state == AppLifecycleState.resumed) {
-      if (_scannerEnabled) {
+      if (_scannerEnabled && !ScannerPopupGuard.isOpen) {
         debugPrint(
           '[ZebraScannerService] App resumed — restoring hardware scanner state',
         );
         _dw
             .switchToProfile(profileName)
-            .then((_) {
-              return _dw.enableScanner();
+            .then<void>((_) async {
+              if (ScannerPopupGuard.isOpen) return;
+              await _dw.enableScanner();
             })
             .catchError((e) {
               debugPrint(

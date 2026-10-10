@@ -7,6 +7,9 @@ class ItemBox {
   final int qty;
   final bool isPallet;
   final int? palletNo;
+
+  /// Local grouping for Excel exports; never used in the backend payload.
+  final int? exportPalletNo;
   final bool isSent;
 
   const ItemBox({
@@ -18,6 +21,7 @@ class ItemBox {
     this.qty = 0,
     this.isPallet = false,
     this.palletNo,
+    this.exportPalletNo,
     this.isSent = false,
   });
 

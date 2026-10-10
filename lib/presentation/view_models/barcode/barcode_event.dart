@@ -9,6 +9,9 @@ class BarcodeScanTypeChanged extends BarcodeEvent {
 
 class BarcodeInitializeRequested extends BarcodeEvent {}
 
+/// Reserves the next local Excel group and switches to box scanning.
+class BarcodeNewPalletRequested extends BarcodeEvent {}
+
 class BarcodeClearMessageRequested extends BarcodeEvent {}
 
 class BarcodeDismissCenteredMessageRequested extends BarcodeEvent {}
@@ -23,11 +26,10 @@ class BarcodePostCurrentOrderRequested extends BarcodeEvent {}
 /// Generates scanner-shaped test data and stores it through the normal flow.
 class BarcodeDummyDataRequested extends BarcodeEvent {}
 
-/// Resets the current screen state (counts, last scan, messages) but does
-/// NOT delete data from the database cache.
+/// Clears inventory and resets its local numbering sequence.
 class BarcodeNewOrderRequested extends BarcodeEvent {}
 
-/// Hard reset — clears both screen state and DB session.
+/// Resets screen state while retaining cached inventory and numbering.
 class BarcodeResetRequested extends BarcodeEvent {}
 
 // Scanner Events

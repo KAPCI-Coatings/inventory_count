@@ -6,6 +6,12 @@ enum BarcodeStatus { initial, loading, posting, success, warning, error }
 enum ScanType { pallet, box }
 
 class BarcodeState extends Equatable {
+  final int currentExportPalletNo;
+  final bool isInventoryMutationInProgress;
+  bool get canChangePallet =>
+      !isInventoryMutationInProgress &&
+      !isSending &&
+      status != BarcodeStatus.warning;
   final ScanType scanType;
   final String? message;
   final String? centeredErrorMessage;
@@ -29,6 +35,8 @@ class BarcodeState extends Equatable {
   final String? sendResultMessage;
 
   const BarcodeState({
+    this.currentExportPalletNo = 0,
+    this.isInventoryMutationInProgress = false,
     this.scanType = ScanType.pallet,
     this.message,
     this.centeredErrorMessage,
@@ -48,6 +56,8 @@ class BarcodeState extends Equatable {
   });
 
   BarcodeState copyWith({
+    int? currentExportPalletNo,
+    bool? isInventoryMutationInProgress,
     ScanType? scanType,
     String? message,
     String? centeredErrorMessage,
@@ -66,6 +76,10 @@ class BarcodeState extends Equatable {
     String? sendResultMessage,
   }) {
     return BarcodeState(
+      currentExportPalletNo:
+          currentExportPalletNo ?? this.currentExportPalletNo,
+      isInventoryMutationInProgress:
+          isInventoryMutationInProgress ?? this.isInventoryMutationInProgress,
       scanType: scanType ?? this.scanType,
       message: message ?? this.message,
       centeredErrorMessage: centeredErrorMessage ?? this.centeredErrorMessage,
@@ -89,6 +103,8 @@ class BarcodeState extends Equatable {
 
   @override
   List<Object?> get props => [
+    currentExportPalletNo,
+    isInventoryMutationInProgress,
     scanType,
     message,
     centeredErrorMessage,

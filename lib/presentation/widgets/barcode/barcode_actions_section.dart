@@ -9,7 +9,7 @@ import 'package:inventory_count_flutter_app/presentation/view_models/barcode/bar
 import 'package:inventory_count_flutter_app/presentation/view_models/barcode/barcode_state.dart';
 import 'package:inventory_count_flutter_app/core/di/di.dart';
 import 'package:inventory_count_flutter_app/core/services/csv_export_service.dart';
-import 'package:inventory_count_flutter_app/core/services/scanner_service.dart';
+import 'package:inventory_count_flutter_app/core/widgets/scanner_dialog.dart';
 import 'package:inventory_count_flutter_app/domain/repositories/barcode_repository.dart';
 import 'package:inventory_count_flutter_app/l10n/app_localizations.dart';
 
@@ -25,7 +25,38 @@ class BarcodeActionsSection extends StatefulWidget {
 
 class _BarcodeActionsSectionState extends State<BarcodeActionsSection> {
   bool _isExporting = false;
+  bool _isConfirmingPallet = false;
   bool _isNavigating = false;
+
+  Future<void> _confirmNewPallet() async {
+    if (_isConfirmingPallet) return;
+    final bloc = context.read<BarcodeBloc>();
+    if (!bloc.state.canChangePallet) return;
+    setState(() => _isConfirmingPallet = true);
+    try {
+      final l10n = AppLocalizations.of(context)!;
+      final confirmed = await showScannerDialog<bool>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: Text(l10n.addNewPallet),
+          content: Text(l10n.confirmNewPallet),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text(l10n.no),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: Text(l10n.yes),
+            ),
+          ],
+        ),
+      );
+      if (confirmed == true && mounted) bloc.add(BarcodeNewPalletRequested());
+    } finally {
+      if (mounted) setState(() => _isConfirmingPallet = false);
+    }
+  }
 
   void _navigateToRoute(String routeName) {
     if (_isNavigating) return;
@@ -38,44 +69,33 @@ class _BarcodeActionsSectionState extends State<BarcodeActionsSection> {
   }
 
   Future<void> _showClearConfirmation(BuildContext context) async {
-    try {
-      await instance<ScannerService>().disableScanner();
-    } catch (_) {}
-    try {
-      if (!context.mounted) return;
-      final bool? confirmed = await showDialog<bool>(
-        context: context,
-        barrierDismissible: false,
-        builder: (dialogContext) => AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          title: const Text(
-            'مسح البيانات',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          content: const Text('هل انت متاكد من مسح جميع البيانات من الجهاز'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: const Text('لا'),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.black87),
-              onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: const Text('نعم', style: TextStyle(color: Colors.white)),
-            ),
-          ],
+    if (!context.mounted) return;
+    final bool? confirmed = await showScannerDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: const Text(
+          'مسح البيانات',
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
-      );
+        content: const Text('هل انت متاكد من مسح جميع البيانات من الجهاز'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('لا'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.black87),
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text('نعم', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
 
-      if (confirmed == true && context.mounted) {
-        context.read<BarcodeBloc>().add(BarcodeNewOrderRequested());
-      }
-    } finally {
-      try {
-        await instance<ScannerService>().enableScanner();
-      } catch (_) {}
+    if (confirmed == true && context.mounted) {
+      context.read<BarcodeBloc>().add(BarcodeNewOrderRequested());
     }
   }
 
@@ -158,6 +178,7 @@ class _BarcodeActionsSectionState extends State<BarcodeActionsSection> {
 
         return BlocBuilder<BarcodeBloc, BarcodeState>(
           buildWhen: (prev, curr) =>
+              prev.canChangePallet != curr.canChangePallet ||
               prev.isSending != curr.isSending ||
               prev.hasPendingItems != curr.hasPendingItems,
           builder: (context, barcodeState) {
@@ -177,6 +198,22 @@ class _BarcodeActionsSectionState extends State<BarcodeActionsSection> {
                         ),
                       ),
                     ),
+                    SizedBox(width: gap),
+                    Expanded(
+                      child: DefaultButton(
+                        text: AppLocalizations.of(context)!.addNewPallet,
+                        onPressed:
+                            barcodeState.canChangePallet && !_isConfirmingPallet
+                            ? _confirmNewPallet
+                            : null,
+                        backgroundColor: Colors.grey.shade400,
+                        textColor: Colors.black,
+                        textSize: ResponsiveUtils.responsiveFontSize(
+                          context,
+                          16,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
                 SizedBox(height: gap),
@@ -188,7 +225,7 @@ class _BarcodeActionsSectionState extends State<BarcodeActionsSection> {
                         text: AppLocalizations.of(context)!.send,
                         isLoading: barcodeState.isSending,
                         onPressed:
-                            (barcodeState.isSending ||
+                            (!barcodeState.canChangePallet ||
                                 !barcodeState.hasPendingItems)
                             ? null
                             : () {
@@ -241,7 +278,9 @@ class _BarcodeActionsSectionState extends State<BarcodeActionsSection> {
                     Expanded(
                       child: DefaultButton(
                         text: AppLocalizations.of(context)!.clear,
-                        onPressed: () => _showClearConfirmation(context),
+                        onPressed: barcodeState.canChangePallet
+                            ? () => _showClearConfirmation(context)
+                            : null,
                         backgroundColor: Colors.grey.shade400,
                         textColor: Colors.black,
                         textSize: ResponsiveUtils.responsiveFontSize(

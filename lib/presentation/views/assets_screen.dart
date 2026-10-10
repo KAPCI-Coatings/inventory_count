@@ -1,3 +1,5 @@
+import 'package:inventory_count_flutter_app/core/widgets/scanner_dialog.dart';
+import 'package:inventory_count_flutter_app/core/services/scanner_popup_guard.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:inventory_count_flutter_app/core/widgets/default_button.dart';
@@ -24,7 +26,8 @@ class AssetsScreen extends StatefulWidget {
 }
 
 class _AssetsScreenState extends State<AssetsScreen> {
-  final AssetLocalDataSource _assetDataSource = instance<AssetLocalDataSource>();
+  final AssetLocalDataSource _assetDataSource =
+      instance<AssetLocalDataSource>();
   final ScannerService _scannerService = instance<ScannerService>();
   StreamSubscription<ScanResult>? _scanSubscription;
 
@@ -69,6 +72,7 @@ class _AssetsScreenState extends State<AssetsScreen> {
     _scannerService.enableScanner();
     _scanSubscription = _scannerService.onScan.listen((result) async {
       try {
+        if (ScannerPopupGuard.isOpen) return;
         final barcode = result.data.trim();
         if (barcode.isEmpty) return;
 
@@ -85,16 +89,21 @@ class _AssetsScreenState extends State<AssetsScreen> {
           ..clearSnackBars()
           ..showSnackBar(
             SnackBar(
-              content: Text('${AppLocalizations.of(context)?.assetNo ?? "Asset No"}: $barcode'),
+              content: Text(
+                '${AppLocalizations.of(context)?.assetNo ?? "Asset No"}: $barcode',
+              ),
               duration: const Duration(seconds: 2),
             ),
           );
       } catch (e) {
         debugPrint('[AssetsScreen] Error processing scan: $e');
         if (mounted) {
-           ScaffoldMessenger.of(context).showSnackBar(
-             SnackBar(content: Text('Error: $e'), duration: const Duration(seconds: 2)),
-           );
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error: $e'),
+              duration: const Duration(seconds: 2),
+            ),
+          );
         }
       }
     });
@@ -102,48 +111,36 @@ class _AssetsScreenState extends State<AssetsScreen> {
   }
 
   Future<void> _confirmAndClear(BuildContext context) async {
-    try {
-      await _scannerService.disableScanner();
-    } catch (_) {}
-    try {
-      if (!context.mounted) return;
-      final bool? confirmed = await showDialog<bool>(
-        context: context,
-        barrierDismissible: false,
-        builder: (dialogContext) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          title: const Text(
-            'مسح البيانات',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          content: const Text(
-            'هل انت متاكد من مسح جميع البيانات من الجهاز',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: const Text('لا'),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.black87),
-              onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: const Text('نعم',
-                  style: TextStyle(color: Colors.white)),
-            ),
-          ],
+    if (!context.mounted) return;
+    final bool? confirmed = await showScannerDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: const Text(
+          'مسح البيانات',
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
-      );
+        content: const Text('هل انت متاكد من مسح جميع البيانات من الجهاز'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('لا'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.black87),
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text('نعم', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
 
-      if (confirmed == true && mounted) {
-        setState(() {
-          _assetCount = 0;
-          _lastAssetNo = '-';
-        });
-      }
-    } finally {
-      try {
-        await _scannerService.enableScanner();
-      } catch (_) {}
+    if (confirmed == true && mounted) {
+      setState(() {
+        _assetCount = 0;
+        _lastAssetNo = '-';
+      });
     }
   }
 
@@ -166,13 +163,17 @@ class _AssetsScreenState extends State<AssetsScreen> {
         canRequestFocus: false,
         child: SafeArea(
           child: Padding(
-            padding: EdgeInsets.all(ResponsiveUtils.responsiveSpacing(context, 24.0)),
+            padding: EdgeInsets.all(
+              ResponsiveUtils.responsiveSpacing(context, 24.0),
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // 1. Title "Assets"
                 ScreenTitle(title: AppLocalizations.of(context)!.assetsTitle),
-                SizedBox(height: ResponsiveUtils.responsiveSpacing(context, 60)),
+                SizedBox(
+                  height: ResponsiveUtils.responsiveSpacing(context, 60),
+                ),
 
                 // 2. Asset No
                 Text(
@@ -184,9 +185,13 @@ class _AssetsScreenState extends State<AssetsScreen> {
                   ),
                 ),
 
-                SizedBox(height: ResponsiveUtils.responsiveSpacing(context, 16)),
+                SizedBox(
+                  height: ResponsiveUtils.responsiveSpacing(context, 16),
+                ),
                 const Divider(color: Colors.black, thickness: 1.5),
-                SizedBox(height: ResponsiveUtils.responsiveSpacing(context, 16)),
+                SizedBox(
+                  height: ResponsiveUtils.responsiveSpacing(context, 16),
+                ),
 
                 // 3. Asset Count
                 Text(
@@ -205,11 +210,16 @@ class _AssetsScreenState extends State<AssetsScreen> {
                   builder: (context, authState) {
                     final bool isUser =
                         authState.selectedRole.toLowerCase() == 'user';
-                    final double gap =
-                        ResponsiveUtils.responsiveSpacing(context, 8);
+                    final double gap = ResponsiveUtils.responsiveSpacing(
+                      context,
+                      8,
+                    );
 
                     if (isUser) {
-                      final double userGap = ResponsiveUtils.responsiveSpacing(context, 8);
+                      final double userGap = ResponsiveUtils.responsiveSpacing(
+                        context,
+                        8,
+                      );
                       return Column(
                         children: [
                           Row(
@@ -217,24 +227,39 @@ class _AssetsScreenState extends State<AssetsScreen> {
                               Expanded(
                                 child: DefaultButton(
                                   text: AppLocalizations.of(context)!.search,
-                                  height: ResponsiveUtils.responsiveHeight(context, 0.07).clamp(48, 64),
-                                  textSize: ResponsiveUtils.responsiveFontSize(context, 16),
+                                  height: ResponsiveUtils.responsiveHeight(
+                                    context,
+                                    0.07,
+                                  ).clamp(48, 64),
+                                  textSize: ResponsiveUtils.responsiveFontSize(
+                                    context,
+                                    16,
+                                  ),
                                   backgroundColor: Colors.grey.shade400,
                                   textColor: Colors.black,
-                                  onPressed: () => _navigateToRoute(Routes.search),
+                                  onPressed: () =>
+                                      _navigateToRoute(Routes.search),
                                 ),
                               ),
                               SizedBox(width: userGap),
                               Expanded(
                                 child: DefaultButton(
                                   text: AppLocalizations.of(context)!.export,
-                                  height: ResponsiveUtils.responsiveHeight(context, 0.07).clamp(48, 64),
-                                  textSize: ResponsiveUtils.responsiveFontSize(context, 16),
+                                  height: ResponsiveUtils.responsiveHeight(
+                                    context,
+                                    0.07,
+                                  ).clamp(48, 64),
+                                  textSize: ResponsiveUtils.responsiveFontSize(
+                                    context,
+                                    16,
+                                  ),
                                   backgroundColor: Colors.grey.shade400,
                                   textColor: Colors.black,
                                   onPressed: () async {
-                                    final items = await _assetDataSource.getAssetScans();
-                                    await instance<CsvExportService>().exportAssetScansToCsv(items);
+                                    final items = await _assetDataSource
+                                        .getAssetScans();
+                                    await instance<CsvExportService>()
+                                        .exportAssetScansToCsv(items);
                                   },
                                 ),
                               ),
@@ -244,14 +269,27 @@ class _AssetsScreenState extends State<AssetsScreen> {
                           Center(
                             child: DefaultButton(
                               text: AppLocalizations.of(context)!.exit,
-                              width: ResponsiveUtils.responsiveWidth(context, 0.4),
-                              height: ResponsiveUtils.responsiveHeight(context, 0.07).clamp(48, 64),
-                              textSize: ResponsiveUtils.responsiveFontSize(context, 16),
+                              width: ResponsiveUtils.responsiveWidth(
+                                context,
+                                0.4,
+                              ),
+                              height: ResponsiveUtils.responsiveHeight(
+                                context,
+                                0.07,
+                              ).clamp(48, 64),
+                              textSize: ResponsiveUtils.responsiveFontSize(
+                                context,
+                                16,
+                              ),
                               backgroundColor: Colors.grey.shade400,
                               textColor: Colors.black,
                               onPressed: () {
-                                context.read<AuthBloc>().add(const AuthLogoutRequested());
-                                Navigator.of(context).pushReplacementNamed(Routes.login);
+                                context.read<AuthBloc>().add(
+                                  const AuthLogoutRequested(),
+                                );
+                                Navigator.of(
+                                  context,
+                                ).pushReplacementNamed(Routes.login);
                               },
                             ),
                           ),
@@ -263,88 +301,100 @@ class _AssetsScreenState extends State<AssetsScreen> {
                       children: [
                         Row(
                           children: [
-                          Expanded(
-                            child: DefaultButton(
-                              text: AppLocalizations.of(context)!.export,
-                              height: ResponsiveUtils.responsiveHeight(
-                                      context, 0.07)
-                                  .clamp(48, 64),
-                              textSize:
-                                  ResponsiveUtils.responsiveFontSize(context, 16),
-                              backgroundColor: Colors.grey.shade400,
-                              textColor: Colors.black,
-                              onPressed: () async {
-                                final items =
-                                    await _assetDataSource.getAssetScans();
-                                await instance<CsvExportService>()
-                                    .exportAssetScansToCsv(items);
-                                
-                                await _assetDataSource.clearAssetScans();
-                                if (!mounted) return;
-                                setState(() {
-                                  _assetCount = 0;
-                                  _lastAssetNo = '-';
-                                });
+                            Expanded(
+                              child: DefaultButton(
+                                text: AppLocalizations.of(context)!.export,
+                                height: ResponsiveUtils.responsiveHeight(
+                                  context,
+                                  0.07,
+                                ).clamp(48, 64),
+                                textSize: ResponsiveUtils.responsiveFontSize(
+                                  context,
+                                  16,
+                                ),
+                                backgroundColor: Colors.grey.shade400,
+                                textColor: Colors.black,
+                                onPressed: () async {
+                                  final items = await _assetDataSource
+                                      .getAssetScans();
+                                  await instance<CsvExportService>()
+                                      .exportAssetScansToCsv(items);
 
-                                // Re-establish scanner subscription.
-                                // The native file-save dialog can disrupt the
-                                // broadcast stream subscription, so we create
-                                // a fresh one to guarantee scans keep working.
-                                _setupScanner();
-                              },
+                                  await _assetDataSource.clearAssetScans();
+                                  if (!mounted) return;
+                                  setState(() {
+                                    _assetCount = 0;
+                                    _lastAssetNo = '-';
+                                  });
+
+                                  // Re-establish scanner subscription.
+                                  // The native file-save dialog can disrupt the
+                                  // broadcast stream subscription, so we create
+                                  // a fresh one to guarantee scans keep working.
+                                  _setupScanner();
+                                },
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: gap),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: DefaultButton(
-                              text: AppLocalizations.of(context)!.clear,
-                              height: ResponsiveUtils.responsiveHeight(
-                                      context, 0.07)
-                                  .clamp(48, 64),
-                              textSize:
-                                  ResponsiveUtils.responsiveFontSize(context, 16),
-                              backgroundColor: Colors.grey.shade400,
-                              textColor: Colors.black,
-                              // Clear resets the screen counters ONLY — DB data stays
-                              onPressed: () => _confirmAndClear(context),
+                          ],
+                        ),
+                        SizedBox(height: gap),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: DefaultButton(
+                                text: AppLocalizations.of(context)!.clear,
+                                height: ResponsiveUtils.responsiveHeight(
+                                  context,
+                                  0.07,
+                                ).clamp(48, 64),
+                                textSize: ResponsiveUtils.responsiveFontSize(
+                                  context,
+                                  16,
+                                ),
+                                backgroundColor: Colors.grey.shade400,
+                                textColor: Colors.black,
+                                // Clear resets the screen counters ONLY — DB data stays
+                                onPressed: () => _confirmAndClear(context),
+                              ),
                             ),
-                          ),
-                          SizedBox(width: gap),
-                          Expanded(
-                            child: DefaultButton(
-                              text: AppLocalizations.of(context)!.exit,
-                              height: ResponsiveUtils.responsiveHeight(
-                                      context, 0.07)
-                                  .clamp(48, 64),
-                              textSize:
-                                  ResponsiveUtils.responsiveFontSize(context, 16),
-                              backgroundColor: Colors.grey.shade400,
-                              textColor: Colors.black,
-                              onPressed: () {
-                                context
-                                    .read<AuthBloc>()
-                                    .add(const AuthLogoutRequested());
-                                Navigator.of(context)
-                                    .pushReplacementNamed(Routes.login);
-                              },
+                            SizedBox(width: gap),
+                            Expanded(
+                              child: DefaultButton(
+                                text: AppLocalizations.of(context)!.exit,
+                                height: ResponsiveUtils.responsiveHeight(
+                                  context,
+                                  0.07,
+                                ).clamp(48, 64),
+                                textSize: ResponsiveUtils.responsiveFontSize(
+                                  context,
+                                  16,
+                                ),
+                                backgroundColor: Colors.grey.shade400,
+                                textColor: Colors.black,
+                                onPressed: () {
+                                  context.read<AuthBloc>().add(
+                                    const AuthLogoutRequested(),
+                                  );
+                                  Navigator.of(
+                                    context,
+                                  ).pushReplacementNamed(Routes.login);
+                                },
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  );
-                },
-              ),
-              SizedBox(height: ResponsiveUtils.responsiveSpacing(context, 24)),
-            ],
+                          ],
+                        ),
+                      ],
+                    );
+                  },
+                ),
+                SizedBox(
+                  height: ResponsiveUtils.responsiveSpacing(context, 24),
+                ),
+              ],
+            ),
           ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 }

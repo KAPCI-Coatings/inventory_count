@@ -13,10 +13,7 @@ class ProcessBarcodeResult {
   /// `true` when this barcode was already scanned before in the session.
   final bool isDuplicate;
 
-  const ProcessBarcodeResult({
-    required this.itemBox,
-    this.isDuplicate = false,
-  });
+  const ProcessBarcodeResult({required this.itemBox, this.isDuplicate = false});
 }
 
 class ProcessBarcodeUseCase {
@@ -24,7 +21,10 @@ class ProcessBarcodeUseCase {
 
   ProcessBarcodeUseCase(this.repository);
 
-  Future<ProcessBarcodeResult> call(String rawBarcode) async {
+  Future<ProcessBarcodeResult> call(
+    String rawBarcode, {
+    int? exportPalletNo,
+  }) async {
     // 1. Validate Length — still required for the inventory barcode format
     if (rawBarcode.length != 20 && rawBarcode.length != 21) {
       throw const InvalidBarcodeFormatException('invalid_barcode_length');
@@ -50,6 +50,7 @@ class ProcessBarcodeUseCase {
         palletBox: 'B',
         qty: 1,
         isPallet: false,
+        exportPalletNo: exportPalletNo,
       );
     } else {
       // PALLET FORMAT (21 digits): P (1) | matnr (6) | batch (10) | letter (1) | qty (3)
@@ -74,6 +75,7 @@ class ProcessBarcodeUseCase {
         palletNo: 1,
         qty: qty,
         isPallet: true,
+        exportPalletNo: exportPalletNo,
       );
     }
 

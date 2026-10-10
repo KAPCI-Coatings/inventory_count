@@ -51,7 +51,9 @@ class BarcodeStatusSection extends StatelessWidget {
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: fillAvailableHeight ? MainAxisSize.max : MainAxisSize.min,
+          mainAxisSize: fillAvailableHeight
+              ? MainAxisSize.max
+              : MainAxisSize.min,
           mainAxisAlignment: fillAvailableHeight
               ? MainAxisAlignment.spaceBetween
               : MainAxisAlignment.start,
@@ -87,7 +89,11 @@ class BarcodeStatusSection extends StatelessWidget {
               style: style,
             ),
             SizedBox(height: spacing),
-            Divider(height: compact ? 6 : 16, thickness: 2, color: Colors.black),
+            Divider(
+              height: compact ? 2 : 16,
+              thickness: 2,
+              color: Colors.black,
+            ),
             SizedBox(height: spacing),
             _InfoRow(
               label: AppLocalizations.of(context)!.palletBoxCount,
@@ -95,7 +101,11 @@ class BarcodeStatusSection extends StatelessWidget {
               style: style,
             ),
             SizedBox(height: spacing),
-            Divider(height: compact ? 6 : 16, thickness: 2, color: Colors.black),
+            Divider(
+              height: compact ? 2 : 16,
+              thickness: 2,
+              color: Colors.black,
+            ),
             SizedBox(height: spacing),
             _InfoRow(
               label: AppLocalizations.of(context)!.boxCount,
@@ -108,7 +118,18 @@ class BarcodeStatusSection extends StatelessWidget {
               value: state.palletCount.toString(),
               style: style,
             ),
-            Divider(height: compact ? 6 : 16, thickness: 2, color: Colors.black),
+            Divider(
+              height: compact ? 2 : 16,
+              thickness: 2,
+              color: Colors.black,
+            ),
+            _InfoRow(
+              label: AppLocalizations.of(context)!.currentPalletNumber,
+              value: state.currentExportPalletNo == 0
+                  ? '-'
+                  : state.currentExportPalletNo.toString(),
+              style: style,
+            ),
             RadioGroup<ScanType>(
               groupValue: state.scanType,
               onChanged: (value) {
@@ -130,9 +151,7 @@ class BarcodeStatusSection extends StatelessWidget {
                       minVerticalPadding: 0,
                       minTileHeight: 32,
                       dense: true,
-                      enabled:
-                          !state.isSending &&
-                          state.status != BarcodeStatus.warning,
+                      enabled: state.canChangePallet,
                     ),
                   ),
                   Expanded(
@@ -145,9 +164,7 @@ class BarcodeStatusSection extends StatelessWidget {
                       minVerticalPadding: 0,
                       minTileHeight: 32,
                       dense: true,
-                      enabled:
-                          !state.isSending &&
-                          state.status != BarcodeStatus.warning,
+                      enabled: state.canChangePallet,
                     ),
                   ),
                 ],

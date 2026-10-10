@@ -104,6 +104,30 @@ abstract class AppLocalizations {
   /// **'Pallets'**
   String get scanPallets;
 
+  /// No description provided for @addNewPallet.
+  ///
+  /// In en, this message translates to:
+  /// **'Add New Pallet'**
+  String get addNewPallet;
+
+  /// No description provided for @confirmNewPallet.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to add a new pallet?'**
+  String get confirmNewPallet;
+
+  /// No description provided for @emptyPalletNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan at least one box for the current pallet before adding a new pallet.'**
+  String get emptyPalletNotice;
+
+  /// No description provided for @currentPalletNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Pallet Number'**
+  String get currentPalletNumber;
+
   /// No description provided for @scanBoxes.
   ///
   /// In en, this message translates to:

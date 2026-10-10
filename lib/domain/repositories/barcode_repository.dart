@@ -1,6 +1,9 @@
 import 'package:inventory_count_flutter_app/domain/entities/barcode.dart';
 
 abstract class BarcodeRepository {
+  Future<int> getCurrentExportPalletNo();
+  Future<int> startNewExportPallet();
+
   /// Saves a scanned barcode to the current session.
   Future<void> saveScannedBarcode(ItemBox item);
 

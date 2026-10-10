@@ -30,7 +30,9 @@ void main() {
   });
 
   test('default pallet mode rejects boxes before saving or counting', () async {
-    final next = bloc.stream.first;
+    final next = bloc.stream.firstWhere(
+      (s) => !s.isInventoryMutationInProgress,
+    );
     bloc.add(BarcodeScanned('12345600000000010001', ''));
     final state = await next;
     expect(state.status, BarcodeStatus.error);
@@ -46,7 +48,9 @@ void main() {
     (tester) async {
       Future<void> scan(String barcode) async {
         await tester.runAsync(() async {
-          final next = bloc.stream.first;
+          final next = bloc.stream.firstWhere(
+            (s) => !s.isInventoryMutationInProgress,
+          );
           bloc.add(BarcodeScanned(barcode, ''));
           await next;
         });

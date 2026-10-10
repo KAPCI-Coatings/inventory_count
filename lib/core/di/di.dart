@@ -1,3 +1,4 @@
+import 'package:inventory_count_flutter_app/data/datasources/inventory_database_schema.dart';
 import 'package:get_it/get_it.dart';
 import 'package:inventory_count_flutter_app/core/services/api_service.dart';
 import 'package:inventory_count_flutter_app/core/services/csv_export_service.dart';
@@ -55,35 +56,11 @@ Future<void> initAppModule() async {
   final String path = join(await getDatabasesPath(), 'inventory_count.db');
   final Database database = await openDatabase(
     path,
-    version: 3,
-    onUpgrade: (db, oldVersion, newVersion) async {
-      if (oldVersion < 2) {
-        await db.execute('DROP TABLE IF EXISTS barcodes');
-      }
-      if (oldVersion < 3) {
-        try {
-          await db.execute(
-            'ALTER TABLE barcodes ADD COLUMN isSent INTEGER DEFAULT 0',
-          );
-        } catch (_) {}
-      }
-    },
+    version: 4,
+    onCreate: (db, version) => createInventorySchema(db),
+    onUpgrade: upgradeInventorySchema,
   );
-
-  // Ensure table exists even if DB was previously created (for auth)
-  await database.execute('''
-    CREATE TABLE IF NOT EXISTS barcodes (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      barCodeNo TEXT,
-      matnr TEXT,
-      batchNo TEXT,
-      serialNo TEXT,
-      palletBox TEXT,
-      qty INTEGER,
-      isPallet INTEGER,
-      isSent INTEGER DEFAULT 0
-    )
-  ''');
+  await createInventorySchema(database);
 
   await database.execute('''
     CREATE TABLE IF NOT EXISTS asset_scans (

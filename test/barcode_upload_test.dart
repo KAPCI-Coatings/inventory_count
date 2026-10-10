@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:inventory_count_flutter_app/core/error/empty_pallet_exception.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
@@ -63,17 +64,42 @@ class Settings extends Fake implements SettingsLocalDataSource {
 class Scanner extends Fake implements ScannerService {
   @override
   Future<void> enableScanner() async {}
+  @override
+  Future<void> disableScanner() async {}
 }
 
 class EmptyRepository extends Fake implements BarcodeRepository {
   final List<ItemBox> items = [];
+  int currentNumber = 0;
+  @override
+  Future<int> getCurrentExportPalletNo() async => currentNumber;
+  @override
+  Future<int> startNewExportPallet() async {
+    if (currentNumber > 0 &&
+        !items.any((item) => item.exportPalletNo == currentNumber)) {
+      throw const EmptyPalletException();
+    }
+    return ++currentNumber;
+  }
+
+  @override
+  Future<void> clearSession() async {
+    items.clear();
+    currentNumber = 0;
+  }
+
+  @override
+  Future<void> markAsSent(List<String> barcodes) async {}
 
   @override
   Future<bool> isDuplicate(String barcodeNo) async =>
       items.any((item) => item.barCodeNo == barcodeNo);
 
   @override
-  Future<void> saveScannedBarcode(ItemBox item) async => items.add(item);
+  Future<void> saveScannedBarcode(ItemBox item) async {
+    items.add(item);
+    currentNumber = max(currentNumber, item.exportPalletNo ?? 0);
+  }
 
   @override
   Future<List<ItemBox>> getScannedItems({
@@ -83,6 +109,41 @@ class EmptyRepository extends Fake implements BarcodeRepository {
 }
 
 void main() {
+  test('local Excel numbers do not change backend JSON', () async {
+    final payloads = <dynamic>[];
+    final service = ApiService(
+      client: MockClient((request) async {
+        payloads.add(jsonDecode(request.body));
+        return http.Response('[]', 200);
+      }),
+    );
+    addTearDown(service.dispose);
+    for (final exportNumber in [null, 42]) {
+      await service.sendInventoryData(
+        baseUrl: 'http://test.api',
+        devId: '1',
+        count: 2,
+        items: [
+          ItemBox(
+            barCodeNo: 'P1234560000000001Z025',
+            isPallet: true,
+            qty: 25,
+            palletNo: 7,
+            exportPalletNo: exportNumber,
+          ),
+          ItemBox(
+            barCodeNo: '12345600000000010001',
+            qty: 1,
+            exportPalletNo: exportNumber,
+          ),
+        ],
+      );
+    }
+    expect(payloads[0], payloads[1]);
+    expect(payloads[1][0]['palletNo'], 7);
+    expect(payloads[1][1]['palletNo'], 1);
+    expect((payloads[1][0] as Map).containsKey('exportPalletNo'), false);
+  });
   test(
     'dummy request stores a mixed batch totaling 2000 to 5000 boxes',
     () async {
@@ -303,5 +364,3 @@ void main() {
     },
   );
 }
-
-

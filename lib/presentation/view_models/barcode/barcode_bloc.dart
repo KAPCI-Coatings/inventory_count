@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:inventory_count_flutter_app/core/error/empty_pallet_exception.dart';
+import 'package:inventory_count_flutter_app/core/services/scanner_popup_guard.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inventory_count_flutter_app/core/error/barcode_exceptions.dart';
@@ -22,6 +24,7 @@ class BarcodeBloc extends Bloc<BarcodeEvent, BarcodeState> {
   StreamSubscription<ScanResult>? _scanSubscription;
   bool _isProcessingScan = false;
   bool _uploadInProgress = false;
+  ItemBox? _pendingDuplicate;
 
   BarcodeBloc(
     this._scannerService,
@@ -43,40 +46,58 @@ class BarcodeBloc extends Bloc<BarcodeEvent, BarcodeState> {
         state.copyWith(scanType: event.scanType, status: BarcodeStatus.initial),
       );
     });
-    on<BarcodeInitializeRequested>((event, emit) async {
-      debugPrint(
-        '[BarcodeBloc] BarcodeInitializeRequested — loading cached items from DB',
-      );
-      final dbItems = await _barcodeRepository.getScannedItems();
-      if (dbItems.isNotEmpty) {
-        int boxCount = 0;
-        int palletCount = 0;
-        int palletBoxCount = 0;
+    on<BarcodeInitializeRequested>(
+      (event, emit) => _mutate(emit, () async {
+        debugPrint(
+          '[BarcodeBloc] BarcodeInitializeRequested — loading cached items from DB',
+        );
+        final dbItems = await _barcodeRepository.getScannedItems();
+        final number = await _barcodeRepository.getCurrentExportPalletNo();
+        emit(state.copyWith(currentExportPalletNo: number));
+        if (dbItems.isNotEmpty) {
+          int boxCount = 0;
+          int palletCount = 0;
+          int palletBoxCount = 0;
 
-        for (final item in dbItems) {
-          if (item.isPallet) {
-            palletCount += 1;
-            palletBoxCount += 1;
-            boxCount += item.qty;
-          } else {
-            boxCount += 1;
-            palletBoxCount += 1;
+          for (final item in dbItems) {
+            if (item.isPallet) {
+              palletCount += 1;
+              palletBoxCount += 1;
+              boxCount += item.qty;
+            } else {
+              boxCount += 1;
+              palletBoxCount += 1;
+            }
           }
-        }
 
+          emit(
+            state.copyWith(
+              itemBoxes: dbItems,
+              lastScan: dbItems.last,
+              boxCount: boxCount,
+              palletCount: palletCount,
+              palletBoxCount: palletBoxCount,
+            ),
+          );
+        }
+      }),
+    );
+
+    on<BarcodeNewPalletRequested>(
+      (event, emit) => _mutate(emit, () async {
+        final number = await _barcodeRepository.startNewExportPallet();
         emit(
           state.copyWith(
-            itemBoxes: dbItems,
-            lastScan: dbItems.last,
-            boxCount: boxCount,
-            palletCount: palletCount,
-            palletBoxCount: palletBoxCount,
+            currentExportPalletNo: number,
+            scanType: ScanType.box,
+            status: BarcodeStatus.initial,
           ),
         );
-      }
-    });
+      }),
+    );
 
     on<BarcodeClearMessageRequested>((event, emit) {
+      if (_isProcessingScan || _pendingDuplicate != null) return;
       _scannerService.enableScanner().catchError((_) {});
       emit(
         state.copyWith(
@@ -90,6 +111,7 @@ class BarcodeBloc extends Bloc<BarcodeEvent, BarcodeState> {
     });
 
     on<BarcodeDismissCenteredMessageRequested>((event, emit) {
+      if (_isProcessingScan || _pendingDuplicate != null) return;
       _scannerService.enableScanner().catchError((_) {});
       emit(
         state.copyWith(
@@ -102,43 +124,50 @@ class BarcodeBloc extends Bloc<BarcodeEvent, BarcodeState> {
     });
 
     on<BarcodeDuplicateConfirmed>((event, emit) async {
-      final itemBox = state.lastScan;
-      if (itemBox == null) return;
+      if (_pendingDuplicate == null) return;
+      await _mutate(emit, () async {
+        final itemBox = _pendingDuplicate;
+        if (itemBox == null) return;
 
-      // Save to database now that user confirmed
-      await _barcodeRepository.saveScannedBarcode(itemBox);
+        // Save to database now that user confirmed
+        await _barcodeRepository.saveScannedBarcode(itemBox);
+        _pendingDuplicate = null;
 
-      final updatedItems = List.of(state.itemBoxes)..add(itemBox);
+        final updatedItems = List.of(state.itemBoxes)..add(itemBox);
 
-      int boxCount = state.boxCount;
-      int palletCount = state.palletCount;
-      int palletBoxCount = state.palletBoxCount;
+        int boxCount = state.boxCount;
+        int palletCount = state.palletCount;
+        int palletBoxCount = state.palletBoxCount;
 
-      if (itemBox.isPallet) {
-        palletCount += 1;
-        palletBoxCount += 1;
-        boxCount += itemBox.qty;
-      } else {
-        boxCount += 1;
-        palletBoxCount += 1;
-      }
+        if (itemBox.isPallet) {
+          palletCount += 1;
+          palletBoxCount += 1;
+          boxCount += itemBox.qty;
+        } else {
+          boxCount += 1;
+          palletBoxCount += 1;
+        }
 
-      emit(
-        state.copyWith(
-          status: BarcodeStatus.success,
-          itemBoxes: updatedItems,
-          boxCount: boxCount,
-          palletCount: palletCount,
-          palletBoxCount: palletBoxCount,
-          dailyScanCount: state.dailyScanCount + 1,
-          centeredWarningMessage: null,
-        ),
-      );
+        emit(
+          state.copyWith(
+            status: BarcodeStatus.success,
+            currentExportPalletNo: itemBox.exportPalletNo,
+            itemBoxes: updatedItems,
+            boxCount: boxCount,
+            palletCount: palletCount,
+            palletBoxCount: palletBoxCount,
+            dailyScanCount: state.dailyScanCount + 1,
+            centeredWarningMessage: null,
+          ),
+        );
 
-      _scannerService.enableScanner().catchError((_) {});
+        _scannerService.enableScanner().catchError((_) {});
+      }, allowWarning: true);
     });
 
     on<BarcodeDuplicateRejected>((event, emit) {
+      if (_isProcessingScan || _uploadInProgress) return;
+      _pendingDuplicate = null;
       emit(
         state.copyWith(
           status: BarcodeStatus.initial,
@@ -153,23 +182,33 @@ class BarcodeBloc extends Bloc<BarcodeEvent, BarcodeState> {
     on<BarcodeDummyDataRequested>(_onDummyDataRequested);
 
     // ── Clear Screen & Cache ──────────────────────────────────────────────────
-    on<BarcodeNewOrderRequested>((event, emit) async {
-      debugPrint(
-        '[BarcodeBloc] BarcodeNewOrderRequested — clearing cache DB and resetting screen',
-      );
-      await _barcodeRepository.clearSession();
-      emit(const BarcodeState());
-      // Re-enable scanner after reset so the next scan works immediately
-      _scannerService.enableScanner().catchError((_) {});
-    });
+    on<BarcodeNewOrderRequested>(
+      (event, emit) => _mutate(emit, () async {
+        debugPrint(
+          '[BarcodeBloc] BarcodeNewOrderRequested — clearing cache DB and resetting screen',
+        );
+        await _barcodeRepository.clearSession();
+        emit(const BarcodeState(isInventoryMutationInProgress: true));
+        // Re-enable scanner after reset so the next scan works immediately
+        _scannerService.enableScanner().catchError((_) {});
+      }),
+    );
 
     // ── Hard Reset ───────────────────────────────────────────────────────────
-    on<BarcodeResetRequested>((event, emit) {
-      debugPrint(
-        '[BarcodeBloc] BarcodeResetRequested — clearing session state',
-      );
-      emit(const BarcodeState());
-    });
+    on<BarcodeResetRequested>(
+      (event, emit) => _mutate(emit, () async {
+        debugPrint(
+          '[BarcodeBloc] BarcodeResetRequested — clearing session state',
+        );
+        final number = await _barcodeRepository.getCurrentExportPalletNo();
+        emit(
+          BarcodeState(
+            currentExportPalletNo: number,
+            isInventoryMutationInProgress: true,
+          ),
+        );
+      }),
+    );
 
     // ── Scanner Control ──────────────────────────────────────────────────────
     on<BarcodeScannerEnableRequested>((event, emit) async {
@@ -207,12 +246,47 @@ class BarcodeBloc extends Bloc<BarcodeEvent, BarcodeState> {
 
   // ── Event Handlers ──────────────────────────────────────────────────────────
 
+  Future<void> _mutate(
+    Emitter<BarcodeState> emit,
+    Future<void> Function() operation, {
+    bool allowWarning = false,
+  }) async {
+    if (_isProcessingScan ||
+        _uploadInProgress ||
+        (!allowWarning && _pendingDuplicate != null)) {
+      return;
+    }
+    _isProcessingScan = true;
+    emit(state.copyWith(isInventoryMutationInProgress: true));
+    try {
+      await operation();
+    } catch (error, stack) {
+      debugPrint('[BarcodeBloc] Inventory mutation failed: $error\n$stack');
+      emit(
+        state.copyWith(
+          status: _pendingDuplicate == null
+              ? BarcodeStatus.error
+              : BarcodeStatus.warning,
+          centeredErrorMessage: error is EmptyPalletException
+              ? 'error_empty_pallet'
+              : 'error_unexpected_scan',
+        ),
+      );
+    } finally {
+      _isProcessingScan = false;
+      emit(state.copyWith(isInventoryMutationInProgress: false));
+    }
+  }
+
   Future<void> _onDummyDataRequested(
     BarcodeDummyDataRequested event,
     Emitter<BarcodeState> emit,
   ) async {
-    if (_uploadInProgress || _isProcessingScan) return;
+    if (_uploadInProgress || _isProcessingScan || _pendingDuplicate != null) {
+      return;
+    }
     _isProcessingScan = true;
+    emit(state.copyWith(isInventoryMutationInProgress: true));
     try {
       final generatedItems = <ItemBox>[];
       for (final item in _dummyBarcodeGenerator.generate()) {
@@ -249,6 +323,7 @@ class BarcodeBloc extends Bloc<BarcodeEvent, BarcodeState> {
       );
     } finally {
       _isProcessingScan = false;
+      emit(state.copyWith(isInventoryMutationInProgress: false));
     }
   }
 
@@ -256,6 +331,7 @@ class BarcodeBloc extends Bloc<BarcodeEvent, BarcodeState> {
     BarcodeScanned event,
     Emitter<BarcodeState> emit,
   ) async {
+    if (ScannerPopupGuard.isOpen) return;
     if (_uploadInProgress ||
         _isProcessingScan ||
         state.status == BarcodeStatus.warning) {
@@ -266,6 +342,7 @@ class BarcodeBloc extends Bloc<BarcodeEvent, BarcodeState> {
     }
 
     _isProcessingScan = true;
+    emit(state.copyWith(isInventoryMutationInProgress: true));
 
     debugPrint(
       '[BarcodeBloc] BarcodeScanned received: "${event.barcode}" (${event.barcode.length} chars)',
@@ -286,7 +363,14 @@ class BarcodeBloc extends Bloc<BarcodeEvent, BarcodeState> {
           cleanBarcode.toUpperCase().startsWith('P')) {
         throw const InvalidBarcodeFormatException('error_scan_boxes_only');
       }
-      final result = await _processBarcodeUseCase(cleanBarcode);
+      final currentNumber = await _barcodeRepository.getCurrentExportPalletNo();
+      final number = state.scanType == ScanType.pallet
+          ? currentNumber + 1
+          : (currentNumber == 0 ? 1 : currentNumber);
+      final result = await _processBarcodeUseCase(
+        cleanBarcode,
+        exportPalletNo: number,
+      );
       final itemBox = result.itemBox;
 
       debugPrint(
@@ -309,6 +393,7 @@ class BarcodeBloc extends Bloc<BarcodeEvent, BarcodeState> {
         }
 
         // Do NOT update lists or counters yet. Save it in lastScan for confirmation.
+        _pendingDuplicate = itemBox;
         emit(
           state.copyWith(
             status: BarcodeStatus.warning,
@@ -335,6 +420,9 @@ class BarcodeBloc extends Bloc<BarcodeEvent, BarcodeState> {
         // Success
         emit(
           BarcodeState(
+            currentExportPalletNo:
+                itemBox.exportPalletNo ?? state.currentExportPalletNo,
+            isInventoryMutationInProgress: true,
             scanType: state.scanType,
             status: BarcodeStatus.success,
             itemBoxes: updatedItems,
@@ -351,6 +439,8 @@ class BarcodeBloc extends Bloc<BarcodeEvent, BarcodeState> {
       debugPrint('[BarcodeBloc] INVALID FORMAT: ${e.message}');
       emit(
         BarcodeState(
+          currentExportPalletNo: state.currentExportPalletNo,
+          isInventoryMutationInProgress: true,
           scanType: state.scanType,
           status: BarcodeStatus.error,
           itemBoxes: state.itemBoxes,
@@ -366,6 +456,8 @@ class BarcodeBloc extends Bloc<BarcodeEvent, BarcodeState> {
       debugPrint('[BarcodeBloc] UNEXPECTED ERROR: $e\n$stackTrace');
       emit(
         BarcodeState(
+          currentExportPalletNo: state.currentExportPalletNo,
+          isInventoryMutationInProgress: true,
           scanType: state.scanType,
           status: BarcodeStatus.error,
           itemBoxes: state.itemBoxes,
@@ -379,6 +471,7 @@ class BarcodeBloc extends Bloc<BarcodeEvent, BarcodeState> {
       );
     } finally {
       _isProcessingScan = false;
+      emit(state.copyWith(isInventoryMutationInProgress: false));
     }
   }
 
@@ -386,8 +479,11 @@ class BarcodeBloc extends Bloc<BarcodeEvent, BarcodeState> {
     BarcodePostCurrentOrderRequested event,
     Emitter<BarcodeState> emit,
   ) async {
-    if (_uploadInProgress) return;
+    if (_uploadInProgress || _isProcessingScan || _pendingDuplicate != null) {
+      return;
+    }
     _uploadInProgress = true;
+    emit(state.copyWith(isInventoryMutationInProgress: true));
     try {
       // SQLite is the source of truth after an interrupted upload.
       final allItems = await _barcodeRepository.getScannedItems();
@@ -474,6 +570,7 @@ class BarcodeBloc extends Bloc<BarcodeEvent, BarcodeState> {
       );
     } finally {
       _uploadInProgress = false;
+      emit(state.copyWith(isInventoryMutationInProgress: false));
       _scannerService.enableScanner().catchError((_) {});
     }
   }

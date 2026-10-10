@@ -5,6 +5,28 @@ import 'package:inventory_count_flutter_app/domain/entities/barcode.dart';
 
 void main() {
   test(
+    'Excel adds numeric pallet groups in F without moving quantity total',
+    () {
+      final sheet = Excel.decodeBytes(
+        CsvExportService().buildInventoryXlsx(const [
+          ItemBox(isPallet: true, qty: 25, exportPalletNo: 1),
+          ItemBox(qty: 1, exportPalletNo: 2),
+          ItemBox(qty: 1, exportPalletNo: 2),
+          ItemBox(qty: 1),
+        ]),
+      )['Inventory'];
+      Data cell(String ref) => sheet.cell(CellIndex.indexByString(ref));
+      expect(cell('F1').value, TextCellValue('Pallet Number'));
+      expect(cell('F2').value, IntCellValue(1));
+      expect(cell('F3').value, IntCellValue(2));
+      expect(cell('F4').value, IntCellValue(2));
+      expect(cell('F5').value, isNull);
+      expect(cell('F6').value, isNull);
+      expect(cell('F2').cellStyle!.numberFormat.formatCode, '0');
+      expect(sheet.evaluate(CellIndex.indexByString('E6')), IntCellValue(28));
+    },
+  );
+  test(
     'XLSX preserves complete batch codes as text and sums numeric quantity',
     () {
       final bytes = CsvExportService().buildInventoryXlsx(const [

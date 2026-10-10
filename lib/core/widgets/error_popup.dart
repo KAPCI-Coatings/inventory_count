@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:inventory_count_flutter_app/core/resources/responsive_utils.dart';
 import 'package:inventory_count_flutter_app/l10n/app_localizations.dart';
-import 'package:inventory_count_flutter_app/core/di/di.dart';
-import 'package:inventory_count_flutter_app/core/services/scanner_service.dart';
+import 'scanner_dialog.dart';
 
 /// Variant of the popup dialog.
 enum PopupVariant {
@@ -30,73 +29,24 @@ class ErrorPopup extends StatelessWidget {
 
   // ── Static helpers ──────────────────────────────────────────────────────────
 
-  /// returns a [Future] that resolves when the dialog is dismissed.
+  /// Scanner remains paused until the dialog and its exit animation finish.
   static Future<void> show(
     BuildContext context,
     String message, {
     PopupVariant variant = PopupVariant.error,
     VoidCallback? onRetry,
-  }) async {
-    try {
-      await instance<ScannerService>().disableScanner();
-      await instance<ScannerService>().suspendScanner();
-    } catch (e) {
-      debugPrint('[ErrorPopup] suspend/disable error: $e');
-    }
-    try {
-      if (!context.mounted) return;
-      await showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext dialogContext) {
-          return ErrorPopup(
-            message: message,
-            variant: variant,
-            onRetry: onRetry,
-          );
-        },
-      );
-    } finally {
-      try {
-        await instance<ScannerService>().resumeScanner();
-        await instance<ScannerService>().enableScanner();
-      } catch (e) {
-        debugPrint('[ErrorPopup] resume/enable error: $e');
-      }
-    }
-  }
+  }) => showScannerDialog<void>(
+    context: context,
+    builder: (_) =>
+        ErrorPopup(message: message, variant: variant, onRetry: onRetry),
+  );
 
-  /// Convenience method for warning popups.
-  /// Returns [true] if the user clicked "Yes", [false] or null if dismissed or "No"
-  static Future<bool?> showWarning(BuildContext context, String message) async {
-    try {
-      await instance<ScannerService>().disableScanner();
-      await instance<ScannerService>().suspendScanner();
-    } catch (e) {
-      debugPrint('[ErrorPopup] suspend/disable error: $e');
-    }
-    try {
-      if (!context.mounted) return null;
-      return await showDialog<bool>(
+  static Future<bool?> showWarning(BuildContext context, String message) =>
+      showScannerDialog<bool>(
         context: context,
-        barrierDismissible: false,
-        builder: (BuildContext dialogContext) {
-          return ErrorPopup(
-            message: message,
-            variant: PopupVariant.warning,
-          );
-        },
+        builder: (_) =>
+            ErrorPopup(message: message, variant: PopupVariant.warning),
       );
-    } finally {
-      try {
-        await instance<ScannerService>().resumeScanner();
-        await instance<ScannerService>().enableScanner();
-      } catch (e) {
-        debugPrint('[ErrorPopup] resume/enable error: $e');
-      }
-    }
-  }
-
   static void showSuccess(BuildContext context, String message) {
     show(context, message, variant: PopupVariant.success);
   }
@@ -141,9 +91,7 @@ class ErrorPopup extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
 
     return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16.0),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
       elevation: 0,
       backgroundColor: Colors.transparent,
       child: Container(
@@ -205,7 +153,10 @@ class ErrorPopup extends StatelessWidget {
                       child: Text(
                         'لا',
                         style: TextStyle(
-                          fontSize: ResponsiveUtils.responsiveFontSize(context, 16.0),
+                          fontSize: ResponsiveUtils.responsiveFontSize(
+                            context,
+                            16.0,
+                          ),
                           color: Colors.black54,
                           fontWeight: FontWeight.bold,
                         ),
@@ -229,7 +180,10 @@ class ErrorPopup extends StatelessWidget {
                       child: Text(
                         'نعم',
                         style: TextStyle(
-                          fontSize: ResponsiveUtils.responsiveFontSize(context, 16.0),
+                          fontSize: ResponsiveUtils.responsiveFontSize(
+                            context,
+                            16.0,
+                          ),
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                         ),
@@ -250,7 +204,10 @@ class ErrorPopup extends StatelessWidget {
                       child: Text(
                         'إغلاق',
                         style: TextStyle(
-                          fontSize: ResponsiveUtils.responsiveFontSize(context, 16.0),
+                          fontSize: ResponsiveUtils.responsiveFontSize(
+                            context,
+                            16.0,
+                          ),
                           color: Colors.black54,
                           fontWeight: FontWeight.bold,
                         ),
@@ -276,7 +233,10 @@ class ErrorPopup extends StatelessWidget {
                         child: Text(
                           'إعادة المحاولة',
                           style: TextStyle(
-                            fontSize: ResponsiveUtils.responsiveFontSize(context, 16.0),
+                            fontSize: ResponsiveUtils.responsiveFontSize(
+                              context,
+                              16.0,
+                            ),
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
                           ),

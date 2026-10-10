@@ -12,6 +12,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String get scanPallets => 'بالتات';
 
   @override
+  String get addNewPallet => 'اضافه بالته جديده';
+
+  @override
+  String get confirmNewPallet => 'هل أنت متأكد من إضافة بالتة جديدة؟';
+
+  @override
+  String get emptyPalletNotice =>
+      'يجب مسح صندوق واحد على الأقل للبالتة الحالية.';
+
+  @override
+  String get currentPalletNumber => 'رقم البالتة الحالية';
+
+  @override
   String get scanBoxes => 'صناديق';
 
   @override

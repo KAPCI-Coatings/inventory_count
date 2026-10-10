@@ -12,6 +12,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get scanPallets => 'Pallets';
 
   @override
+  String get addNewPallet => 'Add New Pallet';
+
+  @override
+  String get confirmNewPallet => 'Are you sure you want to add a new pallet?';
+
+  @override
+  String get emptyPalletNotice =>
+      'Scan at least one box for the current pallet before adding a new pallet.';
+
+  @override
+  String get currentPalletNumber => 'Current Pallet Number';
+
+  @override
   String get scanBoxes => 'Boxes';
 
   @override

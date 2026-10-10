@@ -1,6 +1,10 @@
 {
   "@@locale": "en",
   "scanPallets": "Pallets",
+  "addNewPallet": "Add New Pallet",
+  "confirmNewPallet": "Are you sure you want to add a new pallet?",
+  "emptyPalletNotice": "Scan at least one box for the current pallet before adding a new pallet.",
+  "currentPalletNumber": "Current Pallet Number",
   "scanBoxes": "Boxes",
   "errorScanPalletsOnly": "Pallets is selected. Scan a pallet or select Boxes to scan a box.",
   "errorScanBoxesOnly": "Boxes is selected. Scan a box or select Pallets to scan a pallet.",

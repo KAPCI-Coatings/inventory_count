@@ -1,7 +1,10 @@
 import 'package:inventory_count_flutter_app/domain/entities/barcode.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:inventory_count_flutter_app/core/error/empty_pallet_exception.dart';
 
 abstract class BarcodeLocalDataSource {
+  Future<int> getCurrentExportPalletNo();
+  Future<int> startNewExportPallet();
   Future<void> saveBarcode(ItemBox item);
   Future<bool> isDuplicate(String barcodeNo);
   Future<List<ItemBox>> getBarcodes({String? matnr, String? batchNo});
@@ -15,17 +18,51 @@ class BarcodeLocalDataSourceImpl implements BarcodeLocalDataSource {
 
   BarcodeLocalDataSourceImpl(this.database);
 
+  Future<int> _currentNumber(DatabaseExecutor db) async {
+    final rows = await db.rawQuery('''
+      SELECT MAX(currentExportPalletNo,
+        COALESCE((SELECT MAX(exportPalletNo) FROM barcodes), 0)) AS number
+      FROM inventory_session WHERE id = 1
+    ''');
+    return rows.single['number'] as int;
+  }
+
+  @override
+  Future<int> getCurrentExportPalletNo() => _currentNumber(database);
+
+  @override
+  Future<int> startNewExportPallet() => database.transaction((txn) async {
+    final current = await _currentNumber(txn);
+    if (current > 0) {
+      final rows = await txn.query(
+        tableName,
+        columns: ['id'],
+        where: 'exportPalletNo = ?',
+        whereArgs: [current],
+        limit: 1,
+      );
+      if (rows.isEmpty) throw const EmptyPalletException();
+    }
+    final next = current + 1;
+    await txn.update('inventory_session', {
+      'currentExportPalletNo': next,
+    }, where: 'id = 1');
+    return next;
+  });
+
   @override
   Future<void> saveBarcode(ItemBox item) async {
-    final bool isPallet = item.isPallet || item.barCodeNo.toUpperCase().startsWith('P');
-    final String palletBox = isPallet ? 'P' : (item.palletBox.isNotEmpty ? item.palletBox : 'B');
+    final bool isPallet =
+        item.isPallet || item.barCodeNo.toUpperCase().startsWith('P');
+    final String palletBox = isPallet
+        ? 'P'
+        : (item.palletBox.isNotEmpty ? item.palletBox : 'B');
     final String serialNo = isPallet && item.barCodeNo.length == 21
         ? item.barCodeNo.substring(17, 21)
         : item.serialNo;
 
-    await database.insert(
-      tableName,
-      {
+    await database.transaction((txn) async {
+      await txn.insert(tableName, {
         'barCodeNo': item.barCodeNo,
         'matnr': item.matnr,
         'batchNo': item.batchNo,
@@ -34,9 +71,15 @@ class BarcodeLocalDataSourceImpl implements BarcodeLocalDataSource {
         'qty': item.qty,
         'isPallet': isPallet ? 1 : 0,
         'isSent': item.isSent ? 1 : 0,
-      },
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+        'exportPalletNo': item.exportPalletNo,
+      }, conflictAlgorithm: ConflictAlgorithm.replace);
+      if (item.exportPalletNo != null) {
+        await txn.rawUpdate(
+          'UPDATE inventory_session SET currentExportPalletNo = MAX(currentExportPalletNo, ?) WHERE id = 1',
+          [item.exportPalletNo],
+        );
+      }
+    });
   }
 
   @override
@@ -73,11 +116,14 @@ class BarcodeLocalDataSourceImpl implements BarcodeLocalDataSource {
       tableName,
       where: whereClause,
       whereArgs: whereArgs.isNotEmpty ? whereArgs : null,
+      orderBy: 'id ASC',
     );
 
     return List.generate(maps.length, (i) {
       final barcode = maps[i]['barCodeNo'] as String;
-      final isPallet = (maps[i]['isPallet'] as int) == 1 || barcode.toUpperCase().startsWith('P');
+      final isPallet =
+          (maps[i]['isPallet'] as int) == 1 ||
+          barcode.toUpperCase().startsWith('P');
       String serialNo = maps[i]['serialNo'] as String;
       String palletBox = maps[i]['palletBox'] as String;
 
@@ -97,19 +143,25 @@ class BarcodeLocalDataSourceImpl implements BarcodeLocalDataSource {
         qty: maps[i]['qty'] as int,
         isPallet: isPallet,
         isSent: (maps[i]['isSent'] as int?) == 1,
+        exportPalletNo: maps[i]['exportPalletNo'] as int?,
       );
     });
   }
 
   @override
   Future<void> clearBarcodes() async {
-    await database.delete(tableName);
+    await database.transaction((txn) async {
+      await txn.delete(tableName);
+      await txn.update('inventory_session', {
+        'currentExportPalletNo': 0,
+      }, where: 'id = 1');
+    });
   }
 
   @override
   Future<void> markAsSent(List<String> barcodes) async {
     if (barcodes.isEmpty) return;
-    
+
     // SQLite has a limit on variables, but for normal batch size it's fine
     final placeholders = List.filled(barcodes.length, '?').join(',');
     await database.update(

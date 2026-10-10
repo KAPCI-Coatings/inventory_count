@@ -27,8 +27,9 @@ class CsvExportService {
       'Serial No',
       'Pallet/Box',
       'Quantity',
+      'Pallet Number',
     ];
-    final formats = ['000000', 'General', '0000', 'General', '0'];
+    final formats = ['000000', 'General', '0000', 'General', '0', '0'];
     for (var column = 0; column < headers.length; column++) {
       sheet.updateCell(
         xlsx.CellIndex.indexByColumnRow(columnIndex: column, rowIndex: 0),
@@ -46,6 +47,9 @@ class CsvExportService {
         item.isPallet ? null : _numericIdentifier(item.serialNo),
         xlsx.TextCellValue(item.isPallet ? 'P' : 'B'),
         xlsx.IntCellValue(item.qty),
+        item.exportPalletNo == null
+            ? null
+            : xlsx.IntCellValue(item.exportPalletNo!),
       ];
       for (var column = 0; column < values.length; column++) {
         sheet.updateCell(
