@@ -5,7 +5,7 @@ import 'package:inventory_count_flutter_app/domain/entities/barcode.dart';
 
 void main() {
   test(
-    'Excel adds numeric pallet groups in F without moving quantity total',
+    'Excel adds numeric pallet groups in A before material without moving quantity total',
     () {
       final sheet = Excel.decodeBytes(
         CsvExportService().buildInventoryXlsx(const [
@@ -16,14 +16,15 @@ void main() {
         ]),
       )['Inventory'];
       Data cell(String ref) => sheet.cell(CellIndex.indexByString(ref));
-      expect(cell('F1').value, TextCellValue('Pallet Number'));
-      expect(cell('F2').value, IntCellValue(1));
-      expect(cell('F3').value, IntCellValue(2));
-      expect(cell('F4').value, IntCellValue(2));
-      expect(cell('F5').value, isNull);
-      expect(cell('F6').value, isNull);
-      expect(cell('F2').cellStyle!.numberFormat.formatCode, '0');
-      expect(sheet.evaluate(CellIndex.indexByString('E6')), IntCellValue(28));
+      expect(cell('A1').value, TextCellValue('Pallet Number'));
+      expect(cell('B1').value, TextCellValue('Material'));
+      expect(cell('A2').value, IntCellValue(1));
+      expect(cell('A3').value, IntCellValue(2));
+      expect(cell('A4').value, IntCellValue(2));
+      expect(cell('A5').value, isNull);
+      expect(cell('A6').value, isNull);
+      expect(cell('A2').cellStyle!.numberFormat.formatCode, '0');
+      expect(sheet.evaluate(CellIndex.indexByString('F6')), IntCellValue(28));
     },
   );
   test(
@@ -52,27 +53,28 @@ void main() {
       final book = Excel.decodeBytes(bytes);
       final sheet = book['Inventory'];
       Data cell(String ref) => sheet.cell(CellIndex.indexByString(ref));
-      expect(cell('A2').value, IntCellValue(1234));
-      expect(cell('A2').cellStyle!.numberFormat.formatCode, '000000');
-      expect(cell('B2').value, TextCellValue('0000000123'));
-      expect(cell('B4').value, TextCellValue('0000000000'));
-      expect(cell('C2').value, IntCellValue(2));
-      expect(cell('C2').cellStyle!.numberFormat.formatCode, '0000');
-      expect(cell('C3').value, isNull);
-      expect(cell('D3').value, TextCellValue('P'));
-      expect(cell('E4').value, IntCellValue(0));
-      expect(cell('E4').cellStyle!.numberFormat.formatCode, '0');
-      expect((cell('E5').value as FormulaCellValue).formula, 'SUM(E2:E4)');
-      expect((cell('E5').value as FormulaCellValue).cachedValue, '26');
-      expect(cell('A4').cellStyle!.numberFormat.format(0), '000000');
-      expect(cell('C2').cellStyle!.numberFormat.format(2), '0002');
-      expect(sheet.evaluate(CellIndex.indexByString('E5')), IntCellValue(26));
+      expect(cell('A2').value, isNull);
+      expect(cell('B2').value, IntCellValue(1234));
+      expect(cell('B2').cellStyle!.numberFormat.formatCode, '000000');
+      expect(cell('C2').value, TextCellValue('0000000123'));
+      expect(cell('C4').value, TextCellValue('0000000000'));
+      expect(cell('D2').value, IntCellValue(2));
+      expect(cell('D2').cellStyle!.numberFormat.formatCode, '0000');
+      expect(cell('D3').value, isNull);
+      expect(cell('E3').value, TextCellValue('P'));
+      expect(cell('F4').value, IntCellValue(0));
+      expect(cell('F4').cellStyle!.numberFormat.formatCode, '0');
+      expect((cell('F5').value as FormulaCellValue).formula, 'SUM(F2:F4)');
+      expect((cell('F5').value as FormulaCellValue).cachedValue, '26');
+      expect(cell('B4').cellStyle!.numberFormat.format(0), '000000');
+      expect(cell('D2').cellStyle!.numberFormat.format(2), '0002');
+      expect(sheet.evaluate(CellIndex.indexByString('F5')), IntCellValue(26));
     },
   );
   test('empty export has zero total without circular reference', () {
     final book = Excel.decodeBytes(CsvExportService().buildInventoryXlsx([]));
     expect(
-      book['Inventory'].cell(CellIndex.indexByString('E2')).value,
+      book['Inventory'].cell(CellIndex.indexByString('F2')).value,
       IntCellValue(0),
     );
   });

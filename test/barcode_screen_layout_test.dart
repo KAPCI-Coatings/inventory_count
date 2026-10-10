@@ -12,6 +12,7 @@ import 'package:inventory_count_flutter_app/presentation/view_models/barcode/bar
 import 'package:inventory_count_flutter_app/presentation/view_models/barcode/barcode_state.dart';
 import 'package:inventory_count_flutter_app/presentation/views/barcode_screen.dart';
 import 'package:inventory_count_flutter_app/presentation/widgets/barcode/barcode_actions_section.dart';
+import 'package:inventory_count_flutter_app/presentation/widgets/barcode/barcode_status_section.dart';
 import 'barcode_upload_test.dart' show EmptyRepository, Api, Scanner, Settings;
 
 class _AuthBloc extends Fake implements AuthBloc {
@@ -161,10 +162,11 @@ void main() {
         final boxes = find.text(locale == 'en' ? 'Boxes' : 'صناديق');
         expect(find.byType(Scrollable), findsNothing);
         expect(boxes.hitTestable(), findsOneWidget);
-        final radioRow = find.byType(RadioGroup<ScanType>);
+        final statusSection = find.byType(BarcodeStatusSection);
         final actions = find.byType(BarcodeActionsSection);
         expect(
-          tester.getTopLeft(actions).dy - tester.getBottomRight(radioRow).dy,
+          tester.getTopLeft(actions).dy -
+              tester.getBottomRight(statusSection).dy,
           closeTo(8, 0.1),
         );
         await tester.tap(boxes);

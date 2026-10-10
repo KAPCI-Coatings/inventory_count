@@ -22,34 +22,34 @@ class CsvExportService {
     book.rename('Sheet1', 'Inventory');
     final sheet = book['Inventory'];
     final headers = [
+      'Pallet Number',
       'Material',
       'Batch No',
       'Serial No',
       'Pallet/Box',
       'Quantity',
-      'Pallet Number',
     ];
-    final formats = ['000000', 'General', '0000', 'General', '0', '0'];
+    final formats = ['0', '000000', 'General', '0000', 'General', '0'];
     for (var column = 0; column < headers.length; column++) {
       sheet.updateCell(
         xlsx.CellIndex.indexByColumnRow(columnIndex: column, rowIndex: 0),
         xlsx.TextCellValue(headers[column]),
         cellStyle: xlsx.CellStyle(bold: true),
       );
-      sheet.setColumnWidth(column, column == 1 ? 18 : 14);
+      sheet.setColumnWidth(column, column == 2 ? 18 : 14);
     }
     for (var row = 0; row < items.length; row++) {
       final item = items[row];
       final values = <xlsx.CellValue?>[
+        item.exportPalletNo == null
+            ? null
+            : xlsx.IntCellValue(item.exportPalletNo!),
         _numericIdentifier(item.matnr),
         // Leading zeros must be in the stored value, not only its display format.
         xlsx.TextCellValue(item.batchNo),
         item.isPallet ? null : _numericIdentifier(item.serialNo),
         xlsx.TextCellValue(item.isPallet ? 'P' : 'B'),
         xlsx.IntCellValue(item.qty),
-        item.exportPalletNo == null
-            ? null
-            : xlsx.IntCellValue(item.exportPalletNo!),
       ];
       for (var column = 0; column < values.length; column++) {
         sheet.updateCell(
@@ -66,15 +66,15 @@ class CsvExportService {
     }
     final totalRow = items.length + 2;
     sheet.updateCell(
-      xlsx.CellIndex.indexByString('D$totalRow'),
+      xlsx.CellIndex.indexByString('E$totalRow'),
       xlsx.TextCellValue('Total'),
       cellStyle: xlsx.CellStyle(bold: true),
     );
     sheet.updateCell(
-      xlsx.CellIndex.indexByString('E$totalRow'),
+      xlsx.CellIndex.indexByString('F$totalRow'),
       items.isEmpty
           ? xlsx.IntCellValue(0)
-          : xlsx.FormulaCellValue('SUM(E2:E${totalRow - 1})'),
+          : xlsx.FormulaCellValue('SUM(F2:F${totalRow - 1})'),
       cellStyle: xlsx.CellStyle(
         bold: true,
         numberFormat: xlsx.NumFormat.custom(formatCode: '0'),

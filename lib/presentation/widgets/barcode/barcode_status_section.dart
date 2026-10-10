@@ -22,7 +22,7 @@ class BarcodeStatusSection extends StatelessWidget {
         ? 16
         : ResponsiveUtils.responsiveFontSize(context, 20);
     final double spacing = compact
-        ? 1
+        ? 0
         : ResponsiveUtils.responsiveSpacing(context, 4);
 
     final TextStyle style =
@@ -130,6 +130,11 @@ class BarcodeStatusSection extends StatelessWidget {
                   : state.currentExportPalletNo.toString(),
               style: style,
             ),
+            Divider(
+              height: compact ? 2 : 16,
+              thickness: 2,
+              color: Colors.black,
+            ),
             RadioGroup<ScanType>(
               groupValue: state.scanType,
               onChanged: (value) {
@@ -143,6 +148,15 @@ class BarcodeStatusSection extends StatelessWidget {
                 children: [
                   Expanded(
                     child: RadioListTile<ScanType>(
+                      activeColor: Colors.black,
+                      fillColor: WidgetStateProperty.resolveWith<Color>(
+                        (states) {
+                          if (states.contains(WidgetState.disabled)) {
+                            return Colors.grey.shade400;
+                          }
+                          return Colors.black;
+                        },
+                      ),
                       value: ScanType.pallet,
                       title: Text(AppLocalizations.of(context)!.scanPallets),
                       contentPadding: EdgeInsets.zero,
@@ -156,6 +170,15 @@ class BarcodeStatusSection extends StatelessWidget {
                   ),
                   Expanded(
                     child: RadioListTile<ScanType>(
+                      activeColor: Colors.black,
+                      fillColor: WidgetStateProperty.resolveWith<Color>(
+                        (states) {
+                          if (states.contains(WidgetState.disabled)) {
+                            return Colors.grey.shade400;
+                          }
+                          return Colors.black;
+                        },
+                      ),
                       value: ScanType.box,
                       title: Text(AppLocalizations.of(context)!.scanBoxes),
                       contentPadding: EdgeInsets.zero,
@@ -169,6 +192,11 @@ class BarcodeStatusSection extends StatelessWidget {
                   ),
                 ],
               ),
+            ),
+            Divider(
+              height: compact ? 2 : 16,
+              thickness: 2,
+              color: Colors.black,
             ),
           ],
         );
