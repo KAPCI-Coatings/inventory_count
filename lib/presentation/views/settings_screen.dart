@@ -192,31 +192,44 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   const SizedBox(height: 10),
 
-                  // ── Radio Options (Row 1: Inventory + Asset) ───────────────
-                  Row(
-                    children: <Widget>[
-                      _buildRadioOption(
-                        context: context,
-                        title: AppLocalizations.of(context)!.inventory,
-                        value: SettingsOption.inventory,
-                        groupValue: state.selectedOption,
-                      ),
-                      const SizedBox(width: 8),
-                      _buildRadioOption(
-                        context: context,
-                        title: AppLocalizations.of(context)!.asset,
-                        value: SettingsOption.asset,
-                        groupValue: state.selectedOption,
-                      ),
-                    ],
-                  ),
-
-                  // ── Radio Options (Row 2: Raw Material) ───────────────────
-                  _buildRadioOption(
-                    context: context,
-                    title: AppLocalizations.of(context)!.rowMaterial,
-                    value: SettingsOption.rawMaterial,
+                  // ── Radio Options ──────────────────────────────────────────
+                  RadioGroup<SettingsOption>(
                     groupValue: state.selectedOption,
+                    onChanged: (SettingsOption? val) {
+                      if (val != null) {
+                        context
+                            .read<SettingsBloc>()
+                            .add(SettingsDataTypeChanged(val));
+                      }
+                    },
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        // Row 1: Inventory + Asset
+                        Row(
+                          children: <Widget>[
+                            _buildRadioOption(
+                              context: context,
+                              title: AppLocalizations.of(context)!.inventory,
+                              value: SettingsOption.inventory,
+                            ),
+                            const SizedBox(width: 8),
+                            _buildRadioOption(
+                              context: context,
+                              title: AppLocalizations.of(context)!.asset,
+                              value: SettingsOption.asset,
+                            ),
+                          ],
+                        ),
+
+                        // Row 2: Raw Material
+                        _buildRadioOption(
+                          context: context,
+                          title: AppLocalizations.of(context)!.rowMaterial,
+                          value: SettingsOption.rawMaterial,
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 12),
 
@@ -265,7 +278,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     required BuildContext context,
     required String title,
     required SettingsOption value,
-    required SettingsOption groupValue,
   }) {
     return Semantics(
       button: true,
@@ -282,14 +294,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             children: <Widget>[
               Radio<SettingsOption>(
                 value: value,
-                groupValue: groupValue,
                 visualDensity: VisualDensity.compact,
                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                onChanged: (val) {
-                  if (val != null) {
-                    context.read<SettingsBloc>().add(SettingsDataTypeChanged(val));
-                  }
-                },
                 activeColor: Colors.black,
               ),
               Text(

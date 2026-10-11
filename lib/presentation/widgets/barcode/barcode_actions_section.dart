@@ -108,71 +108,101 @@ class _BarcodeActionsSectionState extends State<BarcodeActionsSection> {
 
         if (isUser) {
           final double gap = ResponsiveUtils.responsiveSpacing(context, 8);
-          return Column(
-            children: [
-              Row(
+          return BlocBuilder<BarcodeBloc, BarcodeState>(
+            buildWhen: (prev, curr) =>
+                prev.canChangePallet != curr.canChangePallet,
+            builder: (context, barcodeState) {
+              return Column(
                 children: [
-                  Expanded(
-                    child: DefaultButton(
-                      text: AppLocalizations.of(context)!.search,
-                      onPressed: () => _navigateToRoute(Routes.search),
-                      backgroundColor: Colors.grey.shade400,
-                      textColor: Colors.black,
-                      textSize: ResponsiveUtils.responsiveFontSize(context, 16),
-                    ),
-                  ),
-                  SizedBox(width: gap),
-                  Expanded(
-                    child: BlocBuilder<BarcodeBloc, BarcodeState>(
-                      buildWhen: (p, c) => false,
-                      builder: (ctx, s) => DefaultButton(
-                        text: AppLocalizations.of(context)!.export,
-                        onPressed: _isExporting
-                            ? null
-                            : () async {
-                                setState(() => _isExporting = true);
-                                try {
-                                  final items =
-                                      await instance<BarcodeRepository>()
-                                          .getScannedItems();
-                                  await instance<CsvExportService>()
-                                      .exportToXlsx(items);
-                                } finally {
-                                  if (mounted) {
-                                    setState(() => _isExporting = false);
-                                  }
-                                }
-                              },
-                        backgroundColor: Colors.grey.shade400,
-                        textColor: Colors.black,
-                        textSize: ResponsiveUtils.responsiveFontSize(
-                          context,
-                          16,
+                  Row(
+                    children: [
+                      Expanded(
+                        child: DefaultButton(
+                          text: AppLocalizations.of(context)!.search,
+                          onPressed: () => _navigateToRoute(Routes.search),
+                          backgroundColor: Colors.grey.shade400,
+                          textColor: Colors.black,
+                          textSize: ResponsiveUtils.responsiveFontSize(
+                            context,
+                            16,
+                          ),
                         ),
                       ),
-                    ),
+                      SizedBox(width: gap),
+                      Expanded(
+                        child: DefaultButton(
+                          text: AppLocalizations.of(context)!.addNewPallet,
+                          onPressed:
+                              barcodeState.canChangePallet &&
+                                  !_isConfirmingPallet
+                              ? _confirmNewPallet
+                              : null,
+                          backgroundColor: Colors.grey.shade400,
+                          textColor: Colors.black,
+                          textSize: ResponsiveUtils.responsiveFontSize(
+                            context,
+                            16,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: gap),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: DefaultButton(
+                          text: AppLocalizations.of(context)!.export,
+                          isLoading: _isExporting,
+                          onPressed: _isExporting
+                              ? null
+                              : () async {
+                                  setState(() => _isExporting = true);
+                                  try {
+                                    final items =
+                                        await instance<BarcodeRepository>()
+                                            .getScannedItems();
+                                    await instance<CsvExportService>()
+                                        .exportToXlsx(items);
+                                  } finally {
+                                    if (mounted) {
+                                      setState(() => _isExporting = false);
+                                    }
+                                  }
+                                },
+                          backgroundColor: Colors.grey.shade400,
+                          textColor: Colors.black,
+                          textSize: ResponsiveUtils.responsiveFontSize(
+                            context,
+                            16,
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: gap),
+                      Expanded(
+                        child: DefaultButton(
+                          text: AppLocalizations.of(context)!.exit,
+                          onPressed: () {
+                            context.read<AuthBloc>().add(
+                              const AuthLogoutRequested(),
+                            );
+                            Navigator.of(
+                              context,
+                            ).pushReplacementNamed(Routes.login);
+                          },
+                          backgroundColor: Colors.grey.shade400,
+                          textColor: Colors.black,
+                          textSize: ResponsiveUtils.responsiveFontSize(
+                            context,
+                            16,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
-              ),
-              SizedBox(height: gap),
-              Center(
-                child: DefaultButton(
-                  text: AppLocalizations.of(context)!.exit,
-                  onPressed: () {
-                    context.read<AuthBloc>().add(const AuthLogoutRequested());
-                    Navigator.of(context).pushReplacementNamed(Routes.login);
-                  },
-                  backgroundColor: Colors.grey.shade400,
-                  textColor: Colors.black,
-                  textSize: ResponsiveUtils.responsiveFontSize(context, 16),
-                  width: ResponsiveUtils.responsiveWidth(context, 0.4),
-                  height: ResponsiveUtils.responsiveHeight(
-                    context,
-                    0.07,
-                  ).clamp(48, 64),
-                ),
-              ),
-            ],
+              );
+            },
           );
         }
 
