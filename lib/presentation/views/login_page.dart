@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:inventory_count_flutter_app/core/di/di.dart';
 import 'package:inventory_count_flutter_app/core/resources/responsive_utils.dart';
+import 'package:inventory_count_flutter_app/core/services/scanner_service.dart';
 import 'package:inventory_count_flutter_app/core/routes_manger/routes.dart';
 import 'package:inventory_count_flutter_app/presentation/view_models/auth/auth_state.dart';
 import 'package:inventory_count_flutter_app/presentation/widgets/auth/login_form.dart';
@@ -33,6 +35,11 @@ class _LoginPageState extends State<LoginPage> {
   void initState() {
     super.initState();
     _passwordFocus.addListener(_onFocusChange);
+
+    // Scanner stays enabled after logout; keep it off on the login screen.
+    instance<ScannerService>().disableScanner().catchError((Object e) {
+      debugPrint('[LoginPage] Could not disable scanner: $e');
+    });
 
     // Re-dispatch AuthInitializeRequested so the bloc re-checks login
     // status.  After a logout the `_isInitialized` flag was reset, so
