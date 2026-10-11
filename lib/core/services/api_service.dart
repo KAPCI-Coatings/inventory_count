@@ -71,9 +71,12 @@ class ApiService {
       }
     }
 
-    final int palletNo = (item.palletNo != null && item.palletNo! > 0)
-        ? item.palletNo!
-        : 1;
+    // Same number as the "Pallet No" column in the Excel export.
+    final int palletNo = (item.exportPalletNo != null && item.exportPalletNo! > 0)
+        ? item.exportPalletNo!
+        : (item.palletNo != null && item.palletNo! > 0)
+            ? item.palletNo!
+            : 1;
 
     return {
       'devId': devId,

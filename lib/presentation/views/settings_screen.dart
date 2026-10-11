@@ -181,7 +181,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     focusNode: _baseUrlFocus,
                     labelText: AppLocalizations.of(context)!.baseUrl,
                     keyboardType: TextInputType.url,
-                    hintText: 'http://10.10.30.47:2604',
+                    hintText: 'http://10.10.30.22:8090',
 
                     height: 44,
                     onChanged: (String value) {

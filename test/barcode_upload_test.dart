@@ -109,7 +109,7 @@ class EmptyRepository extends Fake implements BarcodeRepository {
 }
 
 void main() {
-  test('local Excel numbers do not change backend JSON', () async {
+  test('backend palletNo uses the local Excel pallet number', () async {
     final payloads = <dynamic>[];
     final service = ApiService(
       client: MockClient((request) async {
@@ -139,9 +139,11 @@ void main() {
         ],
       );
     }
-    expect(payloads[0], payloads[1]);
-    expect(payloads[1][0]['palletNo'], 7);
-    expect(payloads[1][1]['palletNo'], 1);
+    // Without an Excel number: fall back to palletNo (pallet) or 1 (box).
+    expect(payloads[0][0]['palletNo'], 7);
+    expect(payloads[0][1]['palletNo'], 1);
+    expect(payloads[1][0]['palletNo'], 42);
+    expect(payloads[1][1]['palletNo'], 42);
     expect((payloads[1][0] as Map).containsKey('exportPalletNo'), false);
   });
   test(

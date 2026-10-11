@@ -1,5 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
+const String defaultBaseUrl = 'http://10.10.30.22:8090';
+
 abstract class SettingsLocalDataSource {
   Future<void> saveDevId(String id);
   String? getDevId();
@@ -38,7 +40,8 @@ class SettingsLocalDataSourceImpl implements SettingsLocalDataSource {
 
   @override
   String? getBaseUrl() {
-    return _prefs.getString(_keyBaseUrl);
+    // Used until an Admin saves a different URL in Settings.
+    return _prefs.getString(_keyBaseUrl) ?? defaultBaseUrl;
   }
 
   @override
