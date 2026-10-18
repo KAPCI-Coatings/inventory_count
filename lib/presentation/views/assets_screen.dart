@@ -123,14 +123,27 @@ class _AssetsScreenState extends State<AssetsScreen> {
         ),
         content: const Text('هل انت متاكد من مسح جميع البيانات من الجهاز'),
         actions: [
-          TextButton(
+          OutlinedButton(
+            style: OutlinedButton.styleFrom(
+              foregroundColor: Colors.black,
+              side: const BorderSide(color: Colors.black, width: 2),
+            ),
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('لا'),
+            child: const Text(
+              'لا',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.black87),
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text('نعم', style: TextStyle(color: Colors.white)),
+            child: const Text(
+              'نعم',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ],
       ),

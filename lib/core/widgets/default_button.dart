@@ -31,7 +31,7 @@ class DefaultButton extends StatelessWidget {
   });
 
   static const Map<String, String> _arabicButtonLabels = {
-    'Add New Pallet': 'اضافه بالته جديده',
+    'Add New Pallet': 'انشاء بالتة جديدة',
     'Submit': 'إرسال',
     'Search': 'بحث',
     'Clear': 'مسح',
@@ -95,7 +95,9 @@ class DefaultButton extends StatelessWidget {
                   child: Text(
                     _displayLabel,
                     style: textTheme.titleMedium?.copyWith(
-                      fontSize: textSize ?? ResponsiveUtils.responsiveFontSize(context, 16),
+                      fontSize:
+                          textSize ??
+                          ResponsiveUtils.responsiveFontSize(context, 16),
                       fontWeight: FontWeight.bold,
                     ),
                   ),

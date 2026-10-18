@@ -41,13 +41,27 @@ class _BarcodeActionsSectionState extends State<BarcodeActionsSection> {
           title: Text(l10n.addNewPallet),
           content: Text(l10n.confirmNewPallet),
           actions: [
-            TextButton(
+            OutlinedButton(
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Colors.black,
+                side: const BorderSide(color: Colors.black, width: 2),
+              ),
               onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: Text(l10n.no),
+              child: Text(
+                l10n.no,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.black87,
+                foregroundColor: Colors.white,
+              ),
               onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: Text(l10n.yes),
+              child: Text(
+                l10n.yes,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
           ],
         ),
@@ -81,14 +95,27 @@ class _BarcodeActionsSectionState extends State<BarcodeActionsSection> {
         ),
         content: const Text('هل انت متاكد من مسح جميع البيانات من الجهاز'),
         actions: [
-          TextButton(
+          OutlinedButton(
+            style: OutlinedButton.styleFrom(
+              foregroundColor: Colors.black,
+              side: const BorderSide(color: Colors.black, width: 2),
+            ),
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('لا'),
+            child: const Text(
+              'لا',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.black87),
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text('نعم', style: TextStyle(color: Colors.white)),
+            child: const Text(
+              'نعم',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ],
       ),

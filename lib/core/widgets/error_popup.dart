@@ -147,7 +147,7 @@ class ErrorPopup extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(vertical: 12.0),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8.0),
-                          side: BorderSide(color: Colors.grey.shade300),
+                          side: const BorderSide(color: Colors.black, width: 2),
                         ),
                       ),
                       child: Text(
@@ -157,7 +157,7 @@ class ErrorPopup extends StatelessWidget {
                             context,
                             16.0,
                           ),
-                          color: Colors.black54,
+                          color: Colors.black,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -170,7 +170,7 @@ class ErrorPopup extends StatelessWidget {
                         Navigator.of(context).pop(true);
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: _accentColor,
+                        backgroundColor: Colors.black87,
                         padding: const EdgeInsets.symmetric(vertical: 12.0),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8.0),
@@ -198,7 +198,7 @@ class ErrorPopup extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(vertical: 12.0),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8.0),
-                          side: BorderSide(color: Colors.grey.shade300),
+                          side: const BorderSide(color: Colors.black, width: 2),
                         ),
                       ),
                       child: Text(
@@ -208,7 +208,7 @@ class ErrorPopup extends StatelessWidget {
                             context,
                             16.0,
                           ),
-                          color: Colors.black54,
+                          color: Colors.black,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -223,7 +223,7 @@ class ErrorPopup extends StatelessWidget {
                           onRetry!();
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: _accentColor,
+                          backgroundColor: Colors.black87,
                           padding: const EdgeInsets.symmetric(vertical: 12.0),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.0),

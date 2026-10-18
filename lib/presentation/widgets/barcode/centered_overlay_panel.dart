@@ -69,18 +69,24 @@ class CenteredOverlayPanel extends StatelessWidget {
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
-                          foregroundColor: color,
+                          foregroundColor: Colors.black,
                         ),
                         onPressed: onConfirm,
-                        child: Text(AppLocalizations.of(context)!.yes),
+                        child: Text(
+                          AppLocalizations.of(context)!.yes,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
                       ),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
-                          foregroundColor: Colors.red,
+                          foregroundColor: Colors.black,
                         ),
                         onPressed: onReject,
-                        child: Text(AppLocalizations.of(context)!.no),
+                        child: Text(
+                          AppLocalizations.of(context)!.no,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ],
                   )
@@ -88,10 +94,13 @@ class CenteredOverlayPanel extends StatelessWidget {
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
-                      foregroundColor: color,
+                      foregroundColor: Colors.black,
                     ),
                     onPressed: onAcknowledge,
-                    child: Text(AppLocalizations.of(context)!.ok),
+                    child: Text(
+                      AppLocalizations.of(context)!.ok,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ),
               ],
             ),

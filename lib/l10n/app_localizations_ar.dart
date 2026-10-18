@@ -12,7 +12,20 @@ class AppLocalizationsAr extends AppLocalizations {
   String get scanPallets => 'Pallets';
 
   @override
-  String get addNewPallet => 'اضافه بالته جديده';
+  String get addNewPallet => 'انشاء بالتة جديدة';
+
+  @override
+  String get switchToBoxesTitle => 'الانتقال إلى الصناديق';
+
+  @override
+  String get switchToBoxesMessage =>
+      'لم تقم بإنشاء بالتة جديدة. هل تريد إنشاء بالتة جديدة أم الاستمرار على البالتة الأخيرة؟';
+
+  @override
+  String get cancelSwitch => 'الغاء';
+
+  @override
+  String get keepLastPallet => 'الاستمرار على الأخيرة';
 
   @override
   String get confirmNewPallet => 'هل أنت متأكد من إضافة بالتة جديدة؟';

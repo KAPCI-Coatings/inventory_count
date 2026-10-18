@@ -1,7 +1,11 @@
 {
   "@@locale": "en",
   "scanPallets": "Pallets",
-  "addNewPallet": "اضافه بالته جديده",
+  "addNewPallet": "انشاء بالتة جديدة",
+  "switchToBoxesTitle": "الانتقال إلى الصناديق",
+  "switchToBoxesMessage": "لم تقم بإنشاء بالتة جديدة. هل تريد إنشاء بالتة جديدة أم الاستمرار على البالتة الأخيرة؟",
+  "cancelSwitch": "الغاء",
+  "keepLastPallet": "الاستمرار على الأخيرة",
   "confirmNewPallet": "هل أنت متأكد من إضافة بالتة جديدة؟",
   "emptyPalletNotice": "يجب مسح صندوق واحد على الأقل للبالتة الحالية.",
   "currentPalletNumber": "Current Pallet Number",

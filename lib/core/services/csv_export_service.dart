@@ -5,12 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:inventory_count_flutter_app/domain/entities/barcode.dart';
 import 'package:inventory_count_flutter_app/domain/entities/asset_scan.dart';
 import 'package:file_saver/file_saver.dart';
+import 'package:intl/intl.dart';
+import 'package:inventory_count_flutter_app/core/di/di.dart';
+import 'package:inventory_count_flutter_app/data/datasources/settings_local_datasource.dart';
 
 class CsvExportService {
   /// Exports inventory with copyable batch codes and numeric quantities.
   Future<void> exportToXlsx(List<ItemBox> items) async {
     await FileSaver.instance.saveAs(
-      name: 'inventory_export_${_timestamp()}',
+      name: _inventoryFileName(),
       fileExtension: 'xlsx',
       bytes: buildInventoryXlsx(items),
       mimeType: MimeType.microsoftExcel,
@@ -128,6 +131,13 @@ class CsvExportService {
       debugPrint('[CsvExportService] Error saving file: $e');
       rethrow;
     }
+  }
+
+  /// e.g. `Device(053)-18-10-2026-10-30AM` (':' is not allowed in file names).
+  String _inventoryFileName() {
+    final devId = instance<SettingsLocalDataSource>().getDevId() ?? '';
+    final stamp = DateFormat('dd-MM-yyyy-hh-mma', 'en').format(DateTime.now());
+    return 'Device($devId)-$stamp';
   }
 
   String _timestamp() =>

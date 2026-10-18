@@ -107,8 +107,32 @@ abstract class AppLocalizations {
   /// No description provided for @addNewPallet.
   ///
   /// In en, this message translates to:
-  /// **'اضافه بالته جديده'**
+  /// **'انشاء بالتة جديدة'**
   String get addNewPallet;
+
+  /// No description provided for @switchToBoxesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'الانتقال إلى الصناديق'**
+  String get switchToBoxesTitle;
+
+  /// No description provided for @switchToBoxesMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'لم تقم بإنشاء بالتة جديدة. هل تريد إنشاء بالتة جديدة أم الاستمرار على البالتة الأخيرة؟'**
+  String get switchToBoxesMessage;
+
+  /// No description provided for @cancelSwitch.
+  ///
+  /// In en, this message translates to:
+  /// **'الغاء'**
+  String get cancelSwitch;
+
+  /// No description provided for @keepLastPallet.
+  ///
+  /// In en, this message translates to:
+  /// **'الاستمرار على الأخيرة'**
+  String get keepLastPallet;
 
   /// No description provided for @confirmNewPallet.
   ///
