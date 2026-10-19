@@ -1,0 +1,125 @@
+{
+  "@@locale": "en",
+  "scanPallets": "Pallets",
+  "addNewPallet": "انشاء بالتة جديدة",
+  "switchToBoxesTitle": "الانتقال إلى الصناديق",
+  "switchToBoxesMessage": "لم تقم بإنشاء بالتة جديدة. هل تريد إنشاء بالتة جديدة أم الاستمرار على البالتة الأخيرة؟",
+  "cancelSwitch": "الغاء",
+  "keepLastPallet": "الاستمرار على الأخيرة",
+  "confirmNewPallet": "هل أنت متأكد من إضافة بالتة جديدة؟",
+  "emptyPalletNotice": "يجب مسح صندوق واحد على الأقل للبالتة الحالية.",
+  "currentPalletNumber": "Current Pallet Number",
+  "scanBoxes": "Boxes",
+  "errorScanPalletsOnly": "تم اختيار البالتات. امسح باركود بالتة أو اختر الصناديق لمسح باركود صندوق.",
+  "errorScanBoxesOnly": "تم اختيار الصناديق. امسح باركود صندوق أو اختر البالتات لمسح باركود بالتة.",
+  "settings": "الإعدادات",
+  "language": "Language",
+  "devId": "Dev_ID",
+  "inventory": "Inventory",
+  "asset": "Asset",
+  "rowMaterial": "Row Material",
+  "submit": "إرسال",
+  "english": "English",
+  "arabic": "Arabic",
+  "french": "French",
+  "settingsSavedSuccessfully": "تم حفظ الإعدادات بنجاح",
+  "assetsTitle": "Assets",
+  "assetNo": "Asset No",
+  "assetCount": "Asset Count",
+  "exit": "خروج",
+  "search": "بحث",
+  "material": "Matiral",
+  "filterPatch": "Filter Patch",
+  "selectedPatch": "Selected Patch",
+  "qty": "Qty",
+  "patch": "Patch",
+  "totalQty": "Total Qty",
+  "clear": "مسح",
+  "error": "خطأ",
+  "close": "إغلاق",
+  "retry": "إعادة المحاولة",
+  "errorInitialization": "خطأ في التهيئة",
+  "errorEmptyPassword": "يرجى إدخال كلمة المرور.",
+  "errorInvalidCredentials": "بيانات الدخول غير صحيحة.",
+  "errorLoginFailed": "فشل تسجيل الدخول.",
+  "errorPasswordUpdateFailed": "فشل تحديث كلمة المرور. يلزم صلاحية الأدمن.",
+  "successPasswordUpdated": "تم تحديث كلمة المرور بنجاح.",
+  "username": "Username",
+  "password": "Password",
+  "login": "تسجيل الدخول",
+  "inventoryCount": "Inventory Count",
+  "confirm_duplicate_pallet": "هل أنت متأكد أنك تريد تكرار هذا الباليت؟",
+  "error_duplicate_barcode": "هذا الباركود مكرر داخل نفس الأوردر.",
+  "error_invalid_barcode_format": "باركود غير صحيح. يجب أن يكون 20 أو 21 حرف بالضبط.",
+  "error_unexpected_scan": "حدث خطأ غير متوقع أثناء معالجة القراءة.",
+  "error_scan_failed": "حدث خطأ أثناء قراءة الباركود.",
+  "error_scanner_init": "تعذر تهيئة الماسح. تأكد من الإعدادات.",
+  "error_no_scanned_data": "لا توجد بيانات ممسوحة للإرسال.",
+  "success_post_clear_cache": "تم الإرسال بنجاح وتم مسح الكاش.",
+  "error_scanner_restart": "تعذر إعادة تشغيل الماسح.",
+  "success_scanner_stopped": "تم إيقاف الماسح.",
+  "error_scanner_status_change": "تعذر تغيير حالة الماسح.",
+  "error_profile_empty": "اسم البروفايل لا يمكن أن يكون فارغا.",
+  "success_profile_changed": "تم تغيير البروفايل بنجاح.",
+  "error_profile_change_failed": "تعذر تغيير البروفايل.",
+  "error_invalid_url": "الرابط غير صحيح. مثال: http://10.10.30.47:2604",
+  "error_invalid_device_id": "رقم الجهاز غير صحيح.",
+  "error_confirm_save_settings": "تعذر تأكيد حفظ إعدادات الإرسال.",
+  "success_save_settings": "تم حفظ إعدادات الإرسال بنجاح.\n{url}",
+  "@success_save_settings": {
+    "placeholders": {
+      "url": {
+        "type": "String"
+      }
+    }
+  },
+  "error_save_settings": "تعذر حفظ الإعدادات.",
+  "error_post_no_connection": "فشل الإرسال. لا يوجد اتصال بالخادم. تأكد من نفس الشبكة والرابط.",
+  "error_post_server_connection": "فشل الإرسال. تعذر الاتصال بالخادم. {details}",
+  "@error_post_server_connection": {
+    "placeholders": {
+      "details": {
+        "type": "String"
+      }
+    }
+  },
+  "error_post_http_not_allowed": "فشل الإرسال. اتصال HTTP غير مسموح على الجهاز.",
+  "error_post_server_code": "فشل الإرسال. الخادم أرجع كود {code}.",
+  "@error_post_server_code": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "error_post_unknown": "فشل الإرسال. سبب الخطأ: {details}",
+  "@error_post_unknown": {
+    "placeholders": {
+      "details": {
+        "type": "String"
+      }
+    }
+  },
+  "yes": "نعم",
+  "no": "لا",
+  "ok": "موافق",
+  "baseUrl": "Base URL",
+  "send": "إرسال",
+  "export": "حفظ كملف",
+  "post": "نشر",
+  "numberOfScan": "Number of Scan",
+  "noScannedBarcodesYet": "No scanned barcodes yet.",
+  "columnNo": "No.",
+  "columnBarcodeFull": "Barcode Full",
+  "batchNo": "Batch No",
+  "serialNo": "Serial No",
+  "palletBox": "Pallet Box",
+  "palletBoxCount": "Pallet Box Count",
+  "boxCount": "Box Count",
+  "palletCount": "Pallet Count",
+  "warning": "تحذير",
+  "success": "نجاح",
+  "confirm_clear_screen": "هل انت متاكد من مسح جميع البيانات من الجهاز",
+  "confirm_duplicate_barcode": "هل تريد تكرار هذا الباركود",
+  "columnSent": "Sent"
+}

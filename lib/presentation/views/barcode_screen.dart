@@ -1,0 +1,267 @@
+import 'package:inventory_count_flutter_app/core/widgets/scanner_dialog.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:inventory_count_flutter_app/presentation/view_models/barcode/barcode_bloc.dart';
+import 'package:inventory_count_flutter_app/presentation/view_models/barcode/barcode_event.dart';
+import 'package:inventory_count_flutter_app/presentation/widgets/barcode/barcode_actions_section.dart';
+import 'package:inventory_count_flutter_app/presentation/widgets/barcode/barcode_status_section.dart';
+import 'package:inventory_count_flutter_app/core/widgets/error_popup.dart';
+import 'package:inventory_count_flutter_app/core/widgets/sending_progress_popup.dart';
+import 'package:inventory_count_flutter_app/presentation/view_models/barcode/barcode_state.dart';
+import 'package:inventory_count_flutter_app/l10n/app_localizations.dart';
+import '../../core/resources/responsive_utils.dart';
+import '../widgets/barcode/barcode_app_bar.dart';
+import '../../core/routes_manger/route_generator.dart';
+
+class BarcodeScreen extends StatefulWidget {
+  const BarcodeScreen({super.key});
+
+  @override
+  State<BarcodeScreen> createState() => _BarcodeScreenState();
+}
+
+class _BarcodeScreenState extends State<BarcodeScreen> with RouteAware {
+  BarcodeBloc? _bloc;
+
+  /// Tracks whether the sending progress popup is currently showing.
+  bool _isProgressDialogOpen = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _bloc = context.read<BarcodeBloc>();
+    _bloc!
+      ..add(BarcodeInitializeRequested())
+      ..add(BarcodeScannerEnableRequested());
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route != null) RouteGenerator.routeObserver.subscribe(this, route);
+  }
+
+  void _setVisible(bool visible) => _bloc?.isScreenVisible = visible;
+
+  @override
+  void didPush() => _setVisible(true);
+
+  @override
+  void didPopNext() => _setVisible(true);
+
+  @override
+  void didPushNext() => _setVisible(false);
+
+  @override
+  void didPop() => _setVisible(false);
+
+  @override
+  void dispose() {
+    RouteGenerator.routeObserver.unsubscribe(this);
+    _setVisible(false);
+    super.dispose();
+  }
+
+  /// Translates a short error key (used in BLoC state) into a human-readable,
+  /// localised string. Falls back to the key itself if unknown.
+  String _translate(BuildContext context, String key, {String? details}) {
+    final l10n = AppLocalizations.of(context);
+    if (l10n == null) return key;
+
+    switch (key) {
+      // Barcode errors
+      case 'error_empty_pallet':
+        return l10n.emptyPalletNotice;
+      case 'error_scan_pallets_only':
+        return l10n.errorScanPalletsOnly;
+      case 'error_scan_boxes_only':
+        return l10n.errorScanBoxesOnly;
+      case 'invalid_barcode_length':
+        return l10n.error_invalid_barcode_format;
+      case 'invalid_pallet_prefix':
+        return l10n.error_invalid_barcode_format;
+      case 'error_unexpected_scan':
+        return l10n.error_unexpected_scan;
+      case 'error_scan_failed':
+        return l10n.error_scan_failed;
+
+      // Duplicate warning
+      case 'warning_duplicate_barcode':
+        return l10n.error_duplicate_barcode;
+      case 'error_box_duplicate':
+        return 'لايمكن قرائه الصندوق مرتين';
+
+      // Network / post errors
+      case 'error_no_scanned_data':
+        return l10n.error_no_scanned_data;
+      case 'error_invalid_url':
+        return l10n.error_invalid_url;
+      case 'error_post_no_connection':
+        return l10n.error_post_no_connection;
+      case 'error_post_http_not_allowed':
+        return l10n.error_post_http_not_allowed;
+      case 'error_post_server_code':
+        return l10n.error_post_server_code(details ?? '');
+      case 'error_post_unknown':
+        return l10n.error_post_unknown(details ?? '');
+      case 'error_post_server_connection':
+        return l10n.error_post_server_connection(details ?? '');
+
+      // Success
+      case 'success_post_clear_cache':
+        return l10n.success_post_clear_cache;
+
+      default:
+        return key;
+    }
+  }
+
+  /// Closes the progress popup if it is currently open.
+  void _dismissProgressDialog() {
+    if (_isProgressDialogOpen && mounted) {
+      _isProgressDialogOpen = false;
+      Navigator.of(context, rootNavigator: true).pop();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: const BarcodeAppBar(),
+      body: FocusScope(
+        canRequestFocus: false,
+        child: SafeArea(
+          child: Builder(
+            builder: (context) {
+              final double pagePadding = ResponsiveUtils.responsiveSpacing(
+                context,
+                16,
+              );
+
+              return BlocListener<BarcodeBloc, BarcodeState>(
+                listenWhen: (_, state) =>
+                    !state.isInventoryMutationInProgress || state.isSending,
+                listener: (context, state) {
+                  // ── Posting — show confirmed upload progress ──────────────
+                  if (state.isSending) {
+                    if (!_isProgressDialogOpen) {
+                      _isProgressDialogOpen = true;
+                      showScannerDialog<void>(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (_) => BlocBuilder<BarcodeBloc, BarcodeState>(
+                          bloc: _bloc,
+                          builder: (_, uploadState) => SendingProgressPopup(
+                            sentCount: uploadState.sentCount,
+                            totalToSend: uploadState.totalToSend,
+                          ),
+                        ),
+                      ).then((_) {
+                        // Dialog was closed (either by us or navigator pop).
+                        _isProgressDialogOpen = false;
+                      });
+                    }
+                    return;
+                  }
+
+                  // ── If we transitioned away from posting, close the popup ─
+                  if (_isProgressDialogOpen) {
+                    _dismissProgressDialog();
+                  }
+
+                  // ── Warning (duplicate) — popup with Yes/No ──
+                  if (state.status == BarcodeStatus.warning &&
+                      state.centeredWarningMessage != null &&
+                      state.centeredWarningMessage!.isNotEmpty) {
+                    const String confirmMessage =
+                        'هل تريد تكرار هذا الباركود\nنعم او لا';
+
+                    ErrorPopup.showWarning(context, confirmMessage).then((
+                      confirmed,
+                    ) {
+                      if (!context.mounted) return;
+                      if (confirmed == true) {
+                        context.read<BarcodeBloc>().add(
+                          BarcodeDuplicateConfirmed(),
+                        );
+                      } else {
+                        context.read<BarcodeBloc>().add(
+                          BarcodeDuplicateRejected(),
+                        );
+                      }
+                      context.read<BarcodeBloc>().add(
+                        BarcodeDismissCenteredMessageRequested(),
+                      );
+                    });
+                    return;
+                  }
+
+                  // ── Error — red popup ─────────────────────────────────────────
+                  if (state.status == BarcodeStatus.error) {
+                    if (state.centeredErrorMessage != null &&
+                        state.centeredErrorMessage!.isNotEmpty) {
+                      ErrorPopup.show(
+                        context,
+                        _translate(context, state.centeredErrorMessage!),
+                        variant: PopupVariant.error,
+                        onRetry: () {
+                          context.read<BarcodeBloc>().add(
+                            BarcodeScannerEnableRequested(),
+                          );
+                        },
+                      ).then((_) {
+                        if (!context.mounted) return;
+                        context.read<BarcodeBloc>().add(
+                          BarcodeDismissCenteredMessageRequested(),
+                        );
+                      });
+                    }
+                    return;
+                  }
+
+                  // ── Success / Send result ─────────────────────────────────────
+                  if (state.status == BarcodeStatus.success &&
+                      state.centeredSuccessMessage != null &&
+                      state.centeredSuccessMessage!.isNotEmpty) {
+                    ErrorPopup.show(
+                      context,
+                      _translate(context, state.centeredSuccessMessage!),
+                      variant: PopupVariant.success,
+                    ).then((_) {
+                      if (!context.mounted) return;
+                      context.read<BarcodeBloc>().add(
+                        BarcodeDismissCenteredMessageRequested(),
+                      );
+                    });
+                  }
+                },
+                child: Stack(
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.all(pagePadding),
+                      child: LayoutBuilder(
+                        builder: (context, constraints) => Column(
+                          children: <Widget>[
+                            Expanded(
+                              child: BarcodeStatusSection(
+                                compact: constraints.maxHeight < 500,
+                                fillAvailableHeight: true,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            const BarcodeActionsSection(),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}

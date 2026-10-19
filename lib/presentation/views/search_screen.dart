@@ -1,0 +1,309 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:inventory_count_flutter_app/core/resources/responsive_utils.dart';
+import 'package:inventory_count_flutter_app/core/widgets/custom_text_field.dart';
+import 'package:inventory_count_flutter_app/core/widgets/numeric_keypad.dart';
+import 'package:inventory_count_flutter_app/core/widgets/default_button.dart';
+import 'package:inventory_count_flutter_app/core/widgets/screen_title.dart';
+import 'package:inventory_count_flutter_app/l10n/app_localizations.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:inventory_count_flutter_app/core/di/di.dart';
+import 'package:inventory_count_flutter_app/core/services/scanner_service.dart';
+import 'package:inventory_count_flutter_app/presentation/widgets/search/search_results_table.dart';
+import 'package:inventory_count_flutter_app/presentation/view_models/search/search_bloc.dart';
+import 'package:inventory_count_flutter_app/presentation/view_models/search/search_event.dart';
+import 'package:inventory_count_flutter_app/presentation/view_models/search/search_state.dart';
+
+class SearchScreen extends StatelessWidget {
+  const SearchScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const _SearchContentView();
+  }
+}
+
+class _SearchContentView extends StatefulWidget {
+  const _SearchContentView();
+
+  @override
+  State<_SearchContentView> createState() => _SearchContentViewState();
+}
+
+class _SearchContentViewState extends State<_SearchContentView> {
+  final TextEditingController _materialController = TextEditingController();
+  final TextEditingController _batchController = TextEditingController();
+  
+  final FocusNode _materialFocus = FocusNode();
+  final FocusNode _batchFocus = FocusNode();
+  TextEditingController? _activeController;
+
+  @override
+  void initState() {
+    super.initState();
+    _materialFocus.addListener(_onFocusChange);
+    _batchFocus.addListener(_onFocusChange);
+    
+    // Disable scanner in search screen
+    try {
+      instance<ScannerService>().disableScanner().catchError((e) {
+        debugPrint('[SearchScreen] Error disabling scanner: $e');
+      });
+    } catch (e) {
+      debugPrint('[SearchScreen] Could not disable scanner: $e');
+    }
+
+    // Automatically load all scanned barcodes on screen open
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _dispatchSearch();
+    });
+  }
+
+  void _onFocusChange() {
+    if (_materialFocus.hasFocus) {
+      setState(() => _activeController = _materialController);
+    } else if (_batchFocus.hasFocus) {
+      setState(() => _activeController = _batchController);
+    } else {
+      setState(() => _activeController = null);
+    }
+  }
+
+  @override
+  void dispose() {
+    _materialController.dispose();
+    _batchController.dispose();
+    _materialFocus.dispose();
+    _batchFocus.dispose();
+    
+    // Re-enable scanner when leaving search screen
+    try {
+      instance<ScannerService>().enableScanner().catchError((e) {
+        debugPrint('[SearchScreen] Error re-enabling scanner: $e');
+      });
+    } catch (e) {
+      debugPrint('[SearchScreen] Could not re-enable scanner: $e');
+    }
+
+    super.dispose();
+  }
+
+  void _dispatchSearch() {
+    context.read<SearchBloc>().add(SearchQueryChanged(
+      matnr: _materialController.text,
+      batchNo: _batchController.text,
+    ));
+  }
+
+  void _onDigitPressed(String digit) {
+    final controller = _activeController;
+    if (controller == null) return;
+    
+    final text = controller.text;
+    final selection = controller.selection;
+    
+    String resultingText;
+    if (selection.start >= 0 && selection.end >= 0) {
+      resultingText = text.replaceRange(selection.start, selection.end, digit);
+    } else {
+      resultingText = text + digit;
+    }
+
+    if (controller == _materialController && resultingText.length > 6) return;
+    if (controller == _batchController && resultingText.length > 10) return;
+
+    if (selection.start >= 0 && selection.end >= 0) {
+      controller.value = TextEditingValue(
+        text: resultingText,
+        selection: TextSelection.collapsed(offset: selection.start + 1),
+      );
+    } else {
+      controller.text = resultingText;
+    }
+    _dispatchSearch();
+  }
+
+  void _onDeletePressed() {
+    final controller = _activeController;
+    if (controller == null) return;
+    
+    final text = controller.text;
+    final selection = controller.selection;
+    
+    if (selection.start > 0 && selection.start == selection.end) {
+      final newText = text.replaceRange(selection.start - 1, selection.end, '');
+      controller.value = TextEditingValue(
+        text: newText,
+        selection: TextSelection.collapsed(offset: selection.start - 1),
+      );
+    } else if (selection.start >= 0 && selection.end > selection.start) {
+      final newText = text.replaceRange(selection.start, selection.end, '');
+      controller.value = TextEditingValue(
+        text: newText,
+        selection: TextSelection.collapsed(offset: selection.start),
+      );
+    }
+    _dispatchSearch();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      resizeToAvoidBottomInset: false,
+      body: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: ResponsiveUtils.responsiveSpacing(context, 12.0),
+            vertical: ResponsiveUtils.responsiveSpacing(context, 12.0),
+          ),
+          child: Column(
+            children: [
+              // 1. Title with Back Arrow
+              Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(
+                      Icons.arrow_back,
+                      color: Colors.black,
+                      size: 30,
+                    ),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                  Expanded(
+                    child: Align(
+                      alignment: AlignmentDirectional.centerStart,
+                      child: ScreenTitle(
+                        title: AppLocalizations.of(context)!.search,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: ResponsiveUtils.responsiveSpacing(context, 12),
+              ),
+
+              // 2. Material Input and Batch Dropdown Side-by-Side
+              Row(
+                children: [
+                  Expanded(
+                    flex: 3,
+                    child: CustomTextField(
+                      controller: _materialController,
+                      focusNode: _materialFocus,
+                      labelText: AppLocalizations.of(context)!.material,
+                      keyboardType: TextInputType.none,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        LengthLimitingTextInputFormatter(6),
+                      ],
+                      height: 45,
+                      onChanged: (value) => _dispatchSearch(),
+                    ),
+                  ),
+                  SizedBox(
+                    width: ResponsiveUtils.responsiveSpacing(context, 12),
+                  ),
+                  Expanded(
+                    flex: 5,
+                    child: CustomTextField(
+                      controller: _batchController,
+                      focusNode: _batchFocus,
+                      labelText: AppLocalizations.of(context)!.filterPatch,
+                      keyboardType: TextInputType.none,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        LengthLimitingTextInputFormatter(10),
+                      ],
+                      height: 45,
+                      onChanged: (value) => _dispatchSearch(),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: ResponsiveUtils.responsiveSpacing(context, 12),
+              ),
+
+              // 4. Table
+              Expanded(
+                child: BlocBuilder<SearchBloc, SearchState>(
+                  builder: (context, state) {
+                    return SearchResultsTable(
+                      items: state.items,
+                      totalQty: state.totalQty,
+                    );
+                  },
+                ),
+              ),
+              SizedBox(
+                height: ResponsiveUtils.responsiveSpacing(context, 8),
+              ),
+
+              // 5. Buttons Row
+              Row(
+                children: [
+                  Expanded(
+                    child: DefaultButton(
+                      text: AppLocalizations.of(context)!.clear,
+                      height: ResponsiveUtils.responsiveHeight(
+                        context,
+                        0.06,
+                      ).clamp(36, 48),
+                      textSize: ResponsiveUtils.responsiveFontSize(
+                        context,
+                        18,
+                      ),
+                      backgroundColor: Colors.grey.shade400,
+                      textColor: Colors.black,
+                      onPressed: () {
+                        _materialController.clear();
+                        _batchController.clear();
+                        _dispatchSearch();
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    width: ResponsiveUtils.responsiveSpacing(context, 16),
+                  ),
+                  Expanded(
+                    child: DefaultButton(
+                      text: AppLocalizations.of(context)!.search,
+                      height: ResponsiveUtils.responsiveHeight(
+                        context,
+                        0.06,
+                      ).clamp(36, 48),
+                      textSize: ResponsiveUtils.responsiveFontSize(
+                        context,
+                        18,
+                      ),
+                      backgroundColor: const Color(
+                        0xFFAFAFAF,
+                      ), // Grey button
+                      textColor: Colors.black,
+                      onPressed: () {
+                        _dispatchSearch();
+                        _materialFocus.unfocus();
+                        _batchFocus.unfocus();
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              if (_activeController != null) ...[
+                SizedBox(
+                  height: ResponsiveUtils.responsiveSpacing(context, 16),
+                ),
+                NumericKeypad(
+                  onDigitPressed: _onDigitPressed,
+                  onDeletePressed: _onDeletePressed,
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

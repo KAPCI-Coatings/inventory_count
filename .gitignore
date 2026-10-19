@@ -11,6 +11,8 @@
 .svn/
 .swiftpm/
 migrate_working_dir/
+.artifacts/
+docs/
 
 # IntelliJ related
 *.iml
@@ -32,6 +34,8 @@ migrate_working_dir/
 .pub/
 /build/
 /coverage/
+Backend/
+
 
 # Symbolication related
 app.*.symbols
@@ -43,3 +47,4 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+graphify-out
