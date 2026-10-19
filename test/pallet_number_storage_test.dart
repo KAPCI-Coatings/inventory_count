@@ -74,7 +74,7 @@ void main() {
       "CREATE TRIGGER fail_insert BEFORE INSERT ON barcodes BEGIN SELECT RAISE(ABORT, 'test failure'); END",
     );
     await expectLater(
-      source.saveBarcode(const ItemBox(exportPalletNo: 2)),
+      source.saveBarcode(const ItemBox(exportPalletNo: 1)),
       throwsA(isA<DatabaseException>()),
     );
     expect(await source.getCurrentExportPalletNo(), 1);

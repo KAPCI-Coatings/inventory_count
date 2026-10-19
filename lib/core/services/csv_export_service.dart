@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:inventory_count_flutter_app/domain/entities/barcode.dart';
 import 'package:inventory_count_flutter_app/domain/entities/asset_scan.dart';
 import 'package:file_saver/file_saver.dart';
-import 'package:intl/intl.dart';
 import 'package:inventory_count_flutter_app/core/di/di.dart';
 import 'package:inventory_count_flutter_app/data/datasources/settings_local_datasource.dart';
 
@@ -13,7 +12,10 @@ class CsvExportService {
   /// Exports inventory with copyable batch codes and numeric quantities.
   Future<void> exportToXlsx(List<ItemBox> items) async {
     await FileSaver.instance.saveAs(
-      name: _inventoryFileName(),
+      name: inventoryFileName(
+        instance<SettingsLocalDataSource>().getDevId() ?? '',
+        DateTime.now(),
+      ),
       fileExtension: 'xlsx',
       bytes: buildInventoryXlsx(items),
       mimeType: MimeType.microsoftExcel,
@@ -134,10 +136,12 @@ class CsvExportService {
   }
 
   /// e.g. `Device(053)-18-10-2026-10-30AM` (':' is not allowed in file names).
-  String _inventoryFileName() {
-    final devId = instance<SettingsLocalDataSource>().getDevId() ?? '';
-    final stamp = DateFormat('dd-MM-yyyy-hh-mma', 'en').format(DateTime.now());
-    return 'Device($devId)-$stamp';
+  static String inventoryFileName(String devId, DateTime time) {
+    String two(int n) => n.toString().padLeft(2, '0');
+    final hour = time.hour % 12 == 0 ? 12 : time.hour % 12;
+    final amPm = time.hour < 12 ? 'AM' : 'PM';
+    return 'Device($devId)-${two(time.day)}-${two(time.month)}-${time.year}'
+        '-${two(hour)}-${two(time.minute)}$amPm';
   }
 
   String _timestamp() =>

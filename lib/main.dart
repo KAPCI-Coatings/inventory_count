@@ -74,6 +74,7 @@ class MyApp extends StatelessWidget {
         onGenerateRoute: RouteGenerator.getRoute,
         initialRoute: Routes.login,
         navigatorKey: RouteGenerator.navigatorKey,
+        navigatorObservers: [RouteGenerator.routeObserver],
       ),
     );
   }

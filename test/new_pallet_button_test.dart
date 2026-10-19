@@ -69,7 +69,7 @@ void main() {
             ),
           ),
         );
-        final label = 'اضافه بالته جديده';
+        final label = 'انشاء بالتة جديدة';
         final add = find.text(label);
         expect(add, findsOneWidget);
         final search = find.text('بحث');

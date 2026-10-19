@@ -11,6 +11,10 @@ class RouteGenerator {
   static final GlobalKey<NavigatorState> navigatorKey =
       GlobalKey<NavigatorState>();
 
+  /// Lets the barcode screen know when another screen covers it.
+  static final RouteObserver<ModalRoute<void>> routeObserver =
+      RouteObserver<ModalRoute<void>>();
+
   static Route<dynamic>? getRoute(RouteSettings settings) {
     switch (settings.name) {
       case Routes.login:

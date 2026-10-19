@@ -11,6 +11,7 @@ import 'package:inventory_count_flutter_app/presentation/view_models/barcode/bar
 import 'package:inventory_count_flutter_app/l10n/app_localizations.dart';
 import '../../core/resources/responsive_utils.dart';
 import '../widgets/barcode/barcode_app_bar.dart';
+import '../../core/routes_manger/route_generator.dart';
 
 class BarcodeScreen extends StatefulWidget {
   const BarcodeScreen({super.key});
@@ -19,7 +20,7 @@ class BarcodeScreen extends StatefulWidget {
   State<BarcodeScreen> createState() => _BarcodeScreenState();
 }
 
-class _BarcodeScreenState extends State<BarcodeScreen> {
+class _BarcodeScreenState extends State<BarcodeScreen> with RouteAware {
   BarcodeBloc? _bloc;
 
   /// Tracks whether the sending progress popup is currently showing.
@@ -35,7 +36,30 @@ class _BarcodeScreenState extends State<BarcodeScreen> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route != null) RouteGenerator.routeObserver.subscribe(this, route);
+  }
+
+  void _setVisible(bool visible) => _bloc?.isScreenVisible = visible;
+
+  @override
+  void didPush() => _setVisible(true);
+
+  @override
+  void didPopNext() => _setVisible(true);
+
+  @override
+  void didPushNext() => _setVisible(false);
+
+  @override
+  void didPop() => _setVisible(false);
+
+  @override
   void dispose() {
+    RouteGenerator.routeObserver.unsubscribe(this);
+    _setVisible(false);
     super.dispose();
   }
 

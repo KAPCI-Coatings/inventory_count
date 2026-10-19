@@ -75,6 +75,9 @@ void main() {
 
       await tester.tap(find.text('Boxes'));
       await tester.pumpAndSettle();
+      // v1.8.0: switching after a pallet scan asks which pallet boxes go to.
+      await tester.tap(find.text('الاستمرار على الأخيرة'));
+      await tester.pumpAndSettle();
       await scan('12345600000000010001');
       expect(bloc.state.boxCount, 26);
       await scan('P1234560000000002Z025');

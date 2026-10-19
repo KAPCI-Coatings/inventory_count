@@ -25,7 +25,8 @@ class BarcodeStatusSection extends StatelessWidget {
     ScanType value,
   ) async {
     final bloc = context.read<BarcodeBloc>();
-    final last = state.lastScan;
+    // Last *saved* item: lastScan may hold a rejected duplicate.
+    final last = state.itemBoxes.isEmpty ? null : state.itemBoxes.last;
     final needsAsk =
         value == ScanType.box &&
         state.scanType == ScanType.pallet &&

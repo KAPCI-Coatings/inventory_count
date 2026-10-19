@@ -62,6 +62,21 @@ class BarcodeLocalDataSourceImpl implements BarcodeLocalDataSource {
         : item.serialNo;
 
     await database.transaction((txn) async {
+      final number = item.exportPalletNo;
+      if (number != null) {
+        final current = await _currentNumber(txn);
+        if (current > 0 && number > current) {
+          final rows = await txn.query(
+            tableName,
+            columns: ['id'],
+            where: 'exportPalletNo = ?',
+            whereArgs: [current],
+            limit: 1,
+          );
+          // Never leave an empty reserved pallet number behind.
+          if (rows.isEmpty) throw const EmptyPalletException();
+        }
+      }
       await txn.insert(tableName, {
         'barCodeNo': item.barCodeNo,
         'matnr': item.matnr,

@@ -58,7 +58,7 @@ void main() {
     );
     await tester.pumpAndSettle();
     for (var attempt = 0; attempt < 2; attempt++) {
-      await tester.tap(find.text('اضافه بالته جديده'));
+      await tester.tap(find.text('انشاء بالتة جديدة'));
       await tester.pumpAndSettle();
       expect(find.text('هل أنت متأكد من إضافة بالتة جديدة؟'), findsOneWidget);
       await tester.tap(find.text('نعم'));
@@ -77,7 +77,7 @@ void main() {
     bloc.add(BarcodeScanned('12345600000000010001', ''));
     await tester.pumpAndSettle();
     expect(repo.items, hasLength(1));
-    await tester.tap(find.text('اضافه بالته جديده'));
+    await tester.tap(find.text('انشاء بالتة جديدة'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('نعم'));
     await tester.pumpAndSettle();

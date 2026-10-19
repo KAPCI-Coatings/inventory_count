@@ -26,6 +26,10 @@ class BarcodeBloc extends Bloc<BarcodeEvent, BarcodeState> {
   bool _uploadInProgress = false;
   ItemBox? _pendingDuplicate;
 
+  /// Hardware scans count as inventory only while the barcode screen is the
+  /// visible screen (not under Assets, Settings, Search...).
+  bool isScreenVisible = false;
+
   BarcodeBloc(
     this._scannerService,
     this._processBarcodeUseCase,
@@ -219,6 +223,10 @@ class BarcodeBloc extends Bloc<BarcodeEvent, BarcodeState> {
             debugPrint(
               '[BarcodeBloc] ★ SCAN RECEIVED from stream: "${result.data}" label=${result.labelType}',
             );
+            if (!isScreenVisible) {
+              debugPrint('[BarcodeBloc] Scan ignored: barcode screen hidden');
+              return;
+            }
             add(BarcodeScanned(result.data, result.labelType));
           },
           onError: (error) {
@@ -364,7 +372,11 @@ class BarcodeBloc extends Bloc<BarcodeEvent, BarcodeState> {
         throw const InvalidBarcodeFormatException('error_scan_boxes_only');
       }
       final currentNumber = await _barcodeRepository.getCurrentExportPalletNo();
-      final number = state.scanType == ScanType.pallet
+      // A reserved pallet that is still empty is reused, never skipped.
+      final currentIsEmpty =
+          currentNumber > 0 &&
+          !state.itemBoxes.any((i) => i.exportPalletNo == currentNumber);
+      final number = state.scanType == ScanType.pallet && !currentIsEmpty
           ? currentNumber + 1
           : (currentNumber == 0 ? 1 : currentNumber);
       final result = await _processBarcodeUseCase(
